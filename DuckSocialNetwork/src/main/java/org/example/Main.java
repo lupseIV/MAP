@@ -1,6 +1,7 @@
 package org.example;
 
 import database.DatabaseConnection;
+import javafx.application.Application;
 import org.domain.validators.*;
 import org.repository.db.*;
 import org.repository.file.*;
@@ -12,6 +13,7 @@ import org.repository.file.user.relationships.FriendshipFileRepository;
 import org.service.*;
 import org.service.utils.LongIdGenerator;
 import org.ui.ConsoleUserInterface;
+import org.ui.gui.GraphicUserInterface;
 import org.utils.Constants;
 
 import java.sql.SQLException;
@@ -20,7 +22,7 @@ import java.util.Objects;
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
-    static void main() throws SQLException {
+    public static void main(String[] args) throws SQLException {
         //validators
         var personValidator = new PersonValidator(Constants.EMAIL_REGEX);
         var duckValidator = new DuckValidator(Constants.EMAIL_REGEX);
@@ -86,9 +88,15 @@ public class Main {
         duckService.setFlockService(flockService);
 
         //ui
-        var app = new ConsoleUserInterface(usersService, friendshipService, flockService, raceEventService);
-        app.run();
+//        var app = new ConsoleUserInterface(usersService, friendshipService, flockService, raceEventService);
+//        app.run();
+
+        //gui
+        GraphicUserInterface.setDucksService(duckService);
+        Application.launch(GraphicUserInterface.class, args);
         DatabaseConnection.closeConnection();
     }
+
+
 }
 

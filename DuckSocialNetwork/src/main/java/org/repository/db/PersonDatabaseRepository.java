@@ -9,7 +9,6 @@ import org.domain.validators.Validator;
 import org.utils.Constants;
 import org.utils.enums.PersonTypes;
 
-import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

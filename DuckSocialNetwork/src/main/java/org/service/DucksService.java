@@ -1,10 +1,14 @@
 package org.service;
 
+import org.domain.dtos.guiDTOS.DuckGuiDTO;
 import org.domain.exceptions.ServiceException;
 import org.domain.users.duck.Duck;
 import org.domain.validators.Validator;
 import org.repository.Repository;
 import org.service.utils.IdGenerator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DucksService extends EntityService<Long, Duck>{
 
@@ -25,5 +29,21 @@ public class DucksService extends EntityService<Long, Duck>{
             flockService.removeDuckFromFlock(flock.getId(), duckId);
         }
         return repository.delete(duckId);
+    }
+
+    public List<DuckGuiDTO> getGuiDucks(){
+        List<DuckGuiDTO> list = new ArrayList<>();
+        for(Duck duck : repository.findAll()){
+            String username = duck.getUsername();
+            String email = duck.getEmail();
+            int nrOfFriends = duck.getFriends().size();
+            String type = String.valueOf(duck.getDuckType());
+            Double speed = duck.getSpeed();
+            Double rezistance = duck.getRezistance();
+            String flockName = duck.getFlock().getFlockName();
+
+            list.add(new DuckGuiDTO(username,email,nrOfFriends,type,speed,rezistance,flockName));
+        }
+        return list;
     }
 }
