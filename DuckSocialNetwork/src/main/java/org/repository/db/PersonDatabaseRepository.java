@@ -16,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PersonDatabaseRepository extends EntityDatabaseRepository<Long, Person> {
@@ -28,7 +29,24 @@ public class PersonDatabaseRepository extends EntityDatabaseRepository<Long, Per
 
     @Override
     public Page<Person> findAllOnPage(Pageable pageable) {
-        return null;
+        String sql = sqlSelectAllStatement + " LIMIT ? OFFSET ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            List<Person> entries = new ArrayList<>();
+
+            stmt.setInt(1, pageable.getPageSize());
+            stmt.setInt(2, pageable.getPageNumber() * pageable.getPageSize());
+
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    Person person = extractEntityFromResultSet(resultSet);
+                    entries.add(person);
+                }
+            }
+            return new Page<>(entries, entities.size());
+        } catch (SQLException e) {
+            throw new RepositoryException("Error getting page of persons", e);
+        }
     }
 
     @Override

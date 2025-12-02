@@ -13,7 +13,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class FriendshipDatabaseRepository extends EntityDatabaseRepository<Long, Friendship>{
@@ -38,7 +40,24 @@ public class FriendshipDatabaseRepository extends EntityDatabaseRepository<Long,
 
     @Override
     public Page<Friendship> findAllOnPage(Pageable pageable) {
-        return null;
+        String sql = sqlSelectAllStatement + " LIMIT ? OFFSET ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            List<Friendship> entries = new ArrayList<>();
+
+            stmt.setInt(1, pageable.getPageSize());
+            stmt.setInt(2, pageable.getPageNumber() * pageable.getPageSize());
+
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                while (resultSet.next()) {
+                    Friendship friendship = extractEntityFromResultSet(resultSet);
+                    entries.add(friendship);
+                }
+            }
+            return new Page<>(entries, entities.size());
+        } catch (SQLException e) {
+            throw new RepositoryException("Error getting page of friendships", e);
+        }
     }
 
     @Override

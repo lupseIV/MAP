@@ -89,6 +89,8 @@ public class Main {
 
         //gui
         GraphicUserInterface.setDucksService(duckService);
+        GraphicUserInterface.setUsersService(usersService);
+        GraphicUserInterface.setFriendshipService(friendshipService);
          Application.launch(GraphicUserInterface.class, args);
         DatabaseConnection.closeConnection();
     }

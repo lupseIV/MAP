@@ -1,14 +1,17 @@
 package org.service;
 
+import org.domain.dtos.guiDTOS.FriendshipGuiDTO;
 import org.domain.users.relationships.Friendship;
 import org.domain.users.User;
 import org.domain.exceptions.ServiceException;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
 import org.repository.Repository;
+import org.repository.util.paging.Pageable;
 import org.service.utils.IdGenerator;
 
 import java.util.*;
+import java.util.stream.StreamSupport;
 
 public class FriendshipService extends EntityService<Long, Friendship>{
 
@@ -60,6 +63,46 @@ public class FriendshipService extends EntityService<Long, Friendship>{
             if(f.getUser1().getId().equals(id) || f.getUser2().getId().equals(id)) friendships.add(f);
         }
         return friendships;
+    }
+
+    public List<FriendshipGuiDTO> getGuiFriendships() {
+        List<FriendshipGuiDTO> list = new ArrayList<>();
+        for (Friendship friendship : repository.findAll()) {
+            list.add(new FriendshipGuiDTO(
+                    friendship.getId(),
+                    friendship.getUser1().getId(),
+                    friendship.getUser1().getUsername(),
+                    friendship.getUser2().getId(),
+                    friendship.getUser2().getUsername()
+            ));
+        }
+        return list;
+    }
+
+    public List<FriendshipGuiDTO> getGuiFriendshipsPage(Pageable pageable) {
+        List<FriendshipGuiDTO> list = new ArrayList<>();
+        List<Friendship> allFriendships = StreamSupport.stream(repository.findAll().spliterator(), false).toList();
+        
+        int start = pageable.getPageNumber() * pageable.getPageSize();
+        int end = Math.min(start + pageable.getPageSize(), allFriendships.size());
+        
+        if (start < allFriendships.size()) {
+            for (int i = start; i < end; i++) {
+                Friendship friendship = allFriendships.get(i);
+                list.add(new FriendshipGuiDTO(
+                        friendship.getId(),
+                        friendship.getUser1().getId(),
+                        friendship.getUser1().getUsername(),
+                        friendship.getUser2().getId(),
+                        friendship.getUser2().getUsername()
+                ));
+            }
+        }
+        return list;
+    }
+
+    public int getTotalFriendshipCount() {
+        return StreamSupport.stream(repository.findAll().spliterator(), false).toList().size();
     }
 
     private void initFriendshipNetwork() {

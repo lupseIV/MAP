@@ -1,11 +1,16 @@
 package org.service;
 
+import org.domain.dtos.guiDTOS.UserGuiDTO;
 import org.domain.users.duck.Duck;
 import org.domain.users.relationships.Friendship;
 import org.domain.users.person.Person;
 import org.domain.users.User;
 import org.domain.exceptions.ServiceException;
+import org.repository.util.paging.Page;
+import org.repository.util.paging.Pageable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -65,6 +70,48 @@ public class UsersService implements Service<Long, User> {
                 throw new ServiceException("No user found with id " + entity.getId());
             }
         }
+    }
+
+    public List<UserGuiDTO> getGuiUsers() {
+        List<UserGuiDTO> list = new ArrayList<>();
+        for (User user : findAll()) {
+            String userType = user instanceof Duck ? "Duck" : "Person";
+            list.add(new UserGuiDTO(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getFriends().size(),
+                    userType
+            ));
+        }
+        return list;
+    }
+
+    public List<UserGuiDTO> getGuiUsersPage(Pageable pageable) {
+        List<UserGuiDTO> list = new ArrayList<>();
+        List<User> allUsers = StreamSupport.stream(findAll().spliterator(), false).toList();
+        
+        int start = pageable.getPageNumber() * pageable.getPageSize();
+        int end = Math.min(start + pageable.getPageSize(), allUsers.size());
+        
+        if (start < allUsers.size()) {
+            for (int i = start; i < end; i++) {
+                User user = allUsers.get(i);
+                String userType = user instanceof Duck ? "Duck" : "Person";
+                list.add(new UserGuiDTO(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getFriends().size(),
+                        userType
+                ));
+            }
+        }
+        return list;
+    }
+
+    public int getTotalUserCount() {
+        return StreamSupport.stream(findAll().spliterator(), false).toList().size();
     }
 
 }
