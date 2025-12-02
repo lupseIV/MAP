@@ -1,11 +1,13 @@
 package org.service;
 
+import org.domain.dtos.filters.DuckGUIFilter;
 import org.domain.dtos.guiDTOS.DuckGuiDTO;
 import org.domain.exceptions.ServiceException;
 import org.domain.users.duck.Duck;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
 import org.repository.Repository;
+import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
 import org.service.utils.IdGenerator;
 
@@ -42,25 +44,38 @@ public class DucksService extends EntityService<Long, Duck>{
             String type = String.valueOf(duck.getDuckType());
             Double speed = duck.getSpeed();
             Double rezistance = duck.getRezistance();
-            String flockName = duck.getFlock().getFlockName();
+            String flockName;
+            if(duck.getFlock() != null) {
+                flockName = duck.getFlock().getFlockName();
+            } else {
+                flockName = "no Flock";
+            }
 
             list.add(new DuckGuiDTO(username,email,nrOfFriends,type,speed,rezistance,flockName));
         }
         return list;
     }
 
-    public List<DuckGuiDTO> getGuiDucksPage(Pageable pageable){
+    public List<DuckGuiDTO> getGuiDucksFromPage(Page<Duck> page){
         List<DuckGuiDTO> list = new ArrayList<>();
-        repository.findAllOnPage(pageable).getElementsOnPage().forEach(duck -> {
+
+        page.getElementsOnPage().forEach(duck -> {
             String username = duck.getUsername();
             String email = duck.getEmail();
             int nrOfFriends = duck.getFriends().size();
             String type = String.valueOf(duck.getDuckType());
             Double speed = duck.getSpeed();
             Double rezistance = duck.getRezistance();
-            String flockName = duck.getFlock().getFlockName();
-            list.add(new DuckGuiDTO(username,email,nrOfFriends,type,speed,rezistance,flockName));
+            String flockName;
+            if(duck.getFlock() != null) {
+                flockName = duck.getFlock().getFlockName();
+            } else {
+                flockName = "no Flock";
+            }
+            list.add(new DuckGuiDTO(username,email,nrOfFriends,type,speed,rezistance, flockName));
         });
         return list;
     }
+
+
 }

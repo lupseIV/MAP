@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox fx:id="rootPane" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.ui.gui.UsersController">
+    <Label text="All users"/>
+    <TableView fx:id="usersTable" prefHeight="400" prefWidth="600">
+        <columns>
+            <TableColumn fx:id="usernameCol" text="Username"/>
+            <TableColumn fx:id="emailCol" text="Email"/>
+        </columns>
+    </TableView>
+</VBox>

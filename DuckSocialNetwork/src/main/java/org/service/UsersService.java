@@ -1,11 +1,16 @@
 package org.service;
 
+import org.domain.dtos.guiDTOS.DuckGuiDTO;
+import org.domain.dtos.guiDTOS.UserGuiDTO;
 import org.domain.users.duck.Duck;
 import org.domain.users.relationships.Friendship;
 import org.domain.users.person.Person;
 import org.domain.users.User;
 import org.domain.exceptions.ServiceException;
+import org.repository.util.paging.Page;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -67,4 +72,29 @@ public class UsersService implements Service<Long, User> {
         }
     }
 
+    public List<UserGuiDTO> getGuiUsers(){
+        List<UserGuiDTO> list = new ArrayList<>();
+        for(User u : findAll()){
+            String username = u.getUsername();
+            String email = u.getEmail();
+            int nrOfFriends = u.getFriends().size();
+
+
+            list.add(new UserGuiDTO(username,email,nrOfFriends));
+        }
+        return list;
+    }
+
+    public List<UserGuiDTO> getGuiUsersFromPage(Page<User> page){
+        List<UserGuiDTO> list = new ArrayList<>();
+
+        page.getElementsOnPage().forEach(user -> {
+            String username = user.getUsername();
+            String email = user.getEmail();
+            int nrOfFriends = user.getFriends().size();
+
+            list.add(new UserGuiDTO(username,email,nrOfFriends));
+        });
+        return list;
+    }
 }

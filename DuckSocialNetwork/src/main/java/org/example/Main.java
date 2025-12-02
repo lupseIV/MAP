@@ -89,7 +89,10 @@ public class Main {
 
         //gui
         GraphicUserInterface.setDucksService(duckService);
-         Application.launch(GraphicUserInterface.class, args);
+        GraphicUserInterface.setUsersService(usersService);
+        GraphicUserInterface.setFriendshipService(friendshipService);
+         var app = new GraphicUserInterface();
+         app.run();
         DatabaseConnection.closeConnection();
     }
 

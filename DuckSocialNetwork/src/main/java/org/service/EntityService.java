@@ -1,6 +1,8 @@
 package org.service;
 
 import org.domain.Entity;
+import org.domain.dtos.filters.DuckGUIFilter;
+import org.domain.users.duck.Duck;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
 import org.repository.Repository;
@@ -18,7 +20,9 @@ public abstract class EntityService<ID, E extends Entity<ID>> implements Service
         this.repository = repository;
         this.idGenerator = idGenerator;
     }
-
+    public Page<E> findAllOnPage(Pageable pageable, DuckGUIFilter filter){
+        return repository.findAllOnPage(pageable, filter);
+    }
     @Override
     public E findOne(ID id) {
         return repository.findOne(id);
