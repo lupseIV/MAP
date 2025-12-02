@@ -62,7 +62,7 @@ public class MainController {
             tabPane.getTabs().addAll(ducksTab, usersTab, friendshipsTab);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to load FXML resources for tabs", e);
         }
     }
 }
