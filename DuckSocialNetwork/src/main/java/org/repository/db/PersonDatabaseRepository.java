@@ -6,6 +6,8 @@ import org.domain.exceptions.RepositoryException;
 import org.domain.users.person.Person;
 import org.domain.users.person.PersonFactory;
 import org.domain.validators.Validator;
+import org.repository.util.paging.Page;
+import org.repository.util.paging.Pageable;
 import org.utils.Constants;
 import org.utils.enums.PersonTypes;
 
@@ -22,6 +24,11 @@ public class PersonDatabaseRepository extends EntityDatabaseRepository<Long, Per
 
     public PersonDatabaseRepository(Validator<Person> validator) {
         super(validator, "SELECT * FROM persons");
+    }
+
+    @Override
+    public Page<Person> findAllOnPage(Pageable pageable) {
+        return null;
     }
 
     @Override

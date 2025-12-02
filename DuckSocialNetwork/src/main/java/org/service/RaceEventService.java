@@ -5,6 +5,7 @@ import org.domain.exceptions.ServiceException;
 import org.domain.users.duck.Duck;
 import org.domain.users.duck.SwimmingDuck;
 import org.domain.validators.Validator;
+import org.repository.PagingRepository;
 import org.repository.Repository;
 import org.service.utils.IdGenerator;
 
@@ -19,7 +20,7 @@ public class RaceEventService extends EntityService<Long, RaceEvent> {
 
     DucksService ducksService;
 
-    public RaceEventService(Validator<RaceEvent> validator, Repository<Long, RaceEvent> repository, IdGenerator<Long> idGenerator, DucksService ducksService) {
+    public RaceEventService(Validator<RaceEvent> validator, PagingRepository<Long, RaceEvent> repository, IdGenerator<Long> idGenerator, DucksService ducksService) {
         super(validator, repository, idGenerator);
         this.ducksService = ducksService;
     }

@@ -6,6 +6,7 @@ import org.domain.users.duck.Duck;
 import org.domain.users.duck.SwimmingDuck;
 import org.domain.users.duck.flock.Flock;
 import org.domain.validators.Validator;
+import org.repository.PagingRepository;
 import org.repository.Repository;
 import org.service.utils.IdGenerator;
 
@@ -13,7 +14,7 @@ public class FlockService extends EntityService<Long, Flock<Duck>>{
 
     private DucksService ducksService;
 
-    public FlockService(Validator<Flock<Duck>> validator, Repository<Long, Flock<Duck>> repository, IdGenerator<Long> idGenerator, DucksService ducksService) {
+    public FlockService(Validator<Flock<Duck>> validator, PagingRepository<Long, Flock<Duck>> repository, IdGenerator<Long> idGenerator, DucksService ducksService) {
         super(validator, repository, idGenerator);
         this.ducksService = ducksService;
     }

@@ -2,15 +2,18 @@ package org.service;
 
 import org.domain.Entity;
 import org.domain.validators.Validator;
+import org.repository.PagingRepository;
 import org.repository.Repository;
+import org.repository.util.paging.Page;
+import org.repository.util.paging.Pageable;
 import org.service.utils.IdGenerator;
 
 public abstract class EntityService<ID, E extends Entity<ID>> implements Service<ID, E> {
     protected Validator<E> validator;
-    protected Repository<ID, E> repository;
+    protected PagingRepository<ID, E> repository;
     protected IdGenerator<ID> idGenerator;
 
-    public EntityService(Validator<E> validator, Repository<ID, E> repository, IdGenerator<ID> idGenerator) {
+    public EntityService(Validator<E> validator, PagingRepository<ID, E> repository, IdGenerator<ID> idGenerator) {
         this.validator = validator;
         this.repository = repository;
         this.idGenerator = idGenerator;
@@ -25,6 +28,8 @@ public abstract class EntityService<ID, E extends Entity<ID>> implements Service
     public Iterable<E> findAll() {
         return repository.findAll();
     }
+
+    public Page<E> findAllOnPage(Pageable pageable) { return repository.findAllOnPage(pageable);}
 
     @Override
     public E save(E entity) {

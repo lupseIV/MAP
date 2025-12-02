@@ -4,6 +4,7 @@ import org.domain.users.relationships.Friendship;
 import org.domain.users.User;
 import org.domain.exceptions.ServiceException;
 import org.domain.validators.Validator;
+import org.repository.PagingRepository;
 import org.repository.Repository;
 import org.service.utils.IdGenerator;
 
@@ -21,7 +22,7 @@ public class FriendshipService extends EntityService<Long, Friendship>{
     }
 
 
-    public FriendshipService(Validator<Friendship> validator, Repository<Long, Friendship> repository, IdGenerator<Long> idGenerator) {
+    public FriendshipService(Validator<Friendship> validator, PagingRepository<Long, Friendship> repository, IdGenerator<Long> idGenerator) {
         super(validator, repository, idGenerator);
 
     }

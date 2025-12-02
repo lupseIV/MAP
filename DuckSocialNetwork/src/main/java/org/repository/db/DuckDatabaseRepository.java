@@ -6,12 +6,15 @@ import org.domain.exceptions.RepositoryException;
 import org.domain.users.duck.Duck;
 import org.domain.users.duck.DuckFactory;
 import org.domain.validators.Validator;
+import org.repository.util.paging.Page;
+import org.repository.util.paging.Pageable;
 import org.utils.enums.DuckTypes;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DuckDatabaseRepository extends EntityDatabaseRepository<Long, Duck> {

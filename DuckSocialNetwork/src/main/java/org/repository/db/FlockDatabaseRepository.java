@@ -5,6 +5,8 @@ import org.domain.exceptions.RepositoryException;
 import org.domain.users.duck.Duck;
 import org.domain.users.duck.flock.Flock;
 import org.domain.validators.Validator;
+import org.repository.util.paging.Page;
+import org.repository.util.paging.Pageable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,6 +18,11 @@ import java.util.List;
 public class FlockDatabaseRepository extends EntityDatabaseRepository<Long, Flock<Duck>>{
 
     private final DuckDatabaseRepository duckDatabaseRepository;
+
+    @Override
+    public Page<Flock<Duck>> findAllOnPage(Pageable pageable) {
+        return null;
+    }
 
     public FlockDatabaseRepository(Validator<Flock<Duck>> validator, DuckDatabaseRepository duckDatabaseRepository) {
         super(validator, "SELECT * FROM flocks", false);

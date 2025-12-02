@@ -5,8 +5,9 @@ import org.domain.exceptions.RepositoryException;
 import org.domain.users.User;
 import org.domain.users.relationships.Friendship;
 import org.domain.validators.Validator;
-import org.repository.file.user.duck.DuckFileRepository;
-import org.repository.file.user.person.PersonFileRepository;
+
+import org.repository.util.paging.Page;
+import org.repository.util.paging.Pageable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -35,7 +36,10 @@ public class FriendshipDatabaseRepository extends EntityDatabaseRepository<Long,
         personDatabaseRepository.findAll().forEach(u -> users.put(u.getId(), u));
     }
 
-
+    @Override
+    public Page<Friendship> findAllOnPage(Pageable pageable) {
+        return null;
+    }
 
     @Override
     public Friendship extractEntityFromResultSet(ResultSet resultSet) throws SQLException {

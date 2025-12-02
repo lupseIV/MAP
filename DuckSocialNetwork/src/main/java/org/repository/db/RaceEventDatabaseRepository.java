@@ -6,6 +6,8 @@ import org.domain.exceptions.RepositoryException;
 import org.domain.users.duck.Duck;
 import org.domain.users.duck.SwimmingDuck;
 import org.domain.validators.Validator;
+import org.repository.util.paging.Page;
+import org.repository.util.paging.Pageable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,6 +24,11 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
         super(validator, "SELECT * FROM race_events",false);
         this.duckDatabaseRepository = duckDatabaseRepository;
         loadFromDatabase();
+    }
+
+    @Override
+    public Page<RaceEvent> findAllOnPage(Pageable pageable) {
+        return null;
     }
 
     @Override

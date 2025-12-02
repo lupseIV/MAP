@@ -4,13 +4,18 @@ package org.repository;
 import org.domain.Entity;
 import org.domain.exceptions.RepositoryException;
 import org.domain.validators.Validator;
+import org.repository.util.paging.Page;
+import org.repository.util.paging.Pageable;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class EntityRepository<ID, E extends Entity<ID>> implements Repository<ID,E> {
+public abstract class EntityRepository<ID, E extends Entity<ID>> implements PagingRepository<ID,E> {
     protected Map<ID, E> entities;
     protected Validator<E> validator;
+
+    @Override
+    public abstract Page<E> findAllOnPage(Pageable pageable);
 
     public EntityRepository(Validator<E> validator) {
         this.validator = validator;
@@ -60,5 +65,19 @@ public class EntityRepository<ID, E extends Entity<ID>> implements Repository<ID
         validator.validate(entity);
         entities.put(entity.getId(), entity);
         return null;
+    }
+
+    public static <T extends Comparable<T>> T getMaxId(Iterable<? extends Entity<T>> entities) {
+
+        T maxId = null;
+
+        for (Entity<T> e : entities) {
+            if (e.getId() != null) {
+                if (maxId == null || e.getId().compareTo(maxId) > 0) {
+                    maxId = e.getId();
+                }
+            }
+        }
+        return maxId;
     }
 }

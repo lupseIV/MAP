@@ -3,13 +3,9 @@ package org.example;
 import database.DatabaseConnection;
 import javafx.application.Application;
 import org.domain.validators.*;
+import org.repository.EntityRepository;
 import org.repository.db.*;
-import org.repository.file.*;
-import org.repository.file.user.duck.DuckFileRepository;
-import org.repository.file.user.duck.flock.FlockFileRepository;
-import org.repository.file.user.events.RaceEventFileRepository;
-import org.repository.file.user.person.PersonFileRepository;
-import org.repository.file.user.relationships.FriendshipFileRepository;
+
 import org.service.*;
 import org.service.utils.LongIdGenerator;
 import org.ui.ConsoleUserInterface;
@@ -60,13 +56,13 @@ public class Main {
         }
 
         Long maxUsersId = Math.max(
-                EntityFileRepository.getMaxId(duckRepo.findAll()),
-                EntityFileRepository.getMaxId(personRepo.findAll())
+                EntityRepository.getMaxId(duckRepo.findAll()),
+                EntityRepository.getMaxId(personRepo.findAll())
         );
 
-        Long maxFriendshipId = EntityFileRepository.getMaxId(friendshipRepo.findAll());
-        Long maxFlockId = EntityFileRepository.getMaxId(flockRepo.findAll());
-        Long  maxEventId = EntityFileRepository.getMaxId(raceEventRepo.findAll());
+        Long maxFriendshipId = EntityRepository.getMaxId(friendshipRepo.findAll());
+        Long maxFlockId = EntityRepository.getMaxId(flockRepo.findAll());
+        Long  maxEventId = EntityRepository.getMaxId(raceEventRepo.findAll());
 
         //id generator
         var usersIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxUsersId, 0L) + 1);
@@ -93,7 +89,7 @@ public class Main {
 
         //gui
         GraphicUserInterface.setDucksService(duckService);
-        Application.launch(GraphicUserInterface.class, args);
+         Application.launch(GraphicUserInterface.class, args);
         DatabaseConnection.closeConnection();
     }
 
