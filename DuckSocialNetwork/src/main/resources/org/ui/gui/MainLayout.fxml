@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
+
+<BorderPane xmlns="http://javafx.com/javafx/19"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.ui.gui.MainController"
+            stylesheets="@./css/styling.css"
+            prefHeight="700.0" prefWidth="1000.0">
+
+    <!-- Left Sidebar -->
+    <left>
+        <VBox styleClass="sidebar">
+            <Label text="Social Network" styleClass="sidebar-label"/>
+
+            <Button text="Ducks" onAction="#handleShowDucks" styleClass="nav-button"/>
+            <Button text="Persons" onAction="#handleShowPersons" styleClass="nav-button"/>
+            <Button text="Friendships" onAction="#handleShowFriendships" styleClass="nav-button"/>
+        </VBox>
+    </left>
+
+    <!-- Dynamic Content Area -->
+    <center>
+        <StackPane fx:id="contentArea" styleClass="content-pane">
+            <!-- Views will be injected here -->
+            <Label text="Welcome! Select a module from the left." style="-fx-text-fill: gray;"/>
+        </StackPane>
+    </center>
+
+</BorderPane>

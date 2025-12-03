@@ -2,6 +2,7 @@ package org.service;
 
 import org.domain.Entity;
 import org.domain.dtos.filters.DuckGUIFilter;
+import org.domain.dtos.filters.SqlFilter;
 import org.domain.users.duck.Duck;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
@@ -20,7 +21,7 @@ public abstract class EntityService<ID, E extends Entity<ID>> implements Service
         this.repository = repository;
         this.idGenerator = idGenerator;
     }
-    public Page<E> findAllOnPage(Pageable pageable, DuckGUIFilter filter){
+    public Page<E> findAllOnPage(Pageable pageable, SqlFilter filter){
         return repository.findAllOnPage(pageable, filter);
     }
     @Override

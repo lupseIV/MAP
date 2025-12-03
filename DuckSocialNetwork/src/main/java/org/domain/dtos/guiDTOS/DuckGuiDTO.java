@@ -1,14 +1,10 @@
 package org.domain.dtos.guiDTOS;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 
 public class DuckGuiDTO {
 
+    private final LongProperty id = new SimpleLongProperty();
     private final StringProperty username = new SimpleStringProperty();
     private final StringProperty email = new SimpleStringProperty();
     private final IntegerProperty nrOfFriends = new SimpleIntegerProperty();
@@ -17,9 +13,9 @@ public class DuckGuiDTO {
     private final DoubleProperty rezistance = new SimpleDoubleProperty();
     private final StringProperty flockName = new SimpleStringProperty();
 
-    public DuckGuiDTO() { }
 
-    public DuckGuiDTO(String username, String email, int nrOfFriends, String type, Double speed, Double rezistance, String flockName) {
+    public DuckGuiDTO(Long id,String username, String email, int nrOfFriends, String type, Double speed, Double rezistance, String flockName) {
+        this.id.set( id);
         this.username.set(username);
         this.email.set(email);
         this.nrOfFriends.set(nrOfFriends);
@@ -29,6 +25,7 @@ public class DuckGuiDTO {
         this.flockName.set(flockName);
     }
 
+    public LongProperty idProperty() { return id; }
     public StringProperty usernameProperty() { return username; }
     public StringProperty emailProperty() { return email; }
     public IntegerProperty nrOfFriendsProperty() { return nrOfFriends; }
@@ -44,6 +41,10 @@ public class DuckGuiDTO {
     public double getSpeed() { return speed.get(); }
     public double getRezistance() { return rezistance.get(); }
     public String getFlockName() { return flockName.get(); }
+
+    public long getId() {
+        return id.get();
+    }
 
     public void setUsername(String username) { this.username.set(username); }
     public void setEmail(String email) { this.email.set(email); }

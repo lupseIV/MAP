@@ -2,6 +2,7 @@ package org.domain.users;
 
 import org.domain.Entity;
 import org.domain.Observer;
+import org.utils.enums.UserTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,14 +13,16 @@ public abstract class User extends Entity<Long> implements Observer {
     private String password;
     private String email;
     private List<User> friends;
+    private UserTypes userType;
 
 
-    public User( String username, String password, String email) {
+    public User( String username, String password, String email, UserTypes userType ) {
 
         this.username = username;
         this.password = password;
         this.email = email;
         this.friends = new ArrayList<>();
+        this.userType = userType;
     }
 
     public String getUsername() {
@@ -95,4 +98,7 @@ public abstract class User extends Entity<Long> implements Observer {
     }
 
 
+    public UserTypes getUserType() {
+        return userType;
+    }
 }

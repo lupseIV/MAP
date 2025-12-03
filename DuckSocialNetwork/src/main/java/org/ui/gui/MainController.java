@@ -2,66 +2,79 @@ package org.ui.gui;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.Pane;
-import java.io.IOException;
-import java.net.URL;
-
 import org.service.DucksService;
+import org.service.PersonsService;
 import org.service.FriendshipService;
 import org.service.UsersService;
 
+import java.io.IOException;
+
 public class MainController {
 
-    @FXML private StackPane mainContent;
+    @FXML
+    private StackPane contentArea;
 
-    private DucksController ducksController;
-    private FriendshipsController friendshipsController;
-    private UsersController usersController;
+    private DucksService ducksService;
+    private PersonsService personsService;
+    private FriendshipService friendshipService;
+    private UsersService usersService;
 
-    public void setServices(DucksService ducksService, UsersService usersService, FriendshipService friendshipService) throws IOException {
-        URL ducksUrl = getClass().getResource("/org/ui/gui/ducks.fxml");
-        URL friendshipsUrl = getClass().getResource("/org/ui/gui/friendship.fxml");
-        URL usersUrl = getClass().getResource("/org/ui/gui/users.fxml");
+    public void setServices(DucksService ds, PersonsService ps, FriendshipService fs, UsersService us) {
+        this.ducksService = ds;
+        this.personsService = ps;
+        this.friendshipService = fs;
+        this.usersService = us;
+    }
 
-        if (ducksUrl == null) throw new IOException("FXML not found: /org/ui/gui/ducks.fxml. Ensure it is under src/main/resources/org/ui/gui/.");
-        if (friendshipsUrl == null) throw new IOException("FXML not found: /org/ui/gui/friendship.fxml. Ensure it is under src/main/resources/org/ui/gui/.");
-        if (usersUrl == null) throw new IOException("FXML not found: /org/ui/gui/users.fxml. Ensure it is under src/main/resources/org/ui/gui/.");
+    @FXML
+    public void handleShowDucks() {
+        loadView("DucksView.fxml", controller -> {
+            if (controller instanceof DucksController) {
+                ((DucksController) controller).setService(ducksService);
+            }
+        });
+    }
 
+    @FXML
+    public void handleShowPersons() {
+        loadView("PersonsView.fxml", controller -> {
+            if (controller instanceof PersonsController) {
+                ((PersonsController) controller).setService(personsService);
+            }
+        });
+    }
+
+    @FXML
+    public void handleShowFriendships() {
+
+        loadView("SocialView.fxml", controller -> {
+            if (controller instanceof SocialController) {
+                ((SocialController) controller).setService(friendshipService, usersService);
+            }
+        });
+    }
+
+
+    private interface ControllerConfigurator {
+        void configure(Object controller);
+    }
+
+    private void loadView(String fxmlFile, ControllerConfigurator configurator) {
         try {
-            FXMLLoader ducksLoader = new FXMLLoader(ducksUrl);
-            Pane ducksUI = ducksLoader.load();
-            ducksController = ducksLoader.getController();
-            ducksController.setDucksService(ducksService);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+            Parent view = loader.load();
 
-            FXMLLoader friendshipsLoader = new FXMLLoader(friendshipsUrl);
-            Pane friendshipsUI = friendshipsLoader.load();
-            friendshipsController = friendshipsLoader.getController();
-            friendshipsController.setFriendshipService(friendshipService);
+            Object controller = loader.getController();
+            configurator.configure(controller);
 
-            FXMLLoader usersLoader = new FXMLLoader(usersUrl);
-            Pane usersUI = usersLoader.load();
-            usersController = usersLoader.getController();
-            usersController.setUsersService(usersService);
+            contentArea.getChildren().clear();
+            contentArea.getChildren().add(view);
 
-            mainContent.getChildren().setAll(ducksUI);
-        } catch (IOException | RuntimeException e) {
-            throw new IOException("Failed to load FXML: " + e.getMessage(), e);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading view: " + fxmlFile);
         }
-    }
-
-    @FXML
-    private void showDucks() {
-        mainContent.getChildren().setAll(ducksController.getRootPane());
-    }
-
-    @FXML
-    private void showFriendships() {
-        mainContent.getChildren().setAll(friendshipsController.getRootPane());
-    }
-
-    @FXML
-    private void showUsers() {
-        mainContent.getChildren().setAll(usersController.getRootPane());
     }
 }

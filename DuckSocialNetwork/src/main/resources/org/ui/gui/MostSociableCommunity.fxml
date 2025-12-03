@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15" alignment="CENTER" xmlns="http://javafx.com/javafx/19"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.ui.gui.MostSociableCommunityDialog"
+      styleClass="root"
+      stylesheets="@./css/styling.css"
+      prefWidth="400" prefHeight="350">
+
+    <padding>
+        <Insets top="20" right="30" bottom="20" left="30"/>
+    </padding>
+
+    <Label text="Most Sociable Community" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+
+    <TableView fx:id="tableView" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="idCol" text="ID" prefWidth="100"/>
+            <TableColumn fx:id="usernameCol" text="Username" prefWidth="100"/>
+            <TableColumn fx:id="emailCol" text="Email" prefWidth="150"/>
+            <TableColumn fx:id="userTypeCol" text="Type" prefWidth="100"/>
+        </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
+    </TableView>
+
+
+    <Region VBox.vgrow="ALWAYS" />
+        <Button text="Closer" onAction="#handleClose" styleClass="nav-button" style="-fx-border-color: #666; -fx-border-radius: 4;"/>
+</VBox>

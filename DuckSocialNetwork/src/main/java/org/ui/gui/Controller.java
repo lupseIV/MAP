@@ -1,10 +1,5 @@
 package org.ui.gui;
 
-import javafx.application.Platform;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -13,11 +8,9 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.text.Text;
-import javafx.util.Callback;
 import org.domain.dtos.filters.DuckGUIFilter;
 import org.domain.dtos.guiDTOS.DuckGuiDTO;
-import org.domain.dtos.guiDTOS.UserGuiDTO;
+import org.domain.dtos.guiDTOS.PersonGuiDTO;
 import org.domain.users.User;
 import org.domain.users.duck.Duck;
 import org.repository.util.paging.Page;
@@ -27,11 +20,8 @@ import org.service.FriendshipService;
 import org.service.UsersService;
 import org.utils.enums.DuckTypes;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class Controller {
 
@@ -60,9 +50,9 @@ public class Controller {
 
     @FXML private Label nrOfCommunitiesLabel;
     @FXML private TableView<User> mostSociableNetwork  ;
-    @FXML private TableColumn<UserGuiDTO, String> usernameColCommunity;
-    @FXML private TableColumn<UserGuiDTO, String> emailColCommunity;
-    @FXML private TableColumn<UserGuiDTO, Integer> nrOfFriendsColCommunity;
+    @FXML private TableColumn<PersonGuiDTO, String> usernameColCommunity;
+    @FXML private TableColumn<PersonGuiDTO, String> emailColCommunity;
+    @FXML private TableColumn<PersonGuiDTO, Integer> nrOfFriendsColCommunity;
     private final ObservableList<User> mostSociableNetworkObservableList = FXCollections.observableArrayList();
 
     private int pageSize = 10;

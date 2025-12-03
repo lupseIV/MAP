@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="15" alignment="CENTER" xmlns="http://javafx.com/javafx/19"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.ui.gui.PersonAddDialogController"
+      styleClass="root"
+      stylesheets="@./css/styling.css"
+      prefWidth="400" prefHeight="350">
+
+    <padding>
+        <Insets top="20" right="30" bottom="20" left="30"/>
+    </padding>
+
+    <Label text="Add New Person" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+
+    <GridPane vgap="10" hgap="10">
+        <columnConstraints>
+            <ColumnConstraints minWidth="120" />
+            <ColumnConstraints hgrow="ALWAYS" />
+        </columnConstraints>
+
+        <!-- Login Info -->
+        <Label text="Username:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="label-bright"/>
+        <TextField fx:id="usernameField" promptText="username" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Password:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="label-bright"/>
+        <PasswordField fx:id="passwordField" promptText="password" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Email:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="label-bright"/>
+        <TextField fx:id="emailField" promptText="user@example.com" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <!-- Separator -->
+        <Separator GridPane.rowIndex="3" GridPane.columnSpan="2" style="-fx-background-color: #444;"/>
+
+        <!-- Personal Info -->
+        <Label text="First Name:" GridPane.rowIndex="4" GridPane.columnIndex="0" styleClass="label-bright"/>
+        <TextField fx:id="firstNameField" promptText="John" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+        <Label text="Last Name:" GridPane.rowIndex="5" GridPane.columnIndex="0" styleClass="label-bright"/>
+        <TextField fx:id="lastNameField" promptText="Doe" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+        <Label text="Occupation:" GridPane.rowIndex="6" GridPane.columnIndex="0" styleClass="label-bright"/>
+        <TextField fx:id="occupationField" promptText="Software Engineer" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+        <Label text="Date of Birth:" GridPane.rowIndex="7" GridPane.columnIndex="0" styleClass="label-bright"/>
+        <DatePicker fx:id="dobPicker" promptText="YYYY-MM-DD" maxWidth="Infinity" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+
+        <Label text="Empathy (0-100):" GridPane.rowIndex="8" GridPane.columnIndex="0" styleClass="label-bright"/>
+        <TextField fx:id="emphatyLevelField" promptText="50.5" GridPane.rowIndex="8" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <Region VBox.vgrow="ALWAYS" />
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Cancel" onAction="#handleCancel" styleClass="nav-button" style="-fx-border-color: #666; -fx-border-radius: 4;"/>
+        <Button text="Save" onAction="#handleSave" styleClass="action-button"/>
+    </HBox>
+
+</VBox>

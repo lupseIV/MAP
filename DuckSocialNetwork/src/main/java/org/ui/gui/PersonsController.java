@@ -12,27 +12,30 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.domain.dtos.filters.DuckGUIFilter;
+import org.domain.dtos.filters.PersonGUIFilter;
 import org.domain.dtos.guiDTOS.DuckGuiDTO;
+import org.domain.dtos.guiDTOS.PersonGuiDTO;
 import org.domain.users.duck.Duck;
+import org.domain.users.person.Person;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
-import org.service.DucksService;
-import org.utils.enums.DuckTypes;
+import org.service.PersonsService;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
-public class DucksController {
+public class PersonsController {
 
-    @FXML private TableView<DuckGuiDTO> tableView;
-    @FXML private TableColumn<DuckGuiDTO, Long> idCol;
-    @FXML private TableColumn<DuckGuiDTO, String> usernameCol;
-    @FXML private TableColumn<DuckGuiDTO, String> emailCol;
-    @FXML private TableColumn<DuckGuiDTO, Integer> nrOfFriendsCol;
-    @FXML private TableColumn<DuckGuiDTO, DuckTypes> typeCol;
-    @FXML private TableColumn<DuckGuiDTO, Double> speedCol;
-    @FXML private TableColumn<DuckGuiDTO, Double> rezistanceCol;
-    @FXML private TableColumn<DuckGuiDTO, String> flockNameCol;
+    @FXML private TableView<PersonGuiDTO> personsTable;
+    @FXML private TableColumn<PersonGuiDTO, Long> idCol;
+    @FXML private TableColumn<PersonGuiDTO, String> usernameCol;
+    @FXML private TableColumn<PersonGuiDTO, String> emailCol;
+    @FXML private TableColumn<PersonGuiDTO, String> firstNameCol;
+    @FXML private TableColumn<PersonGuiDTO, String> lastNameCol;
+    @FXML private TableColumn<PersonGuiDTO, String> occupationCol;
+    @FXML private TableColumn<PersonGuiDTO, String> dobCol;
+    @FXML private TableColumn<PersonGuiDTO, Double> empathyCol;
 
     @FXML private ComboBox<String> comboBox;
 
@@ -41,19 +44,16 @@ public class DucksController {
 
     @FXML private Label labelPage;
 
-    private DucksService service;
+    private PersonsService service;
     private int currentPage = 0;
     private final int pageSize = 14;
     private int totalNrOfElements = 0;
 
-    // Observable list specifically for the View
-    private final ObservableList<DuckGuiDTO> model = FXCollections.observableArrayList();
-    private final DuckGUIFilter filter = new DuckGUIFilter(Optional.empty());
-    /**
-     * Called by MainController after loading the FXML
-     */
-    public void setService(DucksService service) {
-        this.service = service;
+    private final ObservableList<PersonGuiDTO> model = FXCollections.observableArrayList();
+    private final PersonGUIFilter filter = new PersonGUIFilter();
+
+    public void setService(PersonsService service) {
+        this.service = Objects.requireNonNull(service);
         initializeTable();
         initComboBox();
         loadData();
@@ -63,18 +63,17 @@ public class DucksController {
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
-        nrOfFriendsCol.setCellValueFactory(new PropertyValueFactory<>("nrOfFriends"));
-        typeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
-        speedCol.setCellValueFactory(new PropertyValueFactory<>("speed"));
-        rezistanceCol.setCellValueFactory(new PropertyValueFactory<>("rezistance"));
-        flockNameCol.setCellValueFactory(new PropertyValueFactory<>("flockName"));
+        firstNameCol.setCellValueFactory(new PropertyValueFactory<>("FirstName"));
+        lastNameCol.setCellValueFactory(new PropertyValueFactory<>("LastName"));
+        occupationCol.setCellValueFactory(new PropertyValueFactory<>("Occupation"));
+        dobCol.setCellValueFactory(new PropertyValueFactory<>("DateOfBirth"));
+        empathyCol.setCellValueFactory(new PropertyValueFactory<>("EmpathyLevel"));
 
-
-        tableView.setItems(model);
+        personsTable.setItems(model);
     }
 
     private void initComboBox(){
-        comboBox.setItems(FXCollections.observableArrayList(service.getDuckTypes()));
+        comboBox.setItems(FXCollections.observableArrayList("All"));
         comboBox.getSelectionModel().selectFirst();
     }
 
@@ -83,22 +82,22 @@ public class DucksController {
 
         Pageable pageable = new Pageable(currentPage, pageSize);
         try {
-            Page<Duck> duckPage = service.findAllOnPage(pageable, filter);
-            int maxPage = (int) Math.ceil((double) duckPage.getTotalNumberOfElements() / pageSize) - 1;
+            Page<Person> personPage = service.findAllOnPage(pageable, filter);
+            int maxPage = (int) Math.ceil((double) personPage.getTotalNumberOfElements() / pageSize) - 1;
             if (maxPage == -1) {
                 maxPage = 0;
             }
             if (currentPage > maxPage) {
                 currentPage = maxPage;
-                duckPage = service.findAllOnPage(pageable ,filter);
+                personPage = service.findAllOnPage(pageable ,filter);
             }
-            totalNrOfElements = duckPage.getTotalNumberOfElements();
+            totalNrOfElements = personPage.getTotalNumberOfElements();
 
             labelPage.setText("Page " + (currentPage + 1) + " of " + (maxPage + 1));
             buttonPrevious.setDisable(currentPage == 0);
             buttonNext.setDisable((currentPage + 1) * pageSize >= totalNrOfElements);
 
-            model.setAll(service.getGuiDucksFromPage(duckPage));
+            model.setAll(service.getGuiPersonsFromPage(personPage));
         } catch (Exception e) {
             showAlert("Error", "Could not load data: " + e.getMessage());
         }
@@ -123,31 +122,26 @@ public class DucksController {
     @FXML
     public void onComboboxChange() {
         String selected = comboBox.getSelectionModel().getSelectedItem();
-        if(selected.equals("All")){
-            filter.setDuckType(Optional.empty());
-        } else {
-            filter.setDuckType(Optional.of(selected));
-        }
         loadData();
     }
 
     @FXML
-    public void handleAddDuck() {
+    public void handleAddPerson() {
         try {
             // 1. Load the FXML
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("DuckAddDialog.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("PersonAddDialog.fxml"));
             VBox page = loader.load();
 
             // 2. Create the Stage (Dialog Window)
             Stage dialogStage = new Stage();
-            dialogStage.setTitle("Add New Duck");
+            dialogStage.setTitle("Add New Person");
             dialogStage.initModality(Modality.WINDOW_MODAL); // Blocks interaction with main window
-            dialogStage.initOwner(tableView.getScene().getWindow());
+            dialogStage.initOwner(personsTable.getScene().getWindow());
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
 
             // 3. Inject dependencies into the Dialog Controller
-            DuckAddDialogController controller = loader.getController();
+            PersonAddDialogController controller = loader.getController();
             controller.setService(service, dialogStage);
 
             // 4. Show and Wait
@@ -165,8 +159,8 @@ public class DucksController {
     }
 
     @FXML
-    public void handleDeleteDuck() {
-        DuckGuiDTO selected = tableView.getSelectionModel().getSelectedItem();
+    public void handleDeletePerson() {
+        PersonGuiDTO selected = personsTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
             service.delete(selected.getId());
             model.remove(selected);

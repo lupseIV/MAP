@@ -10,6 +10,7 @@ import org.repository.Repository;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
 import org.service.utils.IdGenerator;
+import org.utils.enums.DuckTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,7 @@ public class DucksService extends EntityService<Long, Duck>{
     public List<DuckGuiDTO> getGuiDucks(){
         List<DuckGuiDTO> list = new ArrayList<>();
         for(Duck duck : repository.findAll()){
+            Long id = duck.getId();
             String username = duck.getUsername();
             String email = duck.getEmail();
             int nrOfFriends = duck.getFriends().size();
@@ -51,7 +53,7 @@ public class DucksService extends EntityService<Long, Duck>{
                 flockName = "no Flock";
             }
 
-            list.add(new DuckGuiDTO(username,email,nrOfFriends,type,speed,rezistance,flockName));
+            list.add(new DuckGuiDTO(id,username,email,nrOfFriends,type,speed,rezistance,flockName));
         }
         return list;
     }
@@ -60,6 +62,7 @@ public class DucksService extends EntityService<Long, Duck>{
         List<DuckGuiDTO> list = new ArrayList<>();
 
         page.getElementsOnPage().forEach(duck -> {
+            Long id = duck.getId();
             String username = duck.getUsername();
             String email = duck.getEmail();
             int nrOfFriends = duck.getFriends().size();
@@ -72,10 +75,17 @@ public class DucksService extends EntityService<Long, Duck>{
             } else {
                 flockName = "no Flock";
             }
-            list.add(new DuckGuiDTO(username,email,nrOfFriends,type,speed,rezistance, flockName));
+            list.add(new DuckGuiDTO(id,username,email,nrOfFriends,type,speed,rezistance, flockName));
         });
         return list;
     }
-
+    public List<String> getDuckTypes(){
+        List<String> list = new ArrayList<>();
+        list.add("All");
+        for(DuckTypes dt : DuckTypes.values()){
+            list.add(dt.name());
+        }
+        return list;
+    }
 
 }

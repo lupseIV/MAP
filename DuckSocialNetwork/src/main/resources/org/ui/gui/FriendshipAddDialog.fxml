@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+        <?import javafx.geometry.Insets?>
+        <?import javafx.scene.control.*?>
+        <?import javafx.scene.layout.*?>
+
+<VBox spacing="15" alignment="CENTER" xmlns="http://javafx.com/javafx/19"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.ui.gui.FriendshipAddDialogController"
+      styleClass="root"
+      stylesheets="@./css/styling.css"
+      prefWidth="400" prefHeight="350">
+
+<padding>
+    <Insets top="20" right="30" bottom="20" left="30"/>
+</padding>
+
+<Label text="Add New Friendship" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+
+<GridPane vgap="10" hgap="10">
+    <columnConstraints>
+        <ColumnConstraints minWidth="120" />
+        <ColumnConstraints hgrow="ALWAYS" />
+    </columnConstraints>
+
+    <!-- Login Info -->
+    <Label text="User id 1:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="label-bright"/>
+    <TextField fx:id="user1IdField" promptText="text" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+    <Label text="User id 2:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="label-bright"/>
+    <TextField fx:id="user2IdField" promptText="text" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+</GridPane>
+
+<Region VBox.vgrow="ALWAYS" />
+
+<HBox spacing="10" alignment="CENTER_RIGHT">
+    <Button text="Cancel" onAction="#handleCancel" styleClass="nav-button" style="-fx-border-color: #666; -fx-border-radius: 4;"/>
+    <Button text="Save" onAction="#handleSave" styleClass="action-button"/>
+</HBox>
+
+</VBox>

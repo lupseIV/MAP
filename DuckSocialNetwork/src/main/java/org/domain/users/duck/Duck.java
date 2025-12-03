@@ -3,6 +3,7 @@ package org.domain.users.duck;
 import org.domain.users.User;
 import org.domain.users.duck.flock.Flock;
 import org.utils.enums.DuckTypes;
+import org.utils.enums.UserTypes;
 
 public  abstract class Duck extends User {
     private DuckTypes duckType;
@@ -46,7 +47,7 @@ public  abstract class Duck extends User {
 
 
     public Duck( String username, String password, String email, DuckTypes duckType, Double speed, Double rezistance) {
-        super( username, password, email);
+        super( username, password, email,UserTypes.DUCK);
         this.duckType = duckType;
         this.speed = speed;
         this.rezistance = rezistance;

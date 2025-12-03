@@ -1,15 +1,39 @@
 package org.domain.dtos.guiDTOS;
 
-import javafx.beans.property.*;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class UserGuiDTO {
-    private  StringProperty username = new SimpleStringProperty();
-    private  StringProperty email = new SimpleStringProperty();
-    private  IntegerProperty nrOfFriends = new SimpleIntegerProperty();
-    public UserGuiDTO(String username, String email, int nrOfFriends) {
+
+    private final LongProperty id = new SimpleLongProperty();
+    private final StringProperty username = new SimpleStringProperty();
+    private final StringProperty email = new SimpleStringProperty();
+    private final StringProperty type  = new SimpleStringProperty();
+
+    public UserGuiDTO(Long id, String username, String email, String type) {
+        this.id.set(id);
         this.username.set(username);
         this.email.set(email);
-        this.nrOfFriends.set(nrOfFriends);
+        this.type.set(type);
+    }
+
+    public LongProperty getIdProperty() { return id; }
+    public StringProperty getUsernameProperty() { return username; }
+    public StringProperty getEmailProperty() { return email; }
+    public StringProperty getTypeProperty() { return type; }
+
+    public long getId() {
+        return id.get();
+    }
+
+    public LongProperty idProperty() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id.set(id);
     }
 
     public String getUsername() {
@@ -36,24 +60,15 @@ public class UserGuiDTO {
         this.email.set(email);
     }
 
-    public int getNrOfFriends() {
-        return nrOfFriends.get();
+    public String getType() {
+        return type.get();
     }
 
-    public IntegerProperty nrOfFriendsProperty() {
-        return nrOfFriends;
+    public StringProperty typeProperty() {
+        return type;
     }
 
-    public void setNrOfFriends(int nrOfFriends) {
-        this.nrOfFriends.set(nrOfFriends);
-    }
-
-    @Override
-    public String toString() {
-        return "UserGuiDTO{" +
-                "username=" + username +
-                ", email=" + email +
-                ", nrOfFriends=" + nrOfFriends +
-                '}';
+    public void setType(String type) {
+        this.type.set(type);
     }
 }

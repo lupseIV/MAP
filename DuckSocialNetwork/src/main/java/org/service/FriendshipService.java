@@ -1,14 +1,18 @@
 package org.service;
 
+import org.domain.dtos.guiDTOS.DuckGuiDTO;
+import org.domain.users.duck.Duck;
 import org.domain.users.relationships.Friendship;
 import org.domain.users.User;
 import org.domain.exceptions.ServiceException;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
 import org.repository.Repository;
+import org.repository.util.paging.Page;
 import org.service.utils.IdGenerator;
 
 import java.util.*;
+import java.util.stream.StreamSupport;
 
 public class FriendshipService extends EntityService<Long, Friendship>{
 
@@ -34,6 +38,7 @@ public class FriendshipService extends EntityService<Long, Friendship>{
         friendship.setId(idGenerator.nextId());
 
         friendship.getUser1().addFriend(friendship.getUser2());
+        friendshipNetwork.clear();
 
         return repository.save(friendship);
     }
@@ -45,7 +50,7 @@ public class FriendshipService extends EntityService<Long, Friendship>{
         if(friendship == null)
             throw new ServiceException("Friendship not found");
         friendship.getUser1().removeFriend(friendship.getUser2());
-
+        friendshipNetwork.clear();
         return repository.delete(id);
     }
 
@@ -66,16 +71,22 @@ public class FriendshipService extends EntityService<Long, Friendship>{
         if(friendshipNetwork == null) {
             friendshipNetwork = new HashMap<>();
         }
+        friendshipNetwork.clear();
+
         Iterable<User> users = usersService.findAll();
-
-
         for(User user : users){
-            List<User> friends = user.getFriends();
-            for(User friend : friends){
-                friendshipNetwork.putIfAbsent(friend.getId(),new HashSet<>());
-                friendshipNetwork.putIfAbsent(user.getId(),new HashSet<>());
-                friendshipNetwork.get(friend.getId()).add(user.getId());
-                friendshipNetwork.get(user.getId()).add(friend.getId());
+            if(user.getFriends().isEmpty() || user.getFriends() == null) continue;
+            friendshipNetwork.put(user.getId(), new HashSet<>());
+        }
+
+        Iterable<Friendship> allFriendships = repository.findAll();
+        for(Friendship f : allFriendships) {
+            Long u1Id = f.getUser1().getId();
+            Long u2Id = f.getUser2().getId();
+
+            if (friendshipNetwork.containsKey(u1Id) && friendshipNetwork.containsKey(u2Id)) {
+                friendshipNetwork.get(u1Id).add(u2Id);
+                friendshipNetwork.get(u2Id).add(u1Id);
             }
         }
 
@@ -167,5 +178,10 @@ public class FriendshipService extends EntityService<Long, Friendship>{
                 .stream()
                 .max(Map.Entry.comparingByValue())
                 .orElse(null);
+    }
+
+
+    public List<Friendship> getGuiFriendshipsFromPage(Page<Friendship> page) {
+        return StreamSupport.stream(page.getElementsOnPage().spliterator(),false).toList();
     }
 }

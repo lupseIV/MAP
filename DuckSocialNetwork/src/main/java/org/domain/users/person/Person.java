@@ -2,6 +2,7 @@ package org.domain.users.person;
 
 import org.domain.dtos.PersonData;
 import org.domain.users.User;
+import org.utils.enums.UserTypes;
 
 import java.time.LocalDate;
 
@@ -14,7 +15,7 @@ public class Person extends User {
     private Double empathyLevel;
 
     public Person( String username, String password, String email, String firstName, String lastName, String occupation, LocalDate dateOfBirth, Double empathyLevel) {
-        super(username, password, email);
+        super(username, password, email,UserTypes.PERSON);
         this.firstName = firstName;
         this.lastName = lastName;
         this.occupation = occupation;
@@ -23,7 +24,7 @@ public class Person extends User {
     }
 
     public Person(PersonData pd) {
-        super(pd.getUsername(), pd.getPassword(), pd.getEmail());
+        super(pd.getUsername(), pd.getPassword(), pd.getEmail(),UserTypes.PERSON);
         this.firstName = pd.getFirstName();
         this.lastName = pd.getLastName();
         this.occupation = pd.getOccupation();

@@ -87,12 +87,6 @@ public class Main {
 //        var app = new ConsoleUserInterface(usersService, friendshipService, flockService, raceEventService);
 //        app.run();
 
-        //gui
-        GraphicUserInterface.setDucksService(duckService);
-        GraphicUserInterface.setUsersService(usersService);
-        GraphicUserInterface.setFriendshipService(friendshipService);
-         var app = new GraphicUserInterface();
-         app.run();
         DatabaseConnection.closeConnection();
     }
 
