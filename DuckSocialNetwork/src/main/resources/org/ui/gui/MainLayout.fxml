@@ -18,8 +18,7 @@
         <VBox styleClass="sidebar">
             <Label text="Social Network" styleClass="sidebar-label"/>
 
-            <Button text="Ducks" onAction="#handleShowDucks" styleClass="nav-button"/>
-            <Button text="Persons" onAction="#handleShowPersons" styleClass="nav-button"/>
+            <Button text="Users" onAction="#handleShowUsersView" styleClass="nav-button"/>
             <Button text="Friendships" onAction="#handleShowFriendships" styleClass="nav-button"/>
         </VBox>
     </left>

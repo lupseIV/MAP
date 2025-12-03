@@ -12,7 +12,9 @@
         <VBox alignment="CENTER_LEFT" spacing="20" style="-fx-padding: 0 0 20 0;">
             <Label text="Manage Ducks" styleClass="h1-label"/>
             <Region HBox.hgrow="ALWAYS" />
+            <HBox>
             <ComboBox fx:id="comboBox" onAction="#onComboboxChange"/>
+            </HBox>
         </VBox>
     </top>
 

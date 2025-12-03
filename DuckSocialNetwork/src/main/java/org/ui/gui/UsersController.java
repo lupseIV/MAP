@@ -1,48 +1,49 @@
 package org.ui.gui;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import org.domain.dtos.filters.UserGUIFilter;
+import org.domain.dtos.guiDTOS.UserGuiDTO;
 import org.domain.users.User;
 import org.service.DucksService;
 import org.service.PersonsService;
 import org.service.UsersService;
 
 
-public class UsersController extends AbstractPagingTableViewController<User> implements ViewController {
+public class UsersController  implements ViewController {
 
-    private UsersService service;
+    @FXML private StackPane contentArea;
+
     private DucksService ducksService;
     private PersonsService personsService;
 
-    public UsersController(int currentPage, int pageSize, int totalNrOfElements) {
-        super(0, 14, 0);
-    }
-
-    public void setService(UsersService service, DucksService ducksService, PersonsService personsService) {
-        this.service = service;
+    public void setService(DucksService ducksService, PersonsService personsService, StackPane contentArea) {
         this.ducksService = ducksService;
         this.personsService = personsService;
-        initializeTable();
-        loadData();
+        this.contentArea = contentArea;
     }
 
     @FXML
-    public void onDucksButtonClick() {}
-
-
-    @Override
-    public void loadView(String fxmlFile, ControllerConfigurator configurator, Pane contentArea) {
-
+    public void onDucksButtonClick() {
+        loadView("DucksView.fxml", controller -> {
+            if (controller instanceof DucksController) {
+                ((DucksController) controller).setService(ducksService);
+            }
+        },  contentArea);
     }
 
-    @Override
-    public void initializeTable() {
-
+    @FXML
+    public void onPersonsButtonClick() {
+        loadView("PersonsView.fxml", controller -> {
+            if (controller instanceof PersonsController) {
+                ((PersonsController) controller).setService(personsService);
+            }
+        }, contentArea);
     }
 
-    @Override
-    public void loadData() {
-
-    }
 }

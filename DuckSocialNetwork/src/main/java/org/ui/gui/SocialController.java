@@ -18,6 +18,7 @@ import org.domain.dtos.filters.PersonGUIFilter;
 import org.domain.dtos.guiDTOS.DuckGuiDTO;
 import org.domain.dtos.guiDTOS.PersonGuiDTO;
 import org.domain.dtos.guiDTOS.UserGuiDTO;
+import org.domain.users.User;
 import org.domain.users.duck.Duck;
 import org.domain.users.person.Person;
 import org.domain.users.relationships.Friendship;
@@ -35,8 +36,8 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
 
     @FXML private TableView<Friendship> friendshipsTable;
     @FXML private TableColumn<Friendship, Long> idCol;
-    @FXML private TableColumn<Friendship, String> user1Col;
-    @FXML private TableColumn<Friendship, String> user2Col;
+    @FXML private TableColumn<Friendship, User> user1Col;
+    @FXML private TableColumn<Friendship, User> user2Col;
 
     @FXML private Button buttonNext;
     @FXML private Button buttonPrevious;
@@ -52,10 +53,7 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
         super(0, 14, 0,  new FriendshipGUIFilter());
     }
 
-
-
     public void setService(FriendshipService service, UsersService usersService) {
-
         this.service = Objects.requireNonNull(service);
         this.usersService = Objects.requireNonNull(usersService);
         initializeTable();
@@ -64,12 +62,53 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
 
     public void initializeTable() {
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+
         user1Col.setCellValueFactory(new PropertyValueFactory<>("user1"));
+        user1Col.setCellFactory(column -> getClickableUserCell());
+
         user2Col.setCellValueFactory(new PropertyValueFactory<>("user2"));
+        user2Col.setCellFactory(column -> getClickableUserCell());
 
         friendshipsTable.setItems(model);
     }
 
+    private TableCell<Friendship, User> getClickableUserCell() {
+        return new TableCell<>() {
+            @Override
+            protected void updateItem(User user, boolean empty) {
+                super.updateItem(user, empty);
+
+                if (empty || user == null) {
+                    setText(null);
+                    setGraphic(null);
+                    setOnMouseClicked(null);
+                    setStyle("");
+                } else {
+                    setText(String.valueOf(user.getId()));
+
+                    setStyle("-fx-text-fill: #4a90e2; -fx-cursor: hand;");
+
+                    setOnMouseClicked(event -> {
+                        if (event.getClickCount() == 1) {
+                            showUserDetailsPopup(user);
+                        }
+                    });
+                }
+            }
+        };
+    }
+
+    private void showUserDetailsPopup(User user) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("User Details");
+        alert.setHeaderText("Details for ID: " + user.getId());
+
+        String details = user.toString();
+
+        alert.setContentText(details);
+        alert.initOwner(friendshipsTable.getScene().getWindow());
+        alert.showAndWait();
+    }
 
     public void loadData() {
         if (service == null) return;
@@ -143,19 +182,16 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
     @FXML
     public void onMostSociableCommunity() {
         try {
-            // 1. Load the FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("MostSociableCommunity.fxml"));
             VBox page = loader.load();
 
-            // 2. Create the Stage (Dialog Window)
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Most Sociable Community");
-            dialogStage.initModality(Modality.WINDOW_MODAL); // Blocks interaction with main window
+            dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(friendshipsTable.getScene().getWindow());
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
 
-            // 3. Inject dependencies into the Dialog Controller
             MostSociableCommunityDialog controller = loader.getController();
 
             List<UserGuiDTO> dtoList = service.findMostSociableNetwork().stream()

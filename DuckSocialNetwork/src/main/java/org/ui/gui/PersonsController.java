@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -24,7 +25,7 @@ import org.service.PersonsService;
 import java.io.IOException;
 import java.util.Objects;
 
-public class PersonsController extends AbstractPagingTableViewController<PersonGuiDTO, PersonGUIFilter> {
+public class PersonsController extends AbstractPagingTableViewController<PersonGuiDTO, PersonGUIFilter>  {
 
     @FXML private TableView<PersonGuiDTO> personsTable;
     @FXML private TableColumn<PersonGuiDTO, Long> idCol;
@@ -111,7 +112,6 @@ public class PersonsController extends AbstractPagingTableViewController<PersonG
     @FXML
     public void handleAddPerson() {
         try {
-            // 1. Load the FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("PersonAddDialog.fxml"));
             VBox page = loader.load();
 
@@ -148,6 +148,7 @@ public class PersonsController extends AbstractPagingTableViewController<PersonG
             showAlert("Warning", "Please select a duck to delete.");
         }
     }
+
 
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
