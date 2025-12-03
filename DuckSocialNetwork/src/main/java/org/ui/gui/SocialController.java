@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class SocialController extends AbstractPagingTableViewController{
+public class SocialController extends AbstractPagingTableViewController<Friendship, FriendshipGUIFilter>{
 
     @FXML private TableView<Friendship> friendshipsTable;
     @FXML private TableColumn<Friendship, Long> idCol;
@@ -49,11 +49,10 @@ public class SocialController extends AbstractPagingTableViewController{
 
 
     public SocialController() {
-        super(0, 14, 0);
+        super(0, 14, 0,  new FriendshipGUIFilter());
     }
 
-    private final ObservableList<Friendship> model = FXCollections.observableArrayList();
-    private final FriendshipGUIFilter filter = new FriendshipGUIFilter();
+
 
     public void setService(FriendshipService service, UsersService usersService) {
 

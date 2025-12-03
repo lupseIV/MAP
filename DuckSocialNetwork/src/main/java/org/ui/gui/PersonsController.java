@@ -23,9 +23,8 @@ import org.service.PersonsService;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.Optional;
 
-public class PersonsController extends AbstractPagingTableViewController{
+public class PersonsController extends AbstractPagingTableViewController<PersonGuiDTO, PersonGUIFilter> {
 
     @FXML private TableView<PersonGuiDTO> personsTable;
     @FXML private TableColumn<PersonGuiDTO, Long> idCol;
@@ -47,11 +46,8 @@ public class PersonsController extends AbstractPagingTableViewController{
     private PersonsService service;
 
     public PersonsController() {
-        super(0, 14, 0);
+        super(0, 14, 0, new PersonGUIFilter());
     }
-
-    private final ObservableList<PersonGuiDTO> model = FXCollections.observableArrayList();
-    private final PersonGUIFilter filter = new PersonGUIFilter();
 
     public void setService(PersonsService service) {
         this.service = Objects.requireNonNull(service);

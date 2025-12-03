@@ -22,7 +22,7 @@ import org.utils.enums.DuckTypes;
 import java.io.IOException;
 import java.util.Optional;
 
-public class DucksController {
+public class DucksController extends AbstractPagingTableViewController<DuckGuiDTO, DuckGUIFilter>{
 
     @FXML private TableView<DuckGuiDTO> tableView;
     @FXML private TableColumn<DuckGuiDTO, Long> idCol;
@@ -42,16 +42,12 @@ public class DucksController {
     @FXML private Label labelPage;
 
     private DucksService service;
-    private int currentPage = 0;
-    private final int pageSize = 14;
-    private int totalNrOfElements = 0;
 
-    // Observable list specifically for the View
-    private final ObservableList<DuckGuiDTO> model = FXCollections.observableArrayList();
-    private final DuckGUIFilter filter = new DuckGUIFilter(Optional.empty());
-    /**
-     * Called by MainController after loading the FXML
-     */
+
+    public DucksController() {
+        super(0, 14, 0,new DuckGUIFilter(Optional.empty()));
+    }
+
     public void setService(DucksService service) {
         this.service = service;
         initializeTable();
@@ -59,7 +55,7 @@ public class DucksController {
         loadData();
     }
 
-    private void initializeTable() {
+    public void initializeTable() {
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
@@ -73,12 +69,7 @@ public class DucksController {
         tableView.setItems(model);
     }
 
-    private void initComboBox(){
-        comboBox.setItems(FXCollections.observableArrayList(service.getDuckTypes()));
-        comboBox.getSelectionModel().selectFirst();
-    }
-
-    private void loadData() {
+    public void loadData() {
         if (service == null) return;
 
         Pageable pageable = new Pageable(currentPage, pageSize);
@@ -104,20 +95,9 @@ public class DucksController {
         }
     }
 
-    @FXML
-    public void onNextPage(ActionEvent actionEvent) {
-        if ((currentPage + 1) * pageSize < totalNrOfElements) {
-            currentPage++;
-            loadData();
-        }
-    }
-
-    @FXML
-    public void onPreviousPage(ActionEvent actionEvent) {
-        if (currentPage > 0) {
-            currentPage--;
-            loadData();
-        }
+    private void initComboBox(){
+        comboBox.setItems(FXCollections.observableArrayList(service.getDuckTypes()));
+        comboBox.getSelectionModel().selectFirst();
     }
 
     @FXML
