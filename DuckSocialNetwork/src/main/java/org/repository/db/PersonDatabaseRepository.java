@@ -26,10 +26,7 @@ public class PersonDatabaseRepository extends EntityDatabaseRepository<Long, Per
         super(validator, "SELECT * FROM persons");
     }
 
-    @Override
-    public Page<Person> findAllOnPage(Pageable pageable) {
-        return null;
-    }
+
 
     @Override
     public Person extractEntityFromResultSet(ResultSet resultSet) throws SQLException {

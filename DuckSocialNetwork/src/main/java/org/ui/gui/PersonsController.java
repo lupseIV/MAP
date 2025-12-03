@@ -21,6 +21,7 @@ import org.domain.users.person.Person;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
 import org.service.PersonsService;
+import org.service.UsersService;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -45,13 +46,15 @@ public class PersonsController extends AbstractPagingTableViewController<PersonG
     @FXML private Label labelPage;
 
     private PersonsService service;
+    private UsersService usersService;
 
     public PersonsController() {
         super(0, 14, 0, new PersonGUIFilter());
     }
 
-    public void setService(PersonsService service) {
+    public void setService(PersonsService service, UsersService usersService) {
         this.service = Objects.requireNonNull(service);
+        this.usersService = Objects.requireNonNull(usersService);
         initializeTable();
         initComboBox();
         loadData();
@@ -141,7 +144,7 @@ public class PersonsController extends AbstractPagingTableViewController<PersonG
     public void handleDeletePerson() {
         PersonGuiDTO selected = personsTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            service.delete(selected.getId());
+            usersService.delete(selected.getId());
             model.remove(selected);
             loadData();
         } else {

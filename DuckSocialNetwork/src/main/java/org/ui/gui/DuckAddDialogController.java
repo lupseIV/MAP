@@ -82,16 +82,6 @@ public class DuckAddDialogController {
         if (typeComboBox.getValue() == null) {
             errorMessage += "Please select a duck type!\n";
         }
-//        if (colorsField.getText() == null || colorsField.getText().trim().isEmpty()) {
-//            errorMessage += "No valid color count!\n";
-//        } else {
-//            try {
-//                int c = Integer.parseInt(colorsField.getText());
-//                if (c < 0) errorMessage += "Colors must be positive!\n";
-//            } catch (NumberFormatException e) {
-//                errorMessage += "Colors must be a number (integer)!\n";
-//            }
-//        }
 
         if (errorMessage.length() == 0) {
             return true;

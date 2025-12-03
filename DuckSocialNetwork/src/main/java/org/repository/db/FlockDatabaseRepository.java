@@ -19,10 +19,6 @@ public class FlockDatabaseRepository extends EntityDatabaseRepository<Long, Floc
 
     private final DuckDatabaseRepository duckDatabaseRepository;
 
-    @Override
-    public Page<Flock<Duck>> findAllOnPage(Pageable pageable) {
-        return null;
-    }
 
     public FlockDatabaseRepository(Validator<Flock<Duck>> validator, DuckDatabaseRepository duckDatabaseRepository) {
         super(validator, "SELECT * FROM flocks", false);

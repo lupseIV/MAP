@@ -21,10 +21,12 @@ public class UsersController  implements ViewController {
 
     private DucksService ducksService;
     private PersonsService personsService;
+    private UsersService usersService;
 
-    public void setService(DucksService ducksService, PersonsService personsService, StackPane contentArea) {
+    public void setService(DucksService ducksService, PersonsService personsService, UsersService usersService, StackPane contentArea) {
         this.ducksService = ducksService;
         this.personsService = personsService;
+        this.usersService = usersService;
         this.contentArea = contentArea;
     }
 
@@ -32,7 +34,7 @@ public class UsersController  implements ViewController {
     public void onDucksButtonClick() {
         loadView("DucksView.fxml", controller -> {
             if (controller instanceof DucksController) {
-                ((DucksController) controller).setService(ducksService);
+                ((DucksController) controller).setService(ducksService,usersService);
             }
         },  contentArea);
     }
@@ -41,7 +43,7 @@ public class UsersController  implements ViewController {
     public void onPersonsButtonClick() {
         loadView("PersonsView.fxml", controller -> {
             if (controller instanceof PersonsController) {
-                ((PersonsController) controller).setService(personsService);
+                ((PersonsController) controller).setService(personsService,usersService);
             }
         }, contentArea);
     }

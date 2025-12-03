@@ -26,10 +26,6 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
         loadFromDatabase();
     }
 
-    @Override
-    public Page<RaceEvent> findAllOnPage(Pageable pageable) {
-        return null;
-    }
 
     @Override
     public RaceEvent extractEntityFromResultSet(ResultSet resultSet) throws SQLException {

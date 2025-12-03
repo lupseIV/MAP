@@ -17,6 +17,7 @@ import org.domain.users.duck.Duck;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
 import org.service.DucksService;
+import org.service.UsersService;
 import org.utils.enums.DuckTypes;
 
 import java.io.IOException;
@@ -28,11 +29,9 @@ public class DucksController extends AbstractPagingTableViewController<DuckGuiDT
     @FXML private TableColumn<DuckGuiDTO, Long> idCol;
     @FXML private TableColumn<DuckGuiDTO, String> usernameCol;
     @FXML private TableColumn<DuckGuiDTO, String> emailCol;
-    @FXML private TableColumn<DuckGuiDTO, Integer> nrOfFriendsCol;
     @FXML private TableColumn<DuckGuiDTO, DuckTypes> typeCol;
     @FXML private TableColumn<DuckGuiDTO, Double> speedCol;
     @FXML private TableColumn<DuckGuiDTO, Double> rezistanceCol;
-    @FXML private TableColumn<DuckGuiDTO, String> flockNameCol;
 
     @FXML private ComboBox<String> comboBox;
 
@@ -42,14 +41,16 @@ public class DucksController extends AbstractPagingTableViewController<DuckGuiDT
     @FXML private Label labelPage;
 
     private DucksService service;
+    private UsersService usersService;
 
 
     public DucksController() {
         super(0, 14, 0,new DuckGUIFilter(Optional.empty()));
     }
 
-    public void setService(DucksService service) {
+    public void setService(DucksService service, UsersService usersService) {
         this.service = service;
+        this.usersService = usersService;
         initializeTable();
         initComboBox();
         loadData();
@@ -59,11 +60,9 @@ public class DucksController extends AbstractPagingTableViewController<DuckGuiDT
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
-        nrOfFriendsCol.setCellValueFactory(new PropertyValueFactory<>("nrOfFriends"));
         typeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
         speedCol.setCellValueFactory(new PropertyValueFactory<>("speed"));
         rezistanceCol.setCellValueFactory(new PropertyValueFactory<>("rezistance"));
-        flockNameCol.setCellValueFactory(new PropertyValueFactory<>("flockName"));
 
 
         tableView.setItems(model);
@@ -114,26 +113,21 @@ public class DucksController extends AbstractPagingTableViewController<DuckGuiDT
     @FXML
     public void handleAddDuck() {
         try {
-            // 1. Load the FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("DuckAddDialog.fxml"));
             VBox page = loader.load();
 
-            // 2. Create the Stage (Dialog Window)
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Add New Duck");
-            dialogStage.initModality(Modality.WINDOW_MODAL); // Blocks interaction with main window
+            dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(tableView.getScene().getWindow());
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
 
-            // 3. Inject dependencies into the Dialog Controller
             DuckAddDialogController controller = loader.getController();
             controller.setService(service, dialogStage);
 
-            // 4. Show and Wait
             dialogStage.showAndWait();
 
-            // 5. Refresh data if save was successful
             if (controller.isSaveClicked()) {
                 loadData();
             }
@@ -148,7 +142,7 @@ public class DucksController extends AbstractPagingTableViewController<DuckGuiDT
     public void handleDeleteDuck() {
         DuckGuiDTO selected = tableView.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            service.delete(selected.getId());
+            usersService.delete(selected.getId());
             model.remove(selected);
             loadData();
         } else {

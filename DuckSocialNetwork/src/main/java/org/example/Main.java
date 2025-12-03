@@ -84,8 +84,8 @@ public class Main {
         duckService.setFlockService(flockService);
 
         //ui
-//        var app = new ConsoleUserInterface(usersService, friendshipService, flockService, raceEventService);
-//        app.run();
+        var app = new ConsoleUserInterface(usersService, friendshipService, flockService, raceEventService);
+        app.run();
 
         DatabaseConnection.closeConnection();
     }

@@ -22,8 +22,6 @@
                 <TableColumn fx:id="idCol" text="ID" prefWidth="100"/>
                 <TableColumn fx:id="usernameCol" text="Username" prefWidth="100"/>
                 <TableColumn fx:id="emailCol" text="Email" prefWidth="150"/>
-                <TableColumn fx:id="nrOfFriendsCol" text="Number of Friends" prefWidth="100"/>
-                <TableColumn fx:id="flockNameCol" text="Flock" prefWidth="150"/>
                 <TableColumn fx:id="typeCol" text="Type" prefWidth="150"/>
                 <TableColumn fx:id="rezistanceCol" text="Rezitance" prefWidth="150"/>
                 <TableColumn fx:id="speedCol" text="Speed" prefWidth="150"/>

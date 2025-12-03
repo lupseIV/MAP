@@ -36,27 +36,6 @@ public class DucksService extends EntityService<Long, Duck>{
         return repository.delete(duckId);
     }
 
-    public List<DuckGuiDTO> getGuiDucks(){
-        List<DuckGuiDTO> list = new ArrayList<>();
-        for(Duck duck : repository.findAll()){
-            Long id = duck.getId();
-            String username = duck.getUsername();
-            String email = duck.getEmail();
-            int nrOfFriends = duck.getFriends().size();
-            String type = String.valueOf(duck.getDuckType());
-            Double speed = duck.getSpeed();
-            Double rezistance = duck.getRezistance();
-            String flockName;
-            if(duck.getFlock() != null) {
-                flockName = duck.getFlock().getFlockName();
-            } else {
-                flockName = "no Flock";
-            }
-
-            list.add(new DuckGuiDTO(id,username,email,nrOfFriends,type,speed,rezistance,flockName));
-        }
-        return list;
-    }
 
     public List<DuckGuiDTO> getGuiDucksFromPage(Page<Duck> page){
         List<DuckGuiDTO> list = new ArrayList<>();
@@ -65,17 +44,10 @@ public class DucksService extends EntityService<Long, Duck>{
             Long id = duck.getId();
             String username = duck.getUsername();
             String email = duck.getEmail();
-            int nrOfFriends = duck.getFriends().size();
             String type = String.valueOf(duck.getDuckType());
             Double speed = duck.getSpeed();
             Double rezistance = duck.getRezistance();
-            String flockName;
-            if(duck.getFlock() != null) {
-                flockName = duck.getFlock().getFlockName();
-            } else {
-                flockName = "no Flock";
-            }
-            list.add(new DuckGuiDTO(id,username,email,nrOfFriends,type,speed,rezistance, flockName));
+            list.add(new DuckGuiDTO(id,username,email,type,speed,rezistance));
         });
         return list;
     }

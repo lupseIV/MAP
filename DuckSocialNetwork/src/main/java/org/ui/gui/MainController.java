@@ -31,7 +31,7 @@ public class MainController implements ViewController{
     @FXML public void handleShowUsersView(){
         loadView("UsersView.fxml", controller -> {
             if (controller instanceof UsersController) {
-                ((UsersController) controller).setService(ducksService, personsService,contentArea);
+                ((UsersController) controller).setService(ducksService, personsService,usersService,contentArea);
             }
         }, contentArea);
     }
