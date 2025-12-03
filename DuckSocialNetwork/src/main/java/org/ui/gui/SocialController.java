@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -30,7 +31,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class SocialController {
+public class SocialController extends AbstractPagingTableViewController{
 
     @FXML private TableView<Friendship> friendshipsTable;
     @FXML private TableColumn<Friendship, Long> idCol;
@@ -45,21 +46,24 @@ public class SocialController {
 
     private FriendshipService service;
     private UsersService usersService;
-    private int currentPage = 0;
-    private final int pageSize = 14;
-    private int totalNrOfElements = 0;
+
+
+    public SocialController() {
+        super(0, 14, 0);
+    }
 
     private final ObservableList<Friendship> model = FXCollections.observableArrayList();
     private final FriendshipGUIFilter filter = new FriendshipGUIFilter();
 
     public void setService(FriendshipService service, UsersService usersService) {
+
         this.service = Objects.requireNonNull(service);
         this.usersService = Objects.requireNonNull(usersService);
         initializeTable();
         loadData();
     }
 
-    private void initializeTable() {
+    public void initializeTable() {
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         user1Col.setCellValueFactory(new PropertyValueFactory<>("user1"));
         user2Col.setCellValueFactory(new PropertyValueFactory<>("user2"));
@@ -68,7 +72,7 @@ public class SocialController {
     }
 
 
-    private void loadData() {
+    public void loadData() {
         if (service == null) return;
 
         Pageable pageable = new Pageable(currentPage, pageSize);
@@ -97,45 +101,24 @@ public class SocialController {
     }
 
     @FXML
-    public void onNextPage(ActionEvent actionEvent) {
-        if ((currentPage + 1) * pageSize < totalNrOfElements) {
-            currentPage++;
-            loadData();
-        }
-    }
-
-    @FXML
-    public void onPreviousPage(ActionEvent actionEvent) {
-        if (currentPage > 0) {
-            currentPage--;
-            loadData();
-        }
-    }
-
-    @FXML
     public void handleAdd() {
         try {
-            // 1. Load the FXML
             FXMLLoader loader = new FXMLLoader(getClass().getResource("FriendshipAddDialog.fxml"));
             VBox page = loader.load();
 
-            // 2. Create the Stage (Dialog Window)
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Add New Person");
-            dialogStage.initModality(Modality.WINDOW_MODAL); // Blocks interaction with main window
+            dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(friendshipsTable.getScene().getWindow());
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
 
-            // 3. Inject dependencies into the Dialog Controller
             FriendshipAddDialogController controller = loader.getController();
             controller.setService(service, dialogStage);
             controller.setUsersService(usersService);
 
-            // 4. Show and Wait
             dialogStage.showAndWait();
 
-            // 5. Refresh data if save was successful
             if (controller.isSaveClicked()) {
                 loadData();
             }

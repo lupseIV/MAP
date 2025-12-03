@@ -4,6 +4,7 @@ module org.example {
     requires java.sql;
     requires javafx.base;
     requires javafx.graphics;
+    requires java.desktop;
 
     // Export packages to make them visible to other modules
     exports org.example;

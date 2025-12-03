@@ -11,7 +11,7 @@ import org.service.UsersService;
 
 import java.io.IOException;
 
-public class MainController {
+public class MainController extends AbstractViewController{
 
     @FXML
     private StackPane contentArea;
@@ -34,7 +34,7 @@ public class MainController {
             if (controller instanceof DucksController) {
                 ((DucksController) controller).setService(ducksService);
             }
-        });
+        },  contentArea);
     }
 
     @FXML
@@ -43,7 +43,7 @@ public class MainController {
             if (controller instanceof PersonsController) {
                 ((PersonsController) controller).setService(personsService);
             }
-        });
+        }, contentArea);
     }
 
     @FXML
@@ -53,28 +53,6 @@ public class MainController {
             if (controller instanceof SocialController) {
                 ((SocialController) controller).setService(friendshipService, usersService);
             }
-        });
-    }
-
-
-    private interface ControllerConfigurator {
-        void configure(Object controller);
-    }
-
-    private void loadView(String fxmlFile, ControllerConfigurator configurator) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
-            Parent view = loader.load();
-
-            Object controller = loader.getController();
-            configurator.configure(controller);
-
-            contentArea.getChildren().clear();
-            contentArea.getChildren().add(view);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Error loading view: " + fxmlFile);
-        }
+        }, contentArea);
     }
 }

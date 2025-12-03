@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
 
-public class PersonsController {
+public class PersonsController extends AbstractPagingTableViewController{
 
     @FXML private TableView<PersonGuiDTO> personsTable;
     @FXML private TableColumn<PersonGuiDTO, Long> idCol;
@@ -45,9 +45,10 @@ public class PersonsController {
     @FXML private Label labelPage;
 
     private PersonsService service;
-    private int currentPage = 0;
-    private final int pageSize = 14;
-    private int totalNrOfElements = 0;
+
+    public PersonsController() {
+        super(0, 14, 0);
+    }
 
     private final ObservableList<PersonGuiDTO> model = FXCollections.observableArrayList();
     private final PersonGUIFilter filter = new PersonGUIFilter();
@@ -59,7 +60,7 @@ public class PersonsController {
         loadData();
     }
 
-    private void initializeTable() {
+    public void initializeTable() {
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         usernameCol.setCellValueFactory(new PropertyValueFactory<>("username"));
         emailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
@@ -72,12 +73,9 @@ public class PersonsController {
         personsTable.setItems(model);
     }
 
-    private void initComboBox(){
-        comboBox.setItems(FXCollections.observableArrayList("All"));
-        comboBox.getSelectionModel().selectFirst();
-    }
 
-    private void loadData() {
+
+    public void loadData() {
         if (service == null) return;
 
         Pageable pageable = new Pageable(currentPage, pageSize);
@@ -103,20 +101,9 @@ public class PersonsController {
         }
     }
 
-    @FXML
-    public void onNextPage(ActionEvent actionEvent) {
-        if ((currentPage + 1) * pageSize < totalNrOfElements) {
-            currentPage++;
-            loadData();
-        }
-    }
-
-    @FXML
-    public void onPreviousPage(ActionEvent actionEvent) {
-        if (currentPage > 0) {
-            currentPage--;
-            loadData();
-        }
+    private void initComboBox(){
+        comboBox.setItems(FXCollections.observableArrayList("All"));
+        comboBox.getSelectionModel().selectFirst();
     }
 
     @FXML
@@ -132,22 +119,18 @@ public class PersonsController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("PersonAddDialog.fxml"));
             VBox page = loader.load();
 
-            // 2. Create the Stage (Dialog Window)
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Add New Person");
-            dialogStage.initModality(Modality.WINDOW_MODAL); // Blocks interaction with main window
+            dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(personsTable.getScene().getWindow());
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
 
-            // 3. Inject dependencies into the Dialog Controller
             PersonAddDialogController controller = loader.getController();
             controller.setService(service, dialogStage);
 
-            // 4. Show and Wait
             dialogStage.showAndWait();
 
-            // 5. Refresh data if save was successful
             if (controller.isSaveClicked()) {
                 loadData();
             }

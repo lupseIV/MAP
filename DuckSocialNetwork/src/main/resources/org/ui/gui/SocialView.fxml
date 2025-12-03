@@ -32,9 +32,9 @@
 
     <bottom>
         <HBox styleClass="control-bar">
-            <Button fx:id="buttonPrevious" text="Previous Page" onAction="#onPreviousPage" styleClass="nav-button"/>
+            <Button fx:id="buttonPrevious" text="Previous Page" onAction="#onPrevious" styleClass="nav-button"/>
             <Label fx:id="labelPage" text="Page 1" style="-fx-text-fill: white; -fx-padding: 5;"/>
-            <Button fx:id="buttonNext" text="Next Page" onAction="#onNextPage" styleClass="nav-button"/>
+            <Button fx:id="buttonNext" text="Next Page" onAction="#onNext" styleClass="nav-button"/>
 
             <Region HBox.hgrow="ALWAYS"/>
 
