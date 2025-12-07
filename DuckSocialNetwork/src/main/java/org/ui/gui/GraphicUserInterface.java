@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import org.domain.users.User;
@@ -87,15 +88,16 @@ public class GraphicUserInterface extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainLayout.fxml"));
-        BorderPane root = loader.load();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("LoginView.fxml"));
+        VBox root = loader.load();
 
-        MainController controller = loader.getController();
+        LoginController controller = loader.getController();
         controller.setServices(ducksService, personsService, friendshipService, usersService);
 
-        Scene scene = new Scene(root, 1000, 700);
 
-        primaryStage.setTitle("Duck Social Network Manager");
+        Scene scene = new Scene(root, 1000, 700);
+        controller.setStage(primaryStage);
+        primaryStage.setTitle("Duck Social Network Login");
         primaryStage.setScene(scene);
         primaryStage.show();
     }
