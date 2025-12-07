@@ -31,5 +31,5 @@
 
 
     <Region VBox.vgrow="ALWAYS" />
-        <Button text="Closer" onAction="#handleClose" styleClass="nav-button" style="-fx-border-color: #666; -fx-border-radius: 4;"/>
+        <Button text="Close" onAction="#handleClose" styleClass="nav-button" style="-fx-border-color: #666; -fx-border-radius: 4;"/>
 </VBox>
