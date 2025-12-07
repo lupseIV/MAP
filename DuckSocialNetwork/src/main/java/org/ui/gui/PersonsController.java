@@ -49,7 +49,7 @@ public class PersonsController extends AbstractPagingTableViewController<PersonG
     private UsersService usersService;
 
     public PersonsController() {
-        super(0, 14, 0, new PersonGUIFilter());
+        super(0, 3, 0, new PersonGUIFilter());
     }
 
     public void setService(PersonsService service, UsersService usersService) {

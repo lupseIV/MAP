@@ -38,7 +38,7 @@ public class FriendshipService extends EntityService<Long, Friendship>{
         friendship.setId(idGenerator.nextId());
 
         friendship.getUser1().addFriend(friendship.getUser2());
-        friendshipNetwork.clear();
+        friendshipNetwork=null;
 
         return repository.save(friendship);
     }
@@ -50,7 +50,7 @@ public class FriendshipService extends EntityService<Long, Friendship>{
         if(friendship == null)
             throw new ServiceException("Friendship not found");
         friendship.getUser1().removeFriend(friendship.getUser2());
-        friendshipNetwork.clear();
+        friendshipNetwork=null;
         return repository.delete(id);
     }
 
