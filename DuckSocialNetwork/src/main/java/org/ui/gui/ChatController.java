@@ -88,6 +88,9 @@ public class ChatController implements Observer {
 
     private void loadMessages() {
         if (currentUser != null && chatPartner != null) {
+            // Refresh messages from database for cross-instance sync
+            messageService.refreshMessages();
+            
             // Fetch messages on background thread (safe - no UI access)
             List<Message> conversation = messageService.getConversation(currentUser, chatPartner);
             int newMessageCount = conversation.size();
