@@ -80,4 +80,13 @@ public class MainController implements ViewController{
             e.printStackTrace();
         }
     }
+    
+    @FXML
+    public void handleShowNotifications(){
+        loadView("NotificationPanel.fxml", controller ->  {
+            if (controller instanceof NotificationPanelController) {
+                ((NotificationPanelController) controller).setServices(notificationService, authService);
+            }
+        }, contentArea);
+    }
 }
