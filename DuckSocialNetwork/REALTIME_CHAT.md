@@ -34,7 +34,7 @@ The implementation follows the **Model-View-Controller (MVC)** pattern with the 
 ```java
 // MessageService (Observable)
 public class MessageService implements Observable<Observer> {
-    private List<Observer> observers = new ArrayList<>();
+    private List<Observer> observers = new CopyOnWriteArrayList<>();
     
     public void sendMessage(...) {
         // Save message to database

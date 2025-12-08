@@ -86,7 +86,12 @@ public class MessageService extends EntityService<Long, Message> implements Obse
     @Override
     public void notifyObservers() {
         for (Observer observer : observers) {
-            observer.update();
+            try {
+                observer.update();
+            } catch (Exception e) {
+                // Log error but continue notifying other observers
+                System.err.println("Error notifying observer: " + e.getMessage());
+            }
         }
     }
 }

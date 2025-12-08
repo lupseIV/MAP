@@ -152,7 +152,7 @@ public class ChatController implements Observer {
     @Override
     public void update() {
         // Called by MessageService when a new message is sent
-        // Ensure UI updates happen on JavaFX Application Thread
-        Platform.runLater(() -> loadMessages());
+        // Already wrapped in Platform.runLater to ensure JavaFX thread safety
+        loadMessages();
     }
 }
