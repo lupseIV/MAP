@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="400.0" prefWidth="300.0" spacing="10.0" stylesheets="@css/styling.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.ui.gui.UserSelectionDialogController">
+    <padding>
+        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+    </padding>
+    <children>
+        <Label text="Select User to Chat With" textFill="WHITE">
+            <font>
+                <Font name="System Bold" size="16.0" />
+            </font>
+        </Label>
+        
+        <ListView fx:id="userListView" VBox.vgrow="ALWAYS" />
+        
+        <HBox alignment="CENTER_RIGHT" spacing="10.0">
+            <children>
+                <Button mnemonicParsing="false" onAction="#handleCancel" prefWidth="80.0" text="Cancel" />
+                <Button defaultButton="true" mnemonicParsing="false" onAction="#handleOk" prefWidth="80.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="OK" />
+            </children>
+        </HBox>
+    </children>
+</VBox>

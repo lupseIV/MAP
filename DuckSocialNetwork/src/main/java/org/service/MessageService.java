@@ -3,7 +3,9 @@ package org.service;
 import org.domain.users.User;
 import org.domain.users.relationships.messages.Message;
 import org.domain.users.relationships.messages.ReplyMessage;
-import org.repository.Repository;
+import org.domain.validators.Validator;
+import org.repository.PagingRepository;
+import org.service.utils.IdGenerator;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -11,27 +13,45 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class MessageService {
-    private final Repository<Long, Message> messageRepository;
+public class MessageService extends EntityService<Long, Message> {
+    private NotificationService notificationService;
 
-    public MessageService(Repository<Long, Message> messageRepository) {
-        this.messageRepository = messageRepository;
+    public MessageService(Validator<Message> validator, PagingRepository<Long, Message> messageRepository, IdGenerator<Long> idGenerator) {
+        super(validator, messageRepository, idGenerator);
+    }
+
+    public void setNotificationService(NotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 
     public void sendMessage(User from, List<User> to, String text) {
         Message message = new Message(from, to, text);
-        messageRepository.save(message);
+        save(message);
+        
+        // Create notification for each recipient
+        if (notificationService != null) {
+            for (User recipient : to) {
+                String preview = text.length() > 50 ? text.substring(0, 50) + "..." : text;
+                notificationService.createNotification(recipient, from, preview);
+            }
+        }
     }
 
     public void replyMessage(User from, Message messageToReply, String text) {
         List<User> recipients = new ArrayList<>();
         recipients.add(messageToReply.getFrom());
         ReplyMessage reply = new ReplyMessage(from, recipients, text, messageToReply);
-        messageRepository.save(reply);
+        save(reply);
+        
+        // Create notification for the original sender
+        if (notificationService != null) {
+            String preview = text.length() > 50 ? text.substring(0, 50) + "..." : text;
+            notificationService.createNotification(messageToReply.getFrom(), from, preview);
+        }
     }
 
     public List<Message> getConversation(User u1, User u2) {
-        return StreamSupport.stream(messageRepository.findAll().spliterator(), false)
+        return StreamSupport.stream(repository.findAll().spliterator(), false)
                 .filter(m -> isPartofConversation(m, u1, u2))
                 .sorted(Comparator.comparing(Message::getDate))
                 .collect(Collectors.toList());

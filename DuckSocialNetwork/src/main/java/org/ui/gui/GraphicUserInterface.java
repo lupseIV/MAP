@@ -31,6 +31,7 @@ public class GraphicUserInterface extends Application {
     private UsersService usersService;
     private AuthService authService;
     private MessageService messageService;
+    private NotificationService notificationService;
 
     @Override
     public void init() throws Exception {
@@ -40,6 +41,7 @@ public class GraphicUserInterface extends Application {
         var flockValidator = new FlockValidator();
         var raceEventValidator = new RaceEventValidator();
         var messageValidator = new MessageValidator();
+        var notificationValidator = new NotificationValidator();
 
         DatabaseConnection.initDatabaseSchema();
 
@@ -59,6 +61,7 @@ public class GraphicUserInterface extends Application {
         flockRepo = new FlockDatabaseRepository(flockValidator, duckRepo);
         raceEventRepo = new RaceEventDatabaseRepository(raceEventValidator, duckRepo);
         MessageDatabaseRepository messageRepo = new MessageDatabaseRepository(messageValidator, duckRepo, personRepo);
+        NotificationDatabaseRepository notificationRepo = new NotificationDatabaseRepository(notificationValidator, duckRepo, personRepo);
 
         Long maxUsersId = Math.max(
                 EntityRepository.getMaxId(duckRepo.findAll()),
@@ -68,12 +71,16 @@ public class GraphicUserInterface extends Application {
         Long maxFriendshipId = EntityRepository.getMaxId(friendshipRepo.findAll());
         Long maxFlockId = EntityRepository.getMaxId(flockRepo.findAll());
         Long  maxEventId = EntityRepository.getMaxId(raceEventRepo.findAll());
+        Long maxMessageId = EntityRepository.getMaxId(messageRepo.findAll());
+        Long maxNotificationId = EntityRepository.getMaxId(notificationRepo.findAll());
 
         //id generator
         var usersIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxUsersId, 0L) + 1);
         var friendshipIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxFriendshipId, 0L) + 1);
         var flockIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxFlockId, 0L) + 1);
         var eventIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxEventId, 0L) + 1);
+        var messageIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxMessageId, 0L) + 1);
+        var notificationIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxNotificationId, 0L) + 1);
 
         //service
         ducksService = new DucksService(duckValidator, duckRepo, usersIdGenerator);
@@ -85,7 +92,11 @@ public class GraphicUserInterface extends Application {
 
         usersService = new UsersService(ducksService, personsService,friendshipService);
         authService = new AuthService(usersService);
-        messageService = new MessageService(messageRepo);
+        messageService = new MessageService(messageValidator, messageRepo, messageIdGenerator);
+        notificationService = new NotificationService(notificationValidator, notificationRepo, notificationIdGenerator);
+        
+        // Wire up notification service to message service
+        messageService.setNotificationService(notificationService);
 
         friendshipService.setUsersService(usersService);
         ducksService.setFlockService(flockService);
@@ -97,7 +108,7 @@ public class GraphicUserInterface extends Application {
         VBox root = loader.load();
 
         LoginController controller = loader.getController();
-        controller.setServices(ducksService, personsService, friendshipService, usersService, authService, messageService);
+        controller.setServices(ducksService, personsService, friendshipService, usersService, authService, messageService, notificationService);
 
 
         Scene scene = new Scene(root, 1000, 700);
