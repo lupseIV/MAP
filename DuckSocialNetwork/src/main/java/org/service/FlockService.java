@@ -19,6 +19,17 @@ public class FlockService extends EntityService<Long, Flock<Duck>>{
         this.ducksService = ducksService;
     }
 
+    /**
+     * Override save to use database-generated IDs instead of in-memory IdGenerator.
+     * This prevents race conditions when multiple instances are running.
+     */
+    @Override
+    public Flock<Duck> save(Flock<Duck> entity) {
+        validator.validate(entity);
+        // Don't set ID here - let the repository get it from database sequence
+        return repository.save(entity);
+    }
+
     public Duck addDuckToFlock(Long flockId, Long duckId) {
         var flock = repository.findOne(flockId);
         var duck = ducksService.findOne(duckId);

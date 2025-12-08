@@ -26,6 +26,50 @@ public class FlockDatabaseRepository extends EntityDatabaseRepository<Long, Floc
         loadFromDatabase();
     }
 
+    /**
+     * Get the next ID from the database sequence.
+     * This ensures unique IDs across multiple application instances.
+     */
+    private Long getNextIdFromDatabase() {
+        String sql = "SELECT nextval('flocks_id_seq')";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            if (rs.next()) {
+                return rs.getLong(1);
+            }
+            throw new RepositoryException("Failed to get next ID from database sequence");
+        } catch (SQLException e) {
+            throw new RepositoryException("Error getting next ID from database sequence", e);
+        }
+    }
+
+    /**
+     * Override save to use database-generated ID instead of in-memory generator.
+     */
+    @Override
+    public Flock<Duck> save(Flock<Duck> entity) {
+        // Generate ID from database sequence if not already set
+        if (entity.getId() == null) {
+            entity.setId(getNextIdFromDatabase());
+        }
+        
+        // Check if entity already exists in memory
+        Flock<Duck> existing = super.findOne(entity.getId());
+        if (existing != null) {
+            return null; // Already exists
+        }
+        
+        // Save to database first
+        saveToDatabase(entity);
+        
+        // Then add to in-memory cache
+        entities.put(entity.getId(), entity);
+        
+        return null; // Return null to indicate successful save (no previous value)
+    }
+
 
     @Override
     public Flock<Duck> extractEntityFromResultSet(ResultSet resultSet) throws SQLException {

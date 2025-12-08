@@ -16,6 +16,17 @@ public class NotificationService extends EntityService<Long, Notification> {
         super(validator, notificationRepository, idGenerator);
     }
 
+    /**
+     * Override save to use database-generated IDs instead of in-memory IdGenerator.
+     * This prevents race conditions when multiple instances are running.
+     */
+    @Override
+    public Notification save(Notification entity) {
+        validator.validate(entity);
+        // Don't set ID here - let the repository get it from database sequence
+        return repository.save(entity);
+    }
+
     public void createNotification(User recipient, User sender, String messagePreview) {
         Notification notification = new Notification(recipient, sender, messagePreview);
         save(notification);
