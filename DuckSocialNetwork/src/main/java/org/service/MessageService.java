@@ -7,6 +7,7 @@ import org.domain.users.relationships.messages.Message;
 import org.domain.users.relationships.messages.ReplyMessage;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
+import org.repository.db.MessageDatabaseRepository;
 import org.service.utils.IdGenerator;
 
 import java.util.ArrayList;
@@ -19,13 +20,28 @@ import java.util.stream.StreamSupport;
 public class MessageService extends EntityService<Long, Message> implements Observable<Observer> {
     private NotificationService notificationService;
     private List<Observer> observers = new CopyOnWriteArrayList<>();
+    private MessageDatabaseRepository messageRepository;
 
     public MessageService(Validator<Message> validator, PagingRepository<Long, Message> messageRepository, IdGenerator<Long> idGenerator) {
         super(validator, messageRepository, idGenerator);
+        // Store reference if it's a MessageDatabaseRepository for reloading
+        if (messageRepository instanceof MessageDatabaseRepository) {
+            this.messageRepository = (MessageDatabaseRepository) messageRepository;
+        }
     }
 
     public void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
+    }
+
+    /**
+     * Reload messages from database. This is necessary for multi-instance scenarios
+     * where messages are added by other application instances.
+     */
+    public void refreshMessages() {
+        if (messageRepository != null) {
+            messageRepository.reloadFromDatabase();
+        }
     }
 
     public void sendMessage(User from, List<User> to, String text) {

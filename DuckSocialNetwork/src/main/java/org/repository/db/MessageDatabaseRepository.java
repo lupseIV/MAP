@@ -26,6 +26,16 @@ public class MessageDatabaseRepository extends EntityDatabaseRepository<Long, Me
         this.personRepository = personRepository;
     }
 
+    /**
+     * Refresh the in-memory cache from the database.
+     * This is necessary for multi-instance scenarios where messages
+     * are added by other application instances.
+     */
+    public void reloadFromDatabase() {
+        entities.clear();
+        loadFromDatabase();
+    }
+
     private User findOneUserById(Long id) {
         User user = duckRepository.findOne(id);
         if (user == null) {
