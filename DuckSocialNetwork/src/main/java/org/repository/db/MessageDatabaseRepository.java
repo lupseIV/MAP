@@ -135,11 +135,6 @@ public class MessageDatabaseRepository extends EntityDatabaseRepository<Long, Me
             saveRecipients(message);
 
         } catch (SQLException e) {
-            // Check if it's a duplicate key violation (PostgreSQL error code 23505)
-            if (e.getSQLState() != null && e.getSQLState().equals("23505")) {
-                throw new RepositoryException("Duplicate message ID: " + message.getId() + 
-                    ". This may be caused by concurrent message creation. Please retry.", e);
-            }
             throw new RepositoryException("Error saving message to database", e);
         }
     }
