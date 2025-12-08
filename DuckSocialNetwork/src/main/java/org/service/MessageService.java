@@ -37,19 +37,10 @@ public class MessageService extends EntityService<Long, Message> implements Obse
     /**
      * Reload messages from database. This is necessary for multi-instance scenarios
      * where messages are added by other application instances.
-     * Also updates the ID generator to prevent duplicate key violations.
      */
     public void refreshMessages() {
         if (messageRepository != null) {
             messageRepository.reloadFromDatabase();
-            
-            // Update ID generator to prevent duplicate IDs across instances
-            if (idGenerator instanceof org.service.utils.LongIdGenerator) {
-                Long maxId = org.repository.EntityRepository.getMaxId(repository.findAll());
-                if (maxId != null) {
-                    ((org.service.utils.LongIdGenerator) idGenerator).ensureMinimum(maxId + 1);
-                }
-            }
         }
     }
 
