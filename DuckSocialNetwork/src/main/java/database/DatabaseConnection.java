@@ -1,13 +1,16 @@
 package database;
 
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io. InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java. sql.Statement;
 import java.util.stream.Collectors;
 
 public class DatabaseConnection {
@@ -16,40 +19,55 @@ public class DatabaseConnection {
     private static final String PASS = "141105";
     private static final String SCHEMA_FILE = "/db/schema.sql";
 
-    private static Connection connection = null;
+    private static HikariDataSource dataSource;
 
-    public static Connection getConnection() throws SQLException {
-        if (connection == null || connection.isClosed()) {
-            connection = DriverManager.getConnection(DB_URL, USER, PASS);
-        }
-        return connection;
+    static {
+        HikariConfig config = new HikariConfig();
+        config. setJdbcUrl(DB_URL);
+        config.setUsername(USER);
+        config. setPassword(PASS);
+
+        // Connection pool settings
+        config.setMaximumPoolSize(10);
+        config.setMinimumIdle(2);
+        config. setIdleTimeout(300000);        // 5 minutes
+        config.setMaxLifetime(600000);        // 10 minutes
+        config.setConnectionTimeout(30000);   // 30 seconds
+        config.setKeepaliveTime(60000);       // 1 minute keepalive
+        config. setAutoCommit(true);
+        // Validate connections before use
+        config.setConnectionTestQuery("SELECT 1");
+
+        dataSource = new HikariDataSource(config);
     }
 
-    public static void closeConnection() throws SQLException {
-        if(connection != null && !connection.isClosed()) {
-            connection.close();
+    public static Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
+    }
+
+    public static void closeConnection() {
+        if (dataSource != null && !dataSource.isClosed()) {
+            dataSource.close();
         }
     }
 
     public static void initDatabaseSchema() throws SQLException {
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
-             String sql = readSchemaFile();
+            String sql = readSchemaFile();
 
-             String[] statements = sql.split(";");
-             for (String statement : statements) {
-                 String trimmedStatement = statement.trim();
+            String[] statements = sql.split(";");
+            for (String statement : statements) {
+                String trimmedStatement = statement.trim();
 
-                 if (!trimmedStatement.isEmpty()) {
-
-                     String cleanSql = removeComments(trimmedStatement);
-                     if(!cleanSql.isEmpty()) {
-                         stmt.execute(cleanSql);
-                     }
-                 }
-             }
-
-        } catch (IOException e){
+                if (!trimmedStatement.isEmpty()) {
+                    String cleanSql = removeComments(trimmedStatement);
+                    if (! cleanSql.isEmpty()) {
+                        stmt.execute(cleanSql);
+                    }
+                }
+            }
+        } catch (IOException e) {
             throw new SQLException("Failed to load DB Schema file: " + e.getMessage(), e);
         }
     }
@@ -68,19 +86,18 @@ public class DatabaseConnection {
 
     private static String removeComments(String sql) {
         StringBuilder result = new StringBuilder();
-        String[] lines = sql.split("\n");
+        String[] lines = sql. split("\n");
         for (String line : lines) {
             String trimmedLine = line.trim();
-            if(!trimmedLine.startsWith("--")) {
+            if (! trimmedLine.startsWith("--")) {
                 int commentIndex = line.indexOf("--");
-                if(commentIndex > 0) {
+                if (commentIndex > 0) {
                     result.append(line, 0, commentIndex).append("\n");
                 } else {
-                    result.append(line).append("\n");
+                    result.append(line). append("\n");
                 }
             }
         }
-        return result.toString().trim();
+        return result.toString(). trim();
     }
-
 }

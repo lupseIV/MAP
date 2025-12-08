@@ -118,6 +118,7 @@ public abstract class EntityDatabaseRepository<ID, E extends Entity<ID>> extends
     }
 
     public abstract E extractEntityFromResultSet(ResultSet resultSet) throws SQLException;
+    protected abstract ID getNextIdFromDatabase();
     protected void loadFromDatabase() {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sqlSelectAllStatement);
@@ -134,7 +135,11 @@ public abstract class EntityDatabaseRepository<ID, E extends Entity<ID>> extends
 
     @Override
     public E save(E entity) {
+        var id = getNextIdFromDatabase();
+        entity.setId(id);
+
         E result = super.save(entity);
+
         if(result == null) {
             saveToDatabase(entity);
         }
@@ -157,5 +162,11 @@ public abstract class EntityDatabaseRepository<ID, E extends Entity<ID>> extends
             updateFromDatabase(entity);
         }
         return result;
+    }
+
+    @Override
+    public Iterable<E> findAll(){
+        loadFromDatabase();
+        return super.findAll();
     }
 }

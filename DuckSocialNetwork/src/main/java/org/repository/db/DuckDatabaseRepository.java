@@ -24,7 +24,7 @@ public class DuckDatabaseRepository extends EntityDatabaseRepository<Long, Duck>
      * Get the next ID from the database sequence.
      * This ensures unique IDs across multiple application instances.
      */
-    private Long getNextIdFromDatabase() {
+    protected Long getNextIdFromDatabase() {
         String sql = "SELECT nextval('ducks_id_seq')";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -39,30 +39,6 @@ public class DuckDatabaseRepository extends EntityDatabaseRepository<Long, Duck>
         }
     }
 
-    /**
-     * Override save to use database-generated ID instead of in-memory generator.
-     */
-    @Override
-    public Duck save(Duck entity) {
-        // Generate ID from database sequence if not already set
-        if (entity.getId() == null) {
-            entity.setId(getNextIdFromDatabase());
-        }
-        
-        // Check if entity already exists in memory
-        Duck existing = super.findOne(entity.getId());
-        if (existing != null) {
-            return null; // Already exists
-        }
-        
-        // Save to database first
-        saveToDatabase(entity);
-        
-        // Then add to in-memory cache
-        entities.put(entity.getId(), entity);
-        
-        return null; // Return null to indicate successful save (no previous value)
-    }
 
     @Override
     public Duck extractEntityFromResultSet(ResultSet resultSet) throws SQLException {
