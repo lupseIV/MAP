@@ -1,5 +1,7 @@
 package org.service;
 
+import org.domain.Observable;
+import org.domain.Observer;
 import org.domain.users.User;
 import org.domain.users.relationships.messages.Message;
 import org.domain.users.relationships.messages.ReplyMessage;
@@ -13,8 +15,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class MessageService extends EntityService<Long, Message> {
+public class MessageService extends EntityService<Long, Message> implements Observable<Observer> {
     private NotificationService notificationService;
+    private List<Observer> observers = new ArrayList<>();
 
     public MessageService(Validator<Message> validator, PagingRepository<Long, Message> messageRepository, IdGenerator<Long> idGenerator) {
         super(validator, messageRepository, idGenerator);
@@ -35,6 +38,9 @@ public class MessageService extends EntityService<Long, Message> {
                 notificationService.createNotification(recipient, from, preview);
             }
         }
+        
+        // Notify observers that a new message was sent
+        notifyObservers();
     }
 
     public void replyMessage(User from, Message messageToReply, String text) {
@@ -48,6 +54,9 @@ public class MessageService extends EntityService<Long, Message> {
             String preview = text.length() > 50 ? text.substring(0, 50) + "..." : text;
             notificationService.createNotification(messageToReply.getFrom(), from, preview);
         }
+        
+        // Notify observers that a new message was sent
+        notifyObservers();
     }
 
     public List<Message> getConversation(User u1, User u2) {
@@ -61,5 +70,22 @@ public class MessageService extends EntityService<Long, Message> {
         boolean fromU1toU2 = m.getFrom().equals(u1) && m.getTo().contains(u2);
         boolean fromU2toU1 = m.getFrom().equals(u2) && m.getTo().contains(u1);
         return fromU1toU2 || fromU2toU1;
+    }
+
+    @Override
+    public void addObserver(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void removeObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer observer : observers) {
+            observer.update();
+        }
     }
 }
