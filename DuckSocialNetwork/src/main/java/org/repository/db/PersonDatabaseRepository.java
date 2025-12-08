@@ -50,15 +50,15 @@ public class PersonDatabaseRepository extends EntityDatabaseRepository<Long, Per
      */
     @Override
     public Person save(Person entity) {
+        // Generate ID from database sequence if not already set
+        if (entity.getId() == null) {
+            entity.setId(getNextIdFromDatabase());
+        }
+        
         // Check if entity already exists in memory
         Person existing = super.findOne(entity.getId());
         if (existing != null) {
             return null; // Already exists
-        }
-        
-        // Generate ID from database sequence if not already set
-        if (entity.getId() == null) {
-            entity.setId(getNextIdFromDatabase());
         }
         
         // Save to database first
@@ -67,7 +67,7 @@ public class PersonDatabaseRepository extends EntityDatabaseRepository<Long, Per
         // Then add to in-memory cache
         entities.put(entity.getId(), entity);
         
-        return null;
+        return null; // Return null to indicate successful save (no previous value)
     }
 
 

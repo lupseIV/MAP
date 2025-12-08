@@ -47,15 +47,15 @@ public class FriendshipDatabaseRepository extends EntityDatabaseRepository<Long,
      */
     @Override
     public Friendship save(Friendship entity) {
+        // Generate ID from database sequence if not already set
+        if (entity.getId() == null) {
+            entity.setId(getNextIdFromDatabase());
+        }
+        
         // Check if entity already exists in memory
         Friendship existing = super.findOne(entity.getId());
         if (existing != null) {
             return null; // Already exists
-        }
-        
-        // Generate ID from database sequence if not already set
-        if (entity.getId() == null) {
-            entity.setId(getNextIdFromDatabase());
         }
         
         // Save to database first
@@ -64,7 +64,7 @@ public class FriendshipDatabaseRepository extends EntityDatabaseRepository<Long,
         // Then add to in-memory cache
         entities.put(entity.getId(), entity);
         
-        return null;
+        return null; // Return null to indicate successful save (no previous value)
     }
 
     private User findUserById(Long id) {

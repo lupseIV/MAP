@@ -44,15 +44,15 @@ public class DuckDatabaseRepository extends EntityDatabaseRepository<Long, Duck>
      */
     @Override
     public Duck save(Duck entity) {
+        // Generate ID from database sequence if not already set
+        if (entity.getId() == null) {
+            entity.setId(getNextIdFromDatabase());
+        }
+        
         // Check if entity already exists in memory
         Duck existing = super.findOne(entity.getId());
         if (existing != null) {
             return null; // Already exists
-        }
-        
-        // Generate ID from database sequence if not already set
-        if (entity.getId() == null) {
-            entity.setId(getNextIdFromDatabase());
         }
         
         // Save to database first
@@ -61,7 +61,7 @@ public class DuckDatabaseRepository extends EntityDatabaseRepository<Long, Duck>
         // Then add to in-memory cache
         entities.put(entity.getId(), entity);
         
-        return null;
+        return null; // Return null to indicate successful save (no previous value)
     }
 
     @Override
