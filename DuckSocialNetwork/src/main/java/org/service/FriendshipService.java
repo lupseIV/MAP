@@ -35,7 +35,8 @@ public class FriendshipService extends EntityService<Long, Friendship>{
     public Friendship save(Friendship friendship) {
 
         validator.validate(friendship);
-        friendship.setId(idGenerator.nextId());
+        // Don't set ID here - let the repository get it from database sequence
+        // friendship.setId(idGenerator.nextId());
 
         friendship.getUser1().addFriend(friendship.getUser2());
         friendshipNetwork=null;

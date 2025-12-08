@@ -25,6 +25,17 @@ public class RaceEventService extends EntityService<Long, RaceEvent> {
         this.ducksService = ducksService;
     }
 
+    /**
+     * Override save to use database-generated IDs instead of in-memory IdGenerator.
+     * This prevents race conditions when multiple instances are running.
+     */
+    @Override
+    public RaceEvent save(RaceEvent entity) {
+        validator.validate(entity);
+        // Don't set ID here - let the repository get it from database sequence
+        return repository.save(entity);
+    }
+
     public RaceEvent addSpecifiedNrOfDucksToAnRaceEvent(Long id, Integer nrOfDucks) {
 
         long swimmingCount = StreamSupport.stream(ducksService.findAll().spliterator(), false)

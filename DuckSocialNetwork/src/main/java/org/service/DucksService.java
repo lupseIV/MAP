@@ -23,6 +23,17 @@ public class DucksService extends EntityService<Long, Duck>{
         super(validator, repository, idGenerator);
     }
 
+    /**
+     * Override save to use database-generated IDs instead of in-memory IdGenerator.
+     * This prevents race conditions when multiple instances are running.
+     */
+    @Override
+    public Duck save(Duck entity) {
+        validator.validate(entity);
+        // Don't set ID here - let the repository get it from database sequence
+        return repository.save(entity);
+    }
+
     public void setFlockService(FlockService flockService) {
         this.flockService = flockService;
     }

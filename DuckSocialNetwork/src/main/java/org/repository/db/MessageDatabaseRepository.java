@@ -27,6 +27,50 @@ public class MessageDatabaseRepository extends EntityDatabaseRepository<Long, Me
     }
 
     /**
+     * Get the next ID from the database sequence.
+     * This ensures unique IDs across multiple application instances.
+     */
+    private Long getNextIdFromDatabase() {
+        String sql = "SELECT nextval('messages_id_seq')";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            if (rs.next()) {
+                return rs.getLong(1);
+            }
+            throw new RepositoryException("Failed to get next ID from database sequence");
+        } catch (SQLException e) {
+            throw new RepositoryException("Error getting next ID from database sequence", e);
+        }
+    }
+
+    /**
+     * Override save to use database-generated ID instead of in-memory generator.
+     */
+    @Override
+    public Message save(Message entity) {
+        // Check if entity already exists in memory
+        Message existing = super.findOne(entity.getId());
+        if (existing != null) {
+            return null; // Already exists
+        }
+        
+        // Generate ID from database sequence if not already set
+        if (entity.getId() == null) {
+            entity.setId(getNextIdFromDatabase());
+        }
+        
+        // Save to database first
+        saveToDatabase(entity);
+        
+        // Then add to in-memory cache
+        entities.put(entity.getId(), entity);
+        
+        return null;
+    }
+
+    /**
      * Refresh the in-memory cache from the database.
      * This is necessary for multi-instance scenarios where messages
      * are added by other application instances.
@@ -91,6 +135,11 @@ public class MessageDatabaseRepository extends EntityDatabaseRepository<Long, Me
             saveRecipients(message);
 
         } catch (SQLException e) {
+            // Check if it's a duplicate key violation (PostgreSQL error code 23505)
+            if (e.getSQLState() != null && e.getSQLState().equals("23505")) {
+                throw new RepositoryException("Duplicate message ID: " + message.getId() + 
+                    ". This may be caused by concurrent message creation. Please retry.", e);
+            }
             throw new RepositoryException("Error saving message to database", e);
         }
     }

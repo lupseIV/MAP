@@ -1,9 +1,18 @@
 -- Database schema for DuckSocialNetwork application
 -- Creates all tables needed for the application
 
+-- Create sequences for all ID generation
+CREATE SEQUENCE IF NOT EXISTS persons_id_seq;
+CREATE SEQUENCE IF NOT EXISTS ducks_id_seq;
+CREATE SEQUENCE IF NOT EXISTS friendships_id_seq;
+CREATE SEQUENCE IF NOT EXISTS flocks_id_seq;
+CREATE SEQUENCE IF NOT EXISTS race_events_id_seq;
+CREATE SEQUENCE IF NOT EXISTS messages_id_seq;
+CREATE SEQUENCE IF NOT EXISTS notifications_id_seq;
+
 -- Create Persons table
 CREATE TABLE IF NOT EXISTS persons (
-                                       id BIGINT PRIMARY KEY,
+                                       id BIGINT PRIMARY KEY DEFAULT nextval('persons_id_seq'),
                                        username VARCHAR(255) NOT NULL UNIQUE,
                                        password VARCHAR(255) NOT NULL,
                                        email VARCHAR(255) NOT NULL,
@@ -16,7 +25,7 @@ CREATE TABLE IF NOT EXISTS persons (
 
 -- Create Ducks table
 CREATE TABLE IF NOT EXISTS ducks (
-                                     id BIGINT PRIMARY KEY,
+                                     id BIGINT PRIMARY KEY DEFAULT nextval('ducks_id_seq'),
                                      username VARCHAR(255) NOT NULL UNIQUE,
                                      password VARCHAR(255) NOT NULL,
                                      email VARCHAR(255) NOT NULL,
@@ -27,14 +36,14 @@ CREATE TABLE IF NOT EXISTS ducks (
 
 -- Create Friendships table
 CREATE TABLE IF NOT EXISTS friendships (
-                                           id BIGINT PRIMARY KEY,
+                                           id BIGINT PRIMARY KEY DEFAULT nextval('friendships_id_seq'),
                                            user1_id BIGINT NOT NULL,
                                            user2_id BIGINT NOT NULL
 );
 
 -- Create Flocks table
 CREATE TABLE IF NOT EXISTS flocks (
-                                      id BIGINT PRIMARY KEY,
+                                      id BIGINT PRIMARY KEY DEFAULT nextval('flocks_id_seq'),
                                       flock_name VARCHAR(255) NOT NULL
 );
 
@@ -47,7 +56,7 @@ CREATE TABLE IF NOT EXISTS flock_members (
 
 -- Create Race Events table
 CREATE TABLE IF NOT EXISTS race_events (
-                                           id BIGINT PRIMARY KEY,
+                                           id BIGINT PRIMARY KEY DEFAULT nextval('race_events_id_seq'),
                                            name VARCHAR(255) NOT NULL,
                                            max_time DOUBLE PRECISION
 );
@@ -61,7 +70,7 @@ CREATE TABLE IF NOT EXISTS race_event_participants (
 
 -- Create Messages table
 CREATE TABLE IF NOT EXISTS messages (
-                                        id BIGINT PRIMARY KEY,
+                                        id BIGINT PRIMARY KEY DEFAULT nextval('messages_id_seq'),
                                         from_user_id BIGINT NOT NULL,
                                         message TEXT NOT NULL,
                                         date TIMESTAMP NOT NULL,
@@ -77,7 +86,7 @@ CREATE TABLE IF NOT EXISTS message_recipients (
 
 -- Create Notifications table
 CREATE TABLE IF NOT EXISTS notifications (
-                                             id BIGINT PRIMARY KEY,
+                                             id BIGINT PRIMARY KEY DEFAULT nextval('notifications_id_seq'),
                                              recipient_id BIGINT NOT NULL,
                                              sender_id BIGINT NOT NULL,
                                              message_preview TEXT NOT NULL,

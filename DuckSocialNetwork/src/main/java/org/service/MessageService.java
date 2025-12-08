@@ -30,6 +30,17 @@ public class MessageService extends EntityService<Long, Message> implements Obse
         }
     }
 
+    /**
+     * Override save to use database-generated IDs instead of in-memory IdGenerator.
+     * This prevents race conditions when multiple instances are running.
+     */
+    @Override
+    public Message save(Message entity) {
+        validator.validate(entity);
+        // Don't set ID here - let the repository get it from database sequence
+        return repository.save(entity);
+    }
+
     public void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
     }

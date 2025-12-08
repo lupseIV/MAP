@@ -16,6 +16,17 @@ public class PersonsService extends EntityService<Long, Person> {
         super(validator, repository, idGenerator);
     }
 
+    /**
+     * Override save to use database-generated IDs instead of in-memory IdGenerator.
+     * This prevents race conditions when multiple instances are running.
+     */
+    @Override
+    public Person save(Person entity) {
+        validator.validate(entity);
+        // Don't set ID here - let the repository get it from database sequence
+        return repository.save(entity);
+    }
+
     public List<PersonGuiDTO> getGuiPersons(){
         List<PersonGuiDTO> list = new ArrayList<>();
         for(Person p : repository.findAll()){
