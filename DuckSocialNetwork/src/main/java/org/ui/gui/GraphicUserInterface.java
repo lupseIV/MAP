@@ -29,6 +29,7 @@ public class GraphicUserInterface extends Application {
     private FlockService flockService;
     private RaceEventService raceEventService;
     private UsersService usersService;
+    private AuthService authService;
 
     @Override
     public void init() throws Exception {
@@ -79,8 +80,9 @@ public class GraphicUserInterface extends Application {
         flockService = new FlockService(flockValidator, flockRepo, flockIdGenerator, ducksService);
         raceEventService = new RaceEventService(raceEventValidator, raceEventRepo, eventIdGenerator, ducksService);
 
-        usersService = new UsersService(ducksService, personsService,friendshipService);
 
+        usersService = new UsersService(ducksService, personsService,friendshipService);
+        authService = new AuthService(usersService);
 
         friendshipService.setUsersService(usersService);
         ducksService.setFlockService(flockService);
@@ -92,7 +94,7 @@ public class GraphicUserInterface extends Application {
         VBox root = loader.load();
 
         LoginController controller = loader.getController();
-        controller.setServices(ducksService, personsService, friendshipService, usersService);
+        controller.setServices(ducksService, personsService, friendshipService, usersService, authService);
 
 
         Scene scene = new Scene(root, 1000, 700);

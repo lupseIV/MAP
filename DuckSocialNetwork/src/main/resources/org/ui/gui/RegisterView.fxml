@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="490.0" prefWidth="713.0" stylesheets="@css/styling.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.ui.gui.RegisterController">
+   <children>
+       <VBox alignment="CENTER" fillWidth="false" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+       <VBox alignment="CENTER" fillWidth="false">
+
+      <Label layoutX="214.0" layoutY="59.0" text="Welcome to Duck Social" textFill="WHITE">
+         <font>
+            <Font name="System Bold" size="24.0" />
+         </font></Label>
+      <Label layoutX="261.0" layoutY="113.0" text="Please Register to continue" textFill="WHITE" />
+       </VBox>
+      <VBox alignment="CENTER" fillWidth="false" layoutX="121.0" layoutY="142.0">
+         <children>
+             <GridPane alignment="TOP_CENTER" prefHeight="212.0" prefWidth="472.0" style="-fx-padding: 20;" vgap="10.0">
+                 <TextField fx:id="emailField" prefHeight="29.0" prefWidth="336.0" promptText="Enter your email" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                  <opaqueInsets>
+                     <Insets />
+                  </opaqueInsets>
+               </TextField>
+                 <Label text="Email" textFill="WHITE" GridPane.rowIndex="1" />
+                 <PasswordField fx:id="passwordField" prefHeight="29.0" prefWidth="259.0" promptText="Enter your password" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                 <Label prefHeight="29.0" prefWidth="136.0" text="Enter your password" textFill="#e8e8e8" GridPane.columnSpan="2147483647" GridPane.rowIndex="2" />
+                 <PasswordField fx:id="confirmPasswordField" prefHeight="0.0" prefWidth="259.0" promptText="Confirm your password" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                 <Label prefHeight="7.0" prefWidth="265.0" text="Confirm your password" textFill="#e8e8e8" GridPane.rowIndex="3" />
+                 <ComboBox fx:id="userTypeComboBox" onAction="#handleUserTypeSelection" prefHeight="29.0" prefWidth="367.0" promptText="Select user type" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+               <Label text="Username" textFill="WHITE" />
+               <TextField fx:id="usernameField" promptText="Enter your username" GridPane.columnIndex="1" />
+               <columnConstraints>
+                  <ColumnConstraints maxWidth="260.0" minWidth="168.0" prefWidth="168.0" />
+                  <ColumnConstraints maxWidth="356.0" minWidth="264.0" prefWidth="356.0" />
+               </columnConstraints>
+               <rowConstraints>
+                  <RowConstraints maxHeight="31.0" minHeight="13.0" prefHeight="31.0" />
+                  <RowConstraints maxHeight="31.0" minHeight="13.0" prefHeight="31.0" />
+                  <RowConstraints maxHeight="45.0" minHeight="27.0" prefHeight="27.0" />
+                  <RowConstraints />
+                  <RowConstraints />
+               </rowConstraints>
+             </GridPane>
+            <GridPane fx:id="userTypeFields" prefHeight="48.0" prefWidth="198.0">
+
+      </GridPane>
+             <HBox spacing="20.0" VBox.vgrow="NEVER">
+                 <Button mnemonicParsing="false" onAction="#handleRegister" prefHeight="29.0" prefWidth="123.0" style="-fx-background-color: green; -fx-font-weight: bold;" text="Register" />
+                 <Button mnemonicParsing="false" onAction="#handleCancel" prefHeight="29.0" prefWidth="123.0" style="-fx-background-color: red; -fx-font-weight: bold;" text="Cancel" />
+             </HBox>
+         </children></VBox>
+
+   </VBox>
+   </children>
+
+</AnchorPane>

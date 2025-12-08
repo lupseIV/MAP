@@ -5,10 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.layout.StackPane;
 import org.domain.users.User;
-import org.service.DucksService;
-import org.service.PersonsService;
-import org.service.FriendshipService;
-import org.service.UsersService;
+import org.service.*;
 
 import java.io.IOException;
 
