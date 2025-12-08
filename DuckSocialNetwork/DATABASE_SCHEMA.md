@@ -247,17 +247,11 @@ psql -U your_username -d your_database -f src/main/resources/db/insert_data.sql
 
 ### Complete Setup (Schema + Data)
 
-To set up both schema and data in one go:
+To set up both schema and data, run the commands sequentially:
 
 ```bash
 psql -U your_username -d your_database -f src/main/resources/db/schema.sql
 psql -U your_username -d your_database -f src/main/resources/db/insert_data.sql
-```
-
-Or using a single command line:
-```bash
-psql -U your_username -d your_database < src/main/resources/db/schema.sql && \
-psql -U your_username -d your_database < src/main/resources/db/insert_data.sql
 ```
 
 ## Key Relationships
