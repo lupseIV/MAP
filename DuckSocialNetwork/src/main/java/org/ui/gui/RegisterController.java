@@ -31,6 +31,7 @@ public class RegisterController {
     private FriendshipService friendshipService;
     private UsersService usersService;
     private AuthService authService;
+    private MessageService messageService;
     private Stage stage;
 
     private UserTypes userType;
@@ -54,12 +55,13 @@ public class RegisterController {
     }
 
     public void setServices(DucksService ds, PersonsService ps, FriendshipService fs, UsersService us,
-                            AuthService as) {
+                            AuthService as, MessageService ms) {
         this.ducksService = ds;
         this.personsService = ps;
         this.friendshipService = fs;
         this.usersService = us;
         this.authService = as;
+        this.messageService = ms;
     }
 
     public void setStage(Stage stage) {
@@ -105,7 +107,8 @@ public class RegisterController {
             VBox root = loader.load();
 
             LoginController controller = loader.getController();
-            controller.setServices(ducksService, personsService, friendshipService, usersService, authService);
+            controller.setServices(ducksService, personsService, friendshipService, usersService,
+                    authService, messageService);
 
 
             Scene scene = new Scene(root, 1000, 700);
@@ -153,7 +156,8 @@ public class RegisterController {
             BorderPane root = loader.load();
 
             MainController controller = loader.getController();
-            controller.setServices(ducksService, personsService, friendshipService, usersService);
+            controller.setServices(ducksService, personsService, friendshipService,
+                    usersService, authService, messageService);
 
             Scene scene = new Scene(root, 1000, 700);
             stage.setTitle("Duck Social Network Login");

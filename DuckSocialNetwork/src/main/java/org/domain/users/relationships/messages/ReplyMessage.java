@@ -1,24 +1,34 @@
 package org.domain.users.relationships.messages;
 
-public class ReplyMessage {
-    private Message message;
+import org.domain.users.User;
 
-    public ReplyMessage(Message message) {
-        this.message = message;
+import java.time.LocalDateTime;
+import java.util.List;
+
+public class ReplyMessage extends Message {
+    private Message repliedMessage;
+
+    public ReplyMessage(User from, List<User> to, String message, Message repliedMessage) {
+        super(from, to, message);
+        this.repliedMessage = repliedMessage;
     }
 
-    public Message getMessage() {
-        return message;
+    public ReplyMessage(Long id, User from, List<User> to, String message, LocalDateTime date, Message repliedMessage) {
+        super(id, from, to, message, date);
+        this.repliedMessage = repliedMessage;
     }
 
-    public void setMessage(Message message) {
-        this.message = message;
+    public Message getRepliedMessage() {
+        return repliedMessage;
+    }
+
+    public void setRepliedMessage(Message repliedMessage) {
+        this.repliedMessage = repliedMessage;
     }
 
     @Override
     public String toString() {
-        return "ReplyMessage{" +
-                "message=" + message +
-                '}';
+        String replyText = (repliedMessage != null) ? " (Reply to: " + repliedMessage.getMessage() + ")" : "";
+        return super.toString() + replyText;
     }
 }

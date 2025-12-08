@@ -1,25 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/19"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.ui.gui.MainController"
-            stylesheets="@./css/styling.css"
-            prefHeight="700.0" prefWidth="1000.0">
+<BorderPane prefHeight="700.0" prefWidth="1000.0" stylesheets="@./css/styling.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.ui.gui.MainController">
 
     <!-- Left Sidebar -->
     <left>
         <VBox styleClass="sidebar">
-            <Label text="Social Network" styleClass="sidebar-label"/>
+            <Label styleClass="sidebar-label" text="Social Network" />
 
-            <Button text="Users" onAction="#handleShowUsersView" styleClass="nav-button"/>
-            <Button text="Friendships" onAction="#handleShowFriendships" styleClass="nav-button"/>
+            <Button onAction="#handleShowUsersView" styleClass="nav-button" text="Users" />
+            <Button onAction="#handleShowFriendships" styleClass="nav-button" text="Friendships" />
+         <Button layoutX="30.0" layoutY="131.0" onAction="#handleShowMessageView" styleClass="nav-button" text="Messages" />
         </VBox>
     </left>
 
@@ -27,7 +20,7 @@
     <center>
         <StackPane fx:id="contentArea" styleClass="content-pane">
             <!-- Views will be injected here -->
-            <Label text="Welcome! Select a module from the left." style="-fx-text-fill: gray;"/>
+            <Label style="-fx-text-fill: gray;" text="Welcome! Select a module from the left." />
         </StackPane>
     </center>
 

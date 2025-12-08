@@ -25,6 +25,7 @@ public class LoginController {
     private FriendshipService friendshipService;
     private UsersService usersService;
     private AuthService authService;
+    private MessageService messageService;
     private Stage stage;
 
     @FXML
@@ -37,12 +38,13 @@ public class LoginController {
     private Label errorLabel;
 
     public void setServices(DucksService ds, PersonsService ps, FriendshipService fs, UsersService us,
-                            AuthService as) {
+                            AuthService as, MessageService ms) {
         this.ducksService = ds;
         this.personsService = ps;
         this.friendshipService = fs;
         this.usersService = us;
         this.authService = as;
+        this.messageService = ms;
     }
 
     public void setStage(Stage stage) {
@@ -80,7 +82,8 @@ public class LoginController {
             AnchorPane root = loader.load();
 
             RegisterController controller = loader.getController();
-            controller.setServices(ducksService, personsService, friendshipService, usersService, authService);
+            controller.setServices(ducksService, personsService, friendshipService, usersService,
+                    authService, messageService);
 
 
             Scene scene = new Scene(root, 1000, 700);
@@ -100,7 +103,7 @@ public class LoginController {
             BorderPane root = loader.load();
 
             MainController controller = loader.getController();
-            controller.setServices(ducksService, personsService, friendshipService, usersService);
+            controller.setServices(ducksService, personsService, friendshipService, usersService, authService, messageService);
 
             Scene scene = new Scene(root, 1000, 700);
             stage.setTitle("Duck Social Network Login");

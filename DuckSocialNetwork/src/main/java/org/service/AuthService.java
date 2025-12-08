@@ -3,6 +3,7 @@ package org.service;
 import org.domain.dtos.UserDTO;
 import org.domain.exceptions.ServiceException;
 import org.domain.users.User;
+import org.utils.security.SecurityUtils;
 
 import java.util.Optional;
 import java.util.stream.StreamSupport;
@@ -26,8 +27,10 @@ public class AuthService {
                 .findFirst();
 
         if(user.isPresent()){
-            loggedIn = true;
-            this.user = user.get();
+            if(SecurityUtils.checkPassword(password, user.get().getPassword())){
+                loggedIn = true;
+                this.user = user.get();
+            }
         }
     }
 
@@ -35,14 +38,23 @@ public class AuthService {
         return loggedIn;
     }
 
+    public User getCurrentUser() {
+        return user;
+    }
+
     public void register(User user){
-        Optional<User> u = StreamSupport.stream(usersService.findAll().spliterator(), false)
-                .filter(u1 -> u1.getEmail().equals(user.getEmail()) && u1.getPassword().equals(user.getPassword()))
-                .findFirst();
-        if(u.isPresent()){
-            throw  new ServiceException("User already exists");
+        String hashedPassword = SecurityUtils.hashPassword(user.getPassword());
+        user.setPassword(hashedPassword);
+
+        boolean exists = StreamSupport.stream(usersService.findAll().spliterator(), false)
+                .anyMatch(u -> u.getEmail().equals(user.getEmail()));
+
+        if (exists) {
+            throw new RuntimeException("Email already exists!");
         }
-        this.user = usersService.save(user);
+
+        usersService.save(user);
+        this.user = user;
         loggedIn = true;
     }
 }

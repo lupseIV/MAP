@@ -30,6 +30,7 @@ public class GraphicUserInterface extends Application {
     private RaceEventService raceEventService;
     private UsersService usersService;
     private AuthService authService;
+    private MessageService messageService;
 
     @Override
     public void init() throws Exception {
@@ -38,6 +39,7 @@ public class GraphicUserInterface extends Application {
         var friendshipValidator = new FriendshipValidator();
         var flockValidator = new FlockValidator();
         var raceEventValidator = new RaceEventValidator();
+        var messageValidator = new MessageValidator();
 
         DatabaseConnection.initDatabaseSchema();
 
@@ -56,7 +58,7 @@ public class GraphicUserInterface extends Application {
 
         flockRepo = new FlockDatabaseRepository(flockValidator, duckRepo);
         raceEventRepo = new RaceEventDatabaseRepository(raceEventValidator, duckRepo);
-
+        MessageDatabaseRepository messageRepo = new MessageDatabaseRepository(messageValidator, duckRepo, personRepo);
 
         Long maxUsersId = Math.max(
                 EntityRepository.getMaxId(duckRepo.findAll()),
@@ -83,6 +85,7 @@ public class GraphicUserInterface extends Application {
 
         usersService = new UsersService(ducksService, personsService,friendshipService);
         authService = new AuthService(usersService);
+        messageService = new MessageService(messageRepo);
 
         friendshipService.setUsersService(usersService);
         ducksService.setFlockService(flockService);
@@ -94,7 +97,7 @@ public class GraphicUserInterface extends Application {
         VBox root = loader.load();
 
         LoginController controller = loader.getController();
-        controller.setServices(ducksService, personsService, friendshipService, usersService, authService);
+        controller.setServices(ducksService, personsService, friendshipService, usersService, authService, messageService);
 
 
         Scene scene = new Scene(root, 1000, 700);

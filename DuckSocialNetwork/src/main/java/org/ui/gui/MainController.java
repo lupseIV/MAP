@@ -17,12 +17,17 @@ public class MainController implements ViewController{
     private PersonsService personsService;
     private FriendshipService friendshipService;
     private UsersService usersService;
+    private MessageService messageService;
+    private AuthService authService;
 
-    public void setServices(DucksService ds, PersonsService ps, FriendshipService fs, UsersService us) {
+    public void setServices(DucksService ds, PersonsService ps, FriendshipService fs, UsersService us,
+                            AuthService as, MessageService ms) {
         this.ducksService = ds;
         this.personsService = ps;
         this.friendshipService = fs;
         this.usersService = us;
+        this.authService = as;
+        this.messageService = ms;
     }
 
     @FXML public void handleShowUsersView(){
@@ -39,6 +44,15 @@ public class MainController implements ViewController{
         loadView("SocialView.fxml", controller -> {
             if (controller instanceof SocialController) {
                 ((SocialController) controller).setService(friendshipService, usersService);
+            }
+        }, contentArea);
+    }
+
+    @FXML
+    public void handleShowMessageView(){
+        loadView("ChatView.fxml", controller ->  {
+            if (controller instanceof ChatController) {
+                ((ChatController) controller).setServices(messageService,authService,null);
             }
         }, contentArea);
     }
