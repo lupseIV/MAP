@@ -58,3 +58,29 @@ CREATE TABLE IF NOT EXISTS race_event_participants (
                                                        duck_id BIGINT NOT NULL,
                                                        PRIMARY KEY (event_id, duck_id)
 );
+
+-- Create Messages table
+CREATE TABLE IF NOT EXISTS messages (
+                                        id BIGINT PRIMARY KEY,
+                                        from_user_id BIGINT NOT NULL,
+                                        message TEXT NOT NULL,
+                                        date TIMESTAMP NOT NULL,
+                                        reply_to_id BIGINT
+);
+
+-- Create Message Recipients table (junction table)
+CREATE TABLE IF NOT EXISTS message_recipients (
+                                                  message_id BIGINT NOT NULL,
+                                                  recipient_id BIGINT NOT NULL,
+                                                  PRIMARY KEY (message_id, recipient_id)
+);
+
+-- Create Notifications table
+CREATE TABLE IF NOT EXISTS notifications (
+                                             id BIGINT PRIMARY KEY,
+                                             recipient_id BIGINT NOT NULL,
+                                             sender_id BIGINT NOT NULL,
+                                             message_preview TEXT NOT NULL,
+                                             timestamp TIMESTAMP NOT NULL,
+                                             is_read BOOLEAN NOT NULL DEFAULT FALSE
+);

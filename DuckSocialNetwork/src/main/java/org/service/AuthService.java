@@ -23,7 +23,7 @@ public class AuthService {
         }
 
         Optional<User> user = StreamSupport.stream(usersService.findAll().spliterator(), false)
-                .filter(u -> u.getEmail().equals(email) && u.getPassword().equals(password))
+                .filter(u -> u.getEmail().equals(email))
                 .findFirst();
 
         if(user.isPresent()){
