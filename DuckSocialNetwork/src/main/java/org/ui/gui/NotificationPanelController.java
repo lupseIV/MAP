@@ -45,7 +45,7 @@ public class NotificationPanelController {
         notificationListView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2) {
                 Notification selected = notificationListView.getSelectionModel().getSelectedItem();
-                if (selected != null && !selected.isRead()) {
+                if (selected != null && !selected.isRead() && notificationService != null) {
                     notificationService.markAsRead(selected.getId());
                     loadNotifications();
                 }
@@ -60,7 +60,7 @@ public class NotificationPanelController {
     }
     
     public void loadNotifications() {
-        if (authService != null && authService.getCurrentUser() != null) {
+        if (authService != null && authService.getCurrentUser() != null && notificationService != null) {
             List<Notification> notifications = notificationService.getAllNotifications(authService.getCurrentUser());
             notificationListView.setItems(FXCollections.observableArrayList(notifications));
             
@@ -71,7 +71,7 @@ public class NotificationPanelController {
     
     @FXML
     private void handleMarkAllRead() {
-        if (authService != null && authService.getCurrentUser() != null) {
+        if (authService != null && authService.getCurrentUser() != null && notificationService != null) {
             notificationService.markAllAsRead(authService.getCurrentUser());
             loadNotifications();
         }
