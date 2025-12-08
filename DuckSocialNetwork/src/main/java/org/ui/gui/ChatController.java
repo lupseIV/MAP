@@ -128,7 +128,7 @@ public class ChatController implements Observer {
 
         messageService.sendMessage(currentUser, Collections.singletonList(chatPartner), text);
         messageInput.clear();
-        loadMessages();
+        // Observer pattern will trigger loadMessages() via update()
     }
 
     @FXML
@@ -146,12 +146,13 @@ public class ChatController implements Observer {
 
         messageService.replyMessage(currentUser, selectedMessage, text);
         messageInput.clear();
-        loadMessages();
+        // Observer pattern will trigger loadMessages() via update()
     }
     
     @Override
     public void update() {
         // Called by MessageService when a new message is sent
-        loadMessages();
+        // Ensure UI updates happen on JavaFX Application Thread
+        Platform.runLater(() -> loadMessages());
     }
 }

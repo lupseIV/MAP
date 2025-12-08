@@ -12,12 +12,13 @@ import org.service.utils.IdGenerator;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class MessageService extends EntityService<Long, Message> implements Observable<Observer> {
     private NotificationService notificationService;
-    private List<Observer> observers = new ArrayList<>();
+    private List<Observer> observers = new CopyOnWriteArrayList<>();
 
     public MessageService(Validator<Message> validator, PagingRepository<Long, Message> messageRepository, IdGenerator<Long> idGenerator) {
         super(validator, messageRepository, idGenerator);
