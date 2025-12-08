@@ -73,6 +73,8 @@ The DuckSocialNetwork database is designed to support a social networking applic
 └─────────────────────┘
 ```
 
+*Note: 'rezistance' is the actual column name in the database schema (alternative spelling of 'resistance').
+
 ## Tables
 
 ### 1. Persons
@@ -105,7 +107,7 @@ Stores information about duck users of the social network.
 | email     | VARCHAR(255)   | NOT NULL         | Duck's email address                     |
 | duck_type | VARCHAR(50)    | NOT NULL         | Type of duck (FLYING, SWIMMING, or FLYING_AND_SWIMMING) |
 | speed     | DOUBLE PRECISION|                 | Duck's speed attribute                   |
-| rezistance| DOUBLE PRECISION|                 | Duck's resistance/endurance attribute    |
+| rezistance| DOUBLE PRECISION|                 | Duck's resistance/endurance attribute (note: column name has alternative spelling) |
 
 **Sample Data**: Contains 20 ducks (IDs 1-20) with different types and attributes.
 
@@ -160,7 +162,7 @@ Stores information about racing competitions for ducks.
 | name     | VARCHAR(255)      | NOT NULL      | Name of the race event             |
 | max_time | DOUBLE PRECISION  |               | Maximum time allowed for race      |
 
-**Sample Data**: Contains 4 race events (Dinamo, Mihai, test, TEST).
+**Sample Data**: Contains 4 race events with IDs 1, 3, 4, and 5 (named Dinamo, Mihai, test, TEST respectively). Note: IDs are not sequential.
 
 ### 7. Race Event Participants (Junction Table)
 
