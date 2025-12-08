@@ -1,9 +1,11 @@
 package org.ui.gui;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.Callback;
+import org.domain.Observer;
 import org.domain.users.User;
 import org.domain.users.relationships.messages.Message;
 import org.domain.users.relationships.messages.ReplyMessage;
@@ -12,12 +14,16 @@ import org.service.MessageService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class ChatController {
+public class ChatController implements Observer {
     private MessageService messageService;
     private AuthService authService;
     private User currentUser;
     private User chatPartner;
+    private Timer refreshTimer;
+    private int lastMessageCount = 0;
 
     @FXML private Label recipientLabel;
     @FXML private ListView<Message> messageListView;
@@ -29,7 +35,14 @@ public class ChatController {
         this.currentUser = authService.getCurrentUser();
         this.chatPartner = chatPartner;
 
-        recipientLabel.setText("Chat with " + chatPartner.getEmail()); // Sau getName()
+        recipientLabel.setText("Chat with " + chatPartner.getEmail());
+        
+        // Register as observer
+        messageService.addObserver(this);
+        
+        // Start auto-refresh timer (check every 2 seconds)
+        startAutoRefresh();
+        
         loadMessages();
     }
 
@@ -74,9 +87,40 @@ public class ChatController {
 
     private void loadMessages() {
         if (currentUser != null && chatPartner != null) {
+            // Fetch messages on background thread (safe - no UI access)
             List<Message> conversation = messageService.getConversation(currentUser, chatPartner);
-            messageListView.setItems(FXCollections.observableArrayList(conversation));
-            messageListView.scrollTo(conversation.size() - 1);
+            int newMessageCount = conversation.size();
+            
+            // Only update if message count changed to avoid unnecessary UI updates
+            if (newMessageCount != lastMessageCount) {
+                lastMessageCount = newMessageCount;
+                // Update UI on JavaFX Application Thread
+                Platform.runLater(() -> {
+                    messageListView.setItems(FXCollections.observableArrayList(conversation));
+                    if (!conversation.isEmpty()) {
+                        messageListView.scrollTo(conversation.size() - 1);
+                    }
+                });
+            }
+        }
+    }
+    
+    private void startAutoRefresh() {
+        refreshTimer = new Timer(true); // Daemon thread
+        refreshTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                loadMessages();
+            }
+        }, 0, 2000); // Check every 2 seconds
+    }
+    
+    public void cleanup() {
+        if (refreshTimer != null) {
+            refreshTimer.cancel();
+        }
+        if (messageService != null) {
+            messageService.removeObserver(this);
         }
     }
 
@@ -87,7 +131,7 @@ public class ChatController {
 
         messageService.sendMessage(currentUser, Collections.singletonList(chatPartner), text);
         messageInput.clear();
-        loadMessages();
+        // Observer pattern will trigger loadMessages() via update()
     }
 
     @FXML
@@ -105,6 +149,13 @@ public class ChatController {
 
         messageService.replyMessage(currentUser, selectedMessage, text);
         messageInput.clear();
+        // Observer pattern will trigger loadMessages() via update()
+    }
+    
+    @Override
+    public void update() {
+        // Called by MessageService when a new message is sent (on sender's thread)
+        // loadMessages() handles thread safety with Platform.runLater() for UI updates
         loadMessages();
     }
 }
