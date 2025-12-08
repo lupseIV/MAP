@@ -20,9 +20,10 @@ public class NotificationDatabaseRepository extends EntityDatabaseRepository<Lon
     public NotificationDatabaseRepository(Validator<Notification> validator, 
                                           Repository<Long, Duck> duckRepository, 
                                           Repository<Long, Person> personRepository) {
-        super(validator, "SELECT * FROM notifications");
+        super(validator, "SELECT * FROM notifications",false);
         this.duckRepository = duckRepository;
         this.personRepository = personRepository;
+        loadFromDatabase();
     }
 
     /**

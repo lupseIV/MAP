@@ -95,7 +95,6 @@ public class GraphicUserInterface extends Application {
         messageService = new MessageService(messageValidator, messageRepo, messageIdGenerator);
         notificationService = new NotificationService(notificationValidator, notificationRepo, notificationIdGenerator);
         
-        // Wire up notification service to message service
         messageService.setNotificationService(notificationService);
 
         friendshipService.setUsersService(usersService);

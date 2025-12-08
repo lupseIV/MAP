@@ -3,7 +3,9 @@ package org.ui.gui;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
 import org.domain.users.User;
 import org.service.*;
 
@@ -56,11 +58,11 @@ public class MainController implements ViewController{
             FXMLLoader loader = new FXMLLoader(getClass().getResource("UserSelectionDialog.fxml"));
             Parent page = loader.load();
 
-            javafx.stage.Stage dialogStage = new javafx.stage.Stage();
+            Stage dialogStage = new Stage();
             dialogStage.setTitle("Select User");
             dialogStage.initModality(javafx.stage.Modality.WINDOW_MODAL);
             dialogStage.initOwner(contentArea.getScene().getWindow());
-            javafx.scene.Scene scene = new javafx.scene.Scene(page);
+            Scene scene = new Scene(page);
             dialogStage.setScene(scene);
 
             UserSelectionDialogController controller = loader.getController();
