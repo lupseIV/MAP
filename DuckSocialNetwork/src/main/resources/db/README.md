@@ -33,7 +33,8 @@ To set up the complete database with sample data:
 
 ```bash
 # Create schema and load data
-psql -U username -d database_name -f schema.sql -f insert_data.sql
+psql -U username -d database_name -f schema.sql
+psql -U username -d database_name -f insert_data.sql
 ```
 
 ## Documentation
