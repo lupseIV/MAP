@@ -23,7 +23,7 @@ public class ChatController implements Observer {
     private User currentUser;
     private User chatPartner;
     private Timer refreshTimer;
-    private int lastMessageCount = 0;
+    private int lastMessageCount = -1;
 
     @FXML private Label recipientLabel;
     @FXML private ListView<Message> messageListView;
@@ -59,7 +59,8 @@ public class ChatController implements Observer {
                             setText(null);
                             setStyle("");
                         } else {
-                            boolean isMe = msg.getFrom().equals(currentUser);
+                            // Check if currentUser is set before comparing
+                            boolean isMe = currentUser != null && msg.getFrom().equals(currentUser);
                             String senderName = isMe ? "Me" : msg.getFrom().getEmail();
                             String replyText = "";
 
@@ -91,9 +92,13 @@ public class ChatController implements Observer {
             List<Message> conversation = messageService.getConversation(currentUser, chatPartner);
             int newMessageCount = conversation.size();
             
+            // Debug: Log message loading
+            System.out.println("[ChatController] Loaded " + newMessageCount + " messages (last count: " + lastMessageCount + ")");
+            
             // Only update if message count changed to avoid unnecessary UI updates
             if (newMessageCount != lastMessageCount) {
                 lastMessageCount = newMessageCount;
+                System.out.println("[ChatController] Message count changed, updating UI");
                 // Update UI on JavaFX Application Thread
                 Platform.runLater(() -> {
                     messageListView.setItems(FXCollections.observableArrayList(conversation));
