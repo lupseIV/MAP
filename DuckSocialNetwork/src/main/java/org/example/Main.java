@@ -25,6 +25,8 @@ public class Main {
         var friendshipValidator = new FriendshipValidator();
         var flockValidator = new FlockValidator();
         var raceEventValidator = new RaceEventValidator();
+        var messageValidator = new MessageValidator();
+        var notificationValidator = new NotificationValidator();
 
         try {
             // Initialize database schema
@@ -40,6 +42,8 @@ public class Main {
         FriendshipDatabaseRepository friendshipRepo = null;
         FlockDatabaseRepository flockRepo = null;
         RaceEventDatabaseRepository raceEventRepo = null;
+        MessageDatabaseRepository messageRepo = null;
+        NotificationDatabaseRepository notificationRepo = null;
         try {
             personRepo = new PersonDatabaseRepository(personValidator);
             duckRepo = new DuckDatabaseRepository(duckValidator);
@@ -49,6 +53,8 @@ public class Main {
 
             flockRepo = new FlockDatabaseRepository(flockValidator, duckRepo);
             raceEventRepo = new RaceEventDatabaseRepository(raceEventValidator, duckRepo);
+            messageRepo = new MessageDatabaseRepository(messageValidator, duckRepo, personRepo);
+            notificationRepo = new NotificationDatabaseRepository(notificationValidator, duckRepo, personRepo);
 
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -63,12 +69,16 @@ public class Main {
         Long maxFriendshipId = EntityRepository.getMaxId(friendshipRepo.findAll());
         Long maxFlockId = EntityRepository.getMaxId(flockRepo.findAll());
         Long  maxEventId = EntityRepository.getMaxId(raceEventRepo.findAll());
+        Long maxMessageId = EntityRepository.getMaxId(messageRepo.findAll());
+        Long maxNotificationId = EntityRepository.getMaxId(notificationRepo.findAll());
 
         //id generator
         var usersIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxUsersId, 0L) + 1);
         var friendshipIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxFriendshipId, 0L) + 1);
         var flockIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxFlockId, 0L) + 1);
         var eventIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxEventId, 0L) + 1);
+        var messageIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxMessageId, 0L) + 1);
+        var notificationIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxNotificationId, 0L) + 1);
 
         //service
         var duckService = new DucksService(duckValidator, duckRepo, usersIdGenerator);
@@ -76,9 +86,13 @@ public class Main {
         var friendshipService = new FriendshipService(friendshipValidator, friendshipRepo, friendshipIdGenerator);
         var flockService = new FlockService(flockValidator, flockRepo, flockIdGenerator, duckService);
         var raceEventService = new RaceEventService(raceEventValidator, raceEventRepo, eventIdGenerator, duckService);
+        var messageService = new MessageService(messageValidator, messageRepo, messageIdGenerator);
+        var notificationService = new NotificationService(notificationValidator, notificationRepo, notificationIdGenerator);
 
         var usersService = new UsersService(duckService, personService,friendshipService);
 
+        // Wire up notification service to message service
+        messageService.setNotificationService(notificationService);
 
         friendshipService.setUsersService(usersService);
         duckService.setFlockService(flockService);
