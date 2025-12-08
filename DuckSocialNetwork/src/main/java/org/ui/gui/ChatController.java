@@ -87,11 +87,14 @@ public class ChatController implements Observer {
 
     private void loadMessages() {
         if (currentUser != null && chatPartner != null) {
+            // Fetch messages on background thread (safe - no UI access)
             List<Message> conversation = messageService.getConversation(currentUser, chatPartner);
+            int newMessageCount = conversation.size();
             
             // Only update if message count changed to avoid unnecessary UI updates
-            if (conversation.size() != lastMessageCount) {
-                lastMessageCount = conversation.size();
+            if (newMessageCount != lastMessageCount) {
+                lastMessageCount = newMessageCount;
+                // Update UI on JavaFX Application Thread
                 Platform.runLater(() -> {
                     messageListView.setItems(FXCollections.observableArrayList(conversation));
                     if (!conversation.isEmpty()) {
@@ -151,8 +154,8 @@ public class ChatController implements Observer {
     
     @Override
     public void update() {
-        // Called by MessageService when a new message is sent
-        // Already wrapped in Platform.runLater to ensure JavaFX thread safety
+        // Called by MessageService when a new message is sent (on sender's thread)
+        // loadMessages() handles thread safety with Platform.runLater() for UI updates
         loadMessages();
     }
 }
