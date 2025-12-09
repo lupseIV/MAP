@@ -21,9 +21,10 @@ public class MessageDatabaseRepository extends EntityDatabaseRepository<Long, Me
     private final Repository<Long, Person> personRepository;
 
     public MessageDatabaseRepository(Validator<Message> validator, Repository<Long, Duck> duckRepository, Repository<Long, Person> personRepository) {
-        super(validator, "SELECT * FROM messages");
+        super(validator, "SELECT * FROM messages",false);
         this.duckRepository = duckRepository;
         this.personRepository = personRepository;
+        loadFromDatabase();
     }
 
     private User findOneUserById(Long id) {
