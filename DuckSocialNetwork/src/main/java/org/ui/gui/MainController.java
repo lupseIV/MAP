@@ -3,7 +3,11 @@ package org.ui.gui;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.domain.users.User;
 import org.service.*;
 
@@ -50,10 +54,32 @@ public class MainController implements ViewController{
 
     @FXML
     public void handleShowMessageView(){
-        loadView("ChatView.fxml", controller ->  {
-            if (controller instanceof ChatController) {
-                ((ChatController) controller).setServices(messageService,authService,null);
+        try{
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("ChatPartnerView.fxml"));
+            VBox page = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Select Users to Chat");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(contentArea.getScene().getWindow());
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            ChatPartnerController contr = loader.getController();
+            contr.setServices(usersService, dialogStage);
+
+            dialogStage.showAndWait();
+
+            if (contr.getChatPartner() != null) {
+                loadView("ChatView.fxml", controller ->  {
+                    if (controller instanceof ChatController) {
+                        ((ChatController) controller).setServices(messageService,authService, contr.getChatPartner());
+                    }
+                }, contentArea);
             }
-        }, contentArea);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }
