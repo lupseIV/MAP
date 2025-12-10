@@ -3,18 +3,20 @@ package org.domain.events;
 import org.domain.Entity;
 import org.domain.Observable;
 import org.domain.Observer;
-import org.domain.users.User;
-import org.domain.users.duck.Duck;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-public abstract class Event<T extends Observer> extends Entity<Long> implements Observable<T> {
-    List<T> subscribers;
+public abstract class Event<E, T extends Observer<E>> extends Entity<Long> implements Observable<E, T> {
+    private List<T> subscribers;
 
     public Event(List<T> subscribers) {
         this.subscribers = (subscribers != null) ? subscribers : new ArrayList<>();
+    }
+
+    // Default constructor needed for factories/frameworks
+    public Event() {
+        this.subscribers = new ArrayList<>();
     }
 
     public void setSubscribers(List<T> subscribers) {
@@ -23,7 +25,7 @@ public abstract class Event<T extends Observer> extends Entity<Long> implements 
 
     @Override
     public void addObserver(T o) {
-        subscribers.add( o);
+        subscribers.add(o);
     }
 
     @Override
@@ -32,21 +34,20 @@ public abstract class Event<T extends Observer> extends Entity<Long> implements 
     }
 
     @Override
-    public String toString() {
-        return "Event{" +
-                ", id=" + id +
-                '}';
-    }
-
-    @Override
-    public void notifyObservers() {
+    public void notifyObservers(E event) {
         for(T o : subscribers){
-            o.update();
+            o.update(event);
         }
     }
 
-    public List<T> getSubscribers() {
+    public List<T > getSubscribers() {
         return subscribers;
     }
 
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id=" + getId() +
+                '}';
+    }
 }

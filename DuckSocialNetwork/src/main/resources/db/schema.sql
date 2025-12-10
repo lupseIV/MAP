@@ -58,3 +58,5 @@ CREATE TABLE IF NOT EXISTS race_event_participants (
                                                        duck_id BIGINT NOT NULL,
                                                        PRIMARY KEY (event_id, duck_id)
 );
+
+

@@ -1,7 +1,7 @@
 package org.domain;
 
-public interface Observable<T> {
-    void addObserver(T o);
-    void removeObserver(T o);
-    void notifyObservers();
+public interface Observable<E, O extends Observer<E>> {
+    void addObserver(O observer);
+    void removeObserver(O observer);
+    void notifyObservers(E event);
 }

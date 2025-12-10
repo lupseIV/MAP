@@ -30,4 +30,6 @@ public class FlyingAndSwimmingDuck extends Duck implements Swimming,Flying{
     public String toString() {
         return super.toString()+"FlyingAndSwimmingDuck{}";
     }
+
+
 }

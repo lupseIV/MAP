@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import org.domain.users.User;
 import org.repository.EntityRepository;
 import org.repository.db.*;
+import org.repository.db.PostgresNotificationListener;
 import org.service.*;
 import org.domain.validators.*;
 import database.DatabaseConnection; // Assuming this exists based on imports
@@ -29,8 +30,10 @@ public class GraphicUserInterface extends Application {
     private FlockService flockService;
     private RaceEventService raceEventService;
     private UsersService usersService;
-    private AuthService authService;
     private MessageService messageService;
+
+    private PostgresNotificationListener notificationListener;
+    private MessageDatabaseRepository messageRepo;
 
     @Override
     public void init() throws Exception {
@@ -58,7 +61,7 @@ public class GraphicUserInterface extends Application {
 
         flockRepo = new FlockDatabaseRepository(flockValidator, duckRepo);
         raceEventRepo = new RaceEventDatabaseRepository(raceEventValidator, duckRepo);
-        MessageDatabaseRepository messageRepo = new MessageDatabaseRepository(messageValidator, duckRepo, personRepo);
+        messageRepo = new MessageDatabaseRepository(messageValidator, duckRepo, personRepo);
 
         Long maxUsersId = Math.max(
                 EntityRepository.getMaxId(duckRepo.findAll()),
@@ -68,13 +71,13 @@ public class GraphicUserInterface extends Application {
         Long maxFriendshipId = EntityRepository.getMaxId(friendshipRepo.findAll());
         Long maxFlockId = EntityRepository.getMaxId(flockRepo.findAll());
         Long  maxEventId = EntityRepository.getMaxId(raceEventRepo.findAll());
-
+        Long maxMessageId = EntityRepository. getMaxId(messageRepo.findAll());
         //id generator
         var usersIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxUsersId, 0L) + 1);
         var friendshipIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxFriendshipId, 0L) + 1);
         var flockIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxFlockId, 0L) + 1);
         var eventIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxEventId, 0L) + 1);
-
+        var messageIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxMessageId, 0L) + 1);
         //service
         ducksService = new DucksService(duckValidator, duckRepo, usersIdGenerator);
         personsService = new PersonsService(personValidator, personRepo, usersIdGenerator);
@@ -84,27 +87,57 @@ public class GraphicUserInterface extends Application {
 
 
         usersService = new UsersService(ducksService, personsService,friendshipService);
-        authService = new AuthService(usersService);
-        messageService = new MessageService(messageRepo);
+        messageService = new MessageService(messageValidator, messageRepo, messageIdGenerator);
 
         friendshipService.setUsersService(usersService);
         ducksService.setFlockService(flockService);
+
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        createLoginWindow(primaryStage, "Duck Social Network - Instance 1");
+
+        // ✅ Second window (Instance 2) - CREATE A NEW STAGE!
+        Stage secondStage = new Stage();
+        createLoginWindow(secondStage, "Duck Social Network - Instance 2");
+    }
+
+    private void createLoginWindow(Stage stage, String title) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("LoginView.fxml"));
         VBox root = loader.load();
 
         LoginController controller = loader.getController();
-        controller.setServices(ducksService, personsService, friendshipService, usersService, authService, messageService);
 
+        AuthService windowAuthService = new AuthService(usersService);
+        windowAuthService.setMessageService(messageService);
+        controller. setServices(ducksService, personsService, friendshipService,
+                usersService, windowAuthService, messageService, this);
 
         Scene scene = new Scene(root, 1000, 700);
-        controller.setStage(primaryStage);
-        primaryStage.setTitle("Duck Social Network Login");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        controller. setStage(stage);
+        stage.setTitle(title);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public void setNotificationListener(PostgresNotificationListener notificationListener) {
+        this.notificationListener = notificationListener;
+    }
+
+    @Override
+    public void stop() throws Exception {
+        if (notificationListener != null) {
+            notificationListener.stopListening();
+        }
+
+        try {
+            DatabaseConnection.closeConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        super.stop();
     }
 
     public static void main(String[] args) {

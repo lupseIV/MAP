@@ -22,4 +22,6 @@ public class FlyingDuck extends Duck implements  Flying {
         super(duckData.getUsername(), duckData.getPassword(), duckData.getEmail(), DuckTypes.FLYING, duckData.getSpeed(), duckData.getRezistance());
 
     }
+
+
 }

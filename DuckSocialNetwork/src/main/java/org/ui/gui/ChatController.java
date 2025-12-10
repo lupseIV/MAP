@@ -4,33 +4,50 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.Callback;
+import org.domain.Observer;
+import org.domain.events.MessageEvent;
 import org.domain.users.User;
 import org.domain.users.relationships.messages.Message;
 import org.domain.users.relationships.messages.ReplyMessage;
+import org.repository.db.PostgresNotificationListener;
 import org.service.AuthService;
 import org.service.MessageService;
+import org.utils.enums.MessageType;
 
 import java.util.Collections;
 import java.util.List;
 
-public class ChatController {
+public class ChatController implements Observer<MessageEvent> {
     private MessageService messageService;
     private AuthService authService;
     private User currentUser;
     private User chatPartner;
+    private PostgresNotificationListener notificationListener;
 
     @FXML private Label recipientLabel;
     @FXML private ListView<Message> messageListView;
     @FXML private TextArea messageInput;
 
-    public void setServices(MessageService messageService, AuthService authService, User chatPartner) {
+
+
+    public void setServices(MessageService messageService, AuthService authService, User chatPartner, PostgresNotificationListener notificationListener) {
         this.messageService = messageService;
         this.authService = authService;
         this.currentUser = authService.getCurrentUser();
         this.chatPartner = chatPartner;
+        this.notificationListener = notificationListener;
 
-        recipientLabel.setText("Chat with " + chatPartner.getEmail()); // Sau getName()
+        notificationListener.addObserver(this);
+
+        recipientLabel.setText("Chat with " + chatPartner.getEmail());
         loadMessages();
+    }
+
+    @Override
+    public void update(MessageEvent event) {
+        if (event.getType() == MessageType.NEW_MESSAGE) {
+            loadMessages();
+        }
     }
 
     @FXML
@@ -106,5 +123,9 @@ public class ChatController {
         messageService.replyMessage(currentUser, selectedMessage, text);
         messageInput.clear();
         loadMessages();
+    }
+
+    public void cleanup() {
+        notificationListener.removeObserver(this);
     }
 }

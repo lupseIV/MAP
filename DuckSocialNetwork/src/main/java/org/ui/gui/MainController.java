@@ -73,13 +73,13 @@ public class MainController implements ViewController{
             if (contr.getChatPartner() != null) {
                 loadView("ChatView.fxml", controller ->  {
                     if (controller instanceof ChatController) {
-                        ((ChatController) controller).setServices(messageService,authService, contr.getChatPartner());
+                        ((ChatController) controller).setServices(messageService,authService, contr.getChatPartner(),authService.getNotificationListener());
                     }
                 }, contentArea);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
+
 }

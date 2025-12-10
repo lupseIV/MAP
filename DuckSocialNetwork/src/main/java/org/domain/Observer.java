@@ -1,5 +1,5 @@
 package org.domain;
 
-public interface Observer {
-    void update();
+public interface Observer<T> {
+    void update(T event);
 }

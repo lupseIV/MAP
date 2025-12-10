@@ -26,6 +26,7 @@ public class LoginController {
     private UsersService usersService;
     private AuthService authService;
     private MessageService messageService;
+    private GraphicUserInterface app;
     private Stage stage;
 
     @FXML
@@ -38,13 +39,14 @@ public class LoginController {
     private Label errorLabel;
 
     public void setServices(DucksService ds, PersonsService ps, FriendshipService fs, UsersService us,
-                            AuthService as, MessageService ms) {
+                            AuthService as, MessageService ms, GraphicUserInterface app) {
         this.ducksService = ds;
         this.personsService = ps;
         this.friendshipService = fs;
         this.usersService = us;
         this.authService = as;
         this.messageService = ms;
+        this.app = app;
     }
 
     public void setStage(Stage stage) {
@@ -83,7 +85,7 @@ public class LoginController {
 
             RegisterController controller = loader.getController();
             controller.setServices(ducksService, personsService, friendshipService, usersService,
-                    authService, messageService);
+                    authService, messageService, app);
 
 
             Scene scene = new Scene(root, 1000, 700);
@@ -101,6 +103,8 @@ public class LoginController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("MainLayout.fxml"));
             BorderPane root = loader.load();
+
+            app.setNotificationListener(authService.getNotificationListener());
 
             MainController controller = loader.getController();
             controller.setServices(ducksService, personsService, friendshipService, usersService, authService, messageService);

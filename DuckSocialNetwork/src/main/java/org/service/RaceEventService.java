@@ -62,7 +62,6 @@ public class RaceEventService extends EntityService<Long, RaceEvent> {
             event.addObserver( d);
         }
         validator.validate(event);
-        event.notifyObservers();
         return repository.update(event);
     }
 

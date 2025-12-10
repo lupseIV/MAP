@@ -2,13 +2,15 @@ package org.domain.users;
 
 import org.domain.Entity;
 import org.domain.Observer;
+import org.domain.events.Event;
+import org.domain.events.RaceEvent;
 import org.utils.enums.UserTypes;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class User extends Entity<Long> implements Observer {
+public abstract class User extends Entity<Long>  {
     private String username;
     private String password;
     private String email;

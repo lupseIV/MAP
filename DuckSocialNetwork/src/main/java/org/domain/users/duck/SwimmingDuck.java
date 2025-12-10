@@ -21,4 +21,6 @@ public class SwimmingDuck extends Duck implements Swimming {
     public String toString() {
         return super.toString()+"SwimmingDuck{}";
     }
+
+
 }

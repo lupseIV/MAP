@@ -1,11 +1,14 @@
 package org.domain.users.duck;
 
+import org.domain.Observer;
+import org.domain.events.Event;
+import org.domain.events.RaceEvent;
 import org.domain.users.User;
 import org.domain.users.duck.flock.Flock;
 import org.utils.enums.DuckTypes;
 import org.utils.enums.UserTypes;
 
-public  abstract class Duck extends User {
+public  abstract class Duck extends User implements Observer<RaceEvent> {
     private DuckTypes duckType;
     private Double speed;
     private Double rezistance;
@@ -86,5 +89,11 @@ public  abstract class Duck extends User {
                 ", speed=" + speed +
                 ", duckType=" + duckType +
                 '}';
+    }
+
+    @Override
+    public void update(RaceEvent event) {
+
+
     }
 }
