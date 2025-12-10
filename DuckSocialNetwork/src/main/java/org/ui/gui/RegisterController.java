@@ -85,7 +85,8 @@ public class RegisterController {
         }
 
         try {
-            authService.register(getUserFromType());
+            var user = getUserFromType();
+            authService.register(user);
         } catch (Exception e) {
             e.printStackTrace();
             showAlert("Error",e.getMessage());

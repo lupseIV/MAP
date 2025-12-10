@@ -26,7 +26,7 @@
         <Label text="Job" textFill="WHITE" GridPane.rowIndex="2" />
         <TextField fx:id="occupationField" promptText="Current occupation" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-        <Label text="Salary" textFill="WHITE" GridPane.rowIndex="3" />
+        <Label text="Emphaty Level" textFill="WHITE" GridPane.rowIndex="3" />
         <TextField fx:id="emphatyField" promptText="0.00" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
         <Label text="Birth Date" textFill="WHITE" GridPane.rowIndex="4" />
