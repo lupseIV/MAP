@@ -74,9 +74,9 @@ public class ChatController implements Observer<MessageEvent> {
                             setText(senderName + ":\n" + replyText + msg.getMessage());
 
                             if (isMe) {
-                                setStyle("-fx-alignment: CENTER-RIGHT; -fx-background-color: #e3f2fd;");
+                                getStyleClass().add("my-message");
                             } else {
-                                setStyle("-fx-alignment: CENTER-LEFT; -fx-background-color: #f5f5f5;");
+                                getStyleClass().add("partner-message");
                             }
                         }
                     }
@@ -115,6 +115,13 @@ public class ChatController implements Observer<MessageEvent> {
 
         String text = messageInput.getText();
         if (text.isEmpty()) return;
+
+        if(selectedMessage.getFrom().equals(currentUser)) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setContentText("Can't reply to yourself.");
+            alert.show();
+            return;
+        }
 
         messageService.replyMessage(currentUser, selectedMessage, text);
         messageInput.clear();

@@ -16,6 +16,7 @@ import java.util.stream.StreamSupport;
 
 public class ChatPartnerController {
 
+    private User curentUser;
     private User chatPartner = null;
     private UsersService usersService;
     private Stage dialogStage;
@@ -28,14 +29,16 @@ public class ChatPartnerController {
 
     private final ObservableList<String> model = FXCollections.observableArrayList();
 
-    public void setServices(UsersService usersService, Stage dialogStage) {
+    public void setServices(UsersService usersService, Stage dialogStage, User currentUser) {
         this.usersService = usersService;
+        this.curentUser = currentUser;
         this.dialogStage = dialogStage;
         loadModel();
     }
 
     private void loadModel() {
         ArrayList<String> stringUsers =  StreamSupport.stream(usersService.findAll().spliterator(),false)
+                .filter(u -> !u.getId().equals(curentUser.getId()))
                 .map(u -> u.getUsername() + ": " + u.getEmail()).collect(Collectors.toCollection(ArrayList::new));
 
         model.setAll(stringUsers);

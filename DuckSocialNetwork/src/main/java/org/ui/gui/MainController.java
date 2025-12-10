@@ -66,7 +66,7 @@ public class MainController implements ViewController{
             dialogStage.setScene(scene);
 
             ChatPartnerController contr = loader.getController();
-            contr.setServices(usersService, dialogStage);
+            contr.setServices(usersService, dialogStage, authService.getCurrentUser());
 
             dialogStage.showAndWait();
 
