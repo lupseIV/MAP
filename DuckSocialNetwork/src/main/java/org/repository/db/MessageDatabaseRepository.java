@@ -49,14 +49,47 @@ public class MessageDatabaseRepository extends EntityDatabaseRepository<Long, Me
 
         Message message;
         if (replyToId != 0) {
-            Message parentPlaceholder = new Message(replyToId, null, null, "Parent Message Placeholder", null);
-
+            Message parentPlaceholder = getParentMessage(replyToId);
             message = new ReplyMessage(id, from, to, text, date, parentPlaceholder);
         } else {
             message = new Message(id, from, to, text, date);
         }
 
         return message;
+    }
+
+    private Message getParentMessage(Long id) {
+        String sql = "SELECT * FROM messages WHERE id = ? ";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, id);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return extractParentFromResultSet(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RepositoryException("Error getting parent message from database", e);
+        }
+
+        return null;
+    }
+
+    private Message extractParentFromResultSet(ResultSet rs) throws SQLException {
+        Long id = rs.getLong("id");
+        Long fromId = rs. getLong("from_user_id");
+        String text = rs.getString("message");
+        Timestamp timestamp = rs.getTimestamp("date");
+        LocalDateTime date = timestamp != null ? timestamp.toLocalDateTime() : null;
+
+        User from = findOneUserById(fromId);
+        List<User> to = getRecipientsForMessage(id);
+
+        return new Message(id, from, to, text, date);
     }
 
     @Override

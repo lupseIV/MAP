@@ -58,5 +58,22 @@ CREATE TABLE IF NOT EXISTS race_event_participants (
                                                        duck_id BIGINT NOT NULL,
                                                        PRIMARY KEY (event_id, duck_id)
 );
+CREATE TABLE IF NOT EXISTS messages (
+                                        id BIGINT PRIMARY KEY,
+                                        from_user_id BIGINT NOT NULL,
+                                        message TEXT NOT NULL,
+                                        date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                        reply_to_id BIGINT,
+                                        FOREIGN KEY (from_user_id) REFERENCES persons(id),
+                                        FOREIGN KEY (reply_to_id) REFERENCES messages(id)
+);
 
+-- Create Message Recipients table (for multiple recipients)
+CREATE TABLE IF NOT EXISTS message_recipients (
+                                                  message_id BIGINT NOT NULL,
+                                                  user_id BIGINT NOT NULL,
+                                                  PRIMARY KEY (message_id, user_id),
+                                                  FOREIGN KEY (message_id) REFERENCES messages(id),
+                                                  FOREIGN KEY (user_id) REFERENCES persons(id)
+);
 

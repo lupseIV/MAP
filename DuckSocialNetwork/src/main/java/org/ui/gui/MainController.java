@@ -82,4 +82,28 @@ public class MainController implements ViewController{
         }
     }
 
+    @FXML
+    public void handleLogout() {
+        try {
+            authService.logout();
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("LoginView.fxml"));
+            VBox root = loader.load();
+
+            LoginController controller = loader.getController();
+            controller.setServices(ducksService, personsService, friendshipService,
+                    usersService, new AuthService(usersService), messageService);
+
+            Stage stage = (Stage) contentArea.getScene().getWindow();
+            controller.setStage(stage);
+
+            Scene scene = new Scene(root, 1000, 700);
+            stage.setTitle("Duck Social Network - Login");
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

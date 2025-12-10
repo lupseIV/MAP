@@ -61,4 +61,9 @@ public class AuthService {
 
     }
 
+    public void logout(){
+        this.user = null;
+        loggedIn = false;
+    }
+
 }
