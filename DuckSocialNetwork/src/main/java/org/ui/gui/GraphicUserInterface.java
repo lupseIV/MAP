@@ -10,7 +10,6 @@ import javafx.stage.Stage;
 import org.domain.users.User;
 import org.repository.EntityRepository;
 import org.repository.db.*;
-import org.repository.db.PostgresNotificationListener;
 import org.service.*;
 import org.domain.validators.*;
 import database.DatabaseConnection; // Assuming this exists based on imports
@@ -32,7 +31,6 @@ public class GraphicUserInterface extends Application {
     private UsersService usersService;
     private MessageService messageService;
 
-    private PostgresNotificationListener notificationListener;
     private MessageDatabaseRepository messageRepo;
 
     @Override
@@ -110,34 +108,14 @@ public class GraphicUserInterface extends Application {
         LoginController controller = loader.getController();
 
         AuthService windowAuthService = new AuthService(usersService);
-        windowAuthService.setMessageService(messageService);
         controller. setServices(ducksService, personsService, friendshipService,
-                usersService, windowAuthService, messageService, this);
+                usersService, windowAuthService, messageService);
 
         Scene scene = new Scene(root, 1000, 700);
         controller. setStage(stage);
         stage.setTitle(title);
         stage.setScene(scene);
         stage.show();
-    }
-
-    public void setNotificationListener(PostgresNotificationListener notificationListener) {
-        this.notificationListener = notificationListener;
-    }
-
-    @Override
-    public void stop() throws Exception {
-        if (notificationListener != null) {
-            notificationListener.stopListening();
-        }
-
-        try {
-            DatabaseConnection.closeConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        super.stop();
     }
 
     public static void main(String[] args) {

@@ -1,5 +1,9 @@
 package org.service;
 
+import javafx.application.Platform;
+import org.domain.Observable;
+import org.domain.Observer;
+import org.domain.events.MessageEvent;
 import org.domain.users.User;
 import org.domain.users.relationships.Friendship;
 import org.domain.users.relationships.messages.Message;
@@ -8,14 +12,17 @@ import org.domain.validators.Validator;
 import org.repository.PagingRepository;
 import org.repository.Repository;
 import org.service.utils.IdGenerator;
+import org.utils.enums.MessageType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class MessageService extends EntityService<Long, Message> {
+public class MessageService extends EntityService<Long, Message> implements Observable<MessageEvent, Observer<MessageEvent>> {
+    private final List<Observer<MessageEvent>> observers = new CopyOnWriteArrayList<>();
 
     public MessageService(Validator<Message> validator, PagingRepository<Long, Message> repository, IdGenerator<Long> idGenerator) {
         super(validator, repository, idGenerator);
@@ -24,6 +31,7 @@ public class MessageService extends EntityService<Long, Message> {
     public void sendMessage(User from, List<User> to, String text) {
         Message message = new Message(from, to, text);
         super.save(message);
+        notifyObservers(new MessageEvent(MessageType.NEW_MESSAGE, List.of(message)));
     }
 
     public void replyMessage(User from, Message messageToReply, String text) {
@@ -31,6 +39,8 @@ public class MessageService extends EntityService<Long, Message> {
         recipients.add(messageToReply.getFrom());
         ReplyMessage reply = new ReplyMessage(from, recipients, text, messageToReply);
         super.save(reply);
+        notifyObservers(new MessageEvent(MessageType.NEW_MESSAGE, List.of(reply)));
+
     }
 
     public List<Message> getConversation(User u1, User u2) {
@@ -44,5 +54,22 @@ public class MessageService extends EntityService<Long, Message> {
         boolean fromU1toU2 = m.getFrom().equals(u1) && m.getTo().contains(u2);
         boolean fromU2toU1 = m.getFrom().equals(u2) && m.getTo().contains(u1);
         return fromU1toU2 || fromU2toU1;
+    }
+
+    @Override
+    public void addObserver(Observer<MessageEvent> observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer<MessageEvent> observer) {
+        observers. remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(MessageEvent event) {
+        for (Observer<MessageEvent> observer : observers) {
+            Platform.runLater(() -> observer.update(event));
+        }
     }
 }

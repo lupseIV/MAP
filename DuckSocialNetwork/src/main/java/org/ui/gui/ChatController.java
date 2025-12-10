@@ -9,7 +9,6 @@ import org.domain.events.MessageEvent;
 import org.domain.users.User;
 import org.domain.users.relationships.messages.Message;
 import org.domain.users.relationships.messages.ReplyMessage;
-import org.repository.db.PostgresNotificationListener;
 import org.service.AuthService;
 import org.service.MessageService;
 import org.utils.enums.MessageType;
@@ -22,7 +21,6 @@ public class ChatController implements Observer<MessageEvent> {
     private AuthService authService;
     private User currentUser;
     private User chatPartner;
-    private PostgresNotificationListener notificationListener;
 
     @FXML private Label recipientLabel;
     @FXML private ListView<Message> messageListView;
@@ -30,14 +28,13 @@ public class ChatController implements Observer<MessageEvent> {
 
 
 
-    public void setServices(MessageService messageService, AuthService authService, User chatPartner, PostgresNotificationListener notificationListener) {
+    public void setServices(MessageService messageService, AuthService authService, User chatPartner) {
         this.messageService = messageService;
         this.authService = authService;
         this.currentUser = authService.getCurrentUser();
         this.chatPartner = chatPartner;
-        this.notificationListener = notificationListener;
 
-        notificationListener.addObserver(this);
+        messageService.addObserver(this);
 
         recipientLabel.setText("Chat with " + chatPartner.getEmail());
         loadMessages();
@@ -76,7 +73,6 @@ public class ChatController implements Observer<MessageEvent> {
 
                             setText(senderName + ":\n" + replyText + msg.getMessage());
 
-                            // Stilizare simplă pentru a diferenția expeditorul
                             if (isMe) {
                                 setStyle("-fx-alignment: CENTER-RIGHT; -fx-background-color: #e3f2fd;");
                             } else {
@@ -123,9 +119,5 @@ public class ChatController implements Observer<MessageEvent> {
         messageService.replyMessage(currentUser, selectedMessage, text);
         messageInput.clear();
         loadMessages();
-    }
-
-    public void cleanup() {
-        notificationListener.removeObserver(this);
     }
 }
