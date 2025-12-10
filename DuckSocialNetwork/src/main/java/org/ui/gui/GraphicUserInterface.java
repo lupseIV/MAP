@@ -3,21 +3,17 @@ package org.ui.gui;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import org.domain.users.User;
 import org.repository.EntityRepository;
 import org.repository.db.*;
 import org.service.*;
 import org.domain.validators.*;
-import database.DatabaseConnection; // Assuming this exists based on imports
+import database.DatabaseConnection;
 import org.service.utils.LongIdGenerator;
 import org.utils.Constants;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Objects;
 
@@ -96,7 +92,6 @@ public class GraphicUserInterface extends Application {
     public void start(Stage primaryStage) throws Exception {
         createLoginWindow(primaryStage, "Duck Social Network - Instance 1");
 
-        // ✅ Second window (Instance 2) - CREATE A NEW STAGE!
         Stage secondStage = new Stage();
         createLoginWindow(secondStage, "Duck Social Network - Instance 2");
     }
@@ -116,6 +111,15 @@ public class GraphicUserInterface extends Application {
         stage.setTitle(title);
         stage.setScene(scene);
         stage.show();
+    }
+
+    @Override
+    public void stop() {
+        try{
+            DatabaseConnection.closeConnection();
+        }catch(SQLException e){
+            System.out.println("Error closing connection: " + e.getMessage());
+        }
     }
 
     public static void main(String[] args) {
