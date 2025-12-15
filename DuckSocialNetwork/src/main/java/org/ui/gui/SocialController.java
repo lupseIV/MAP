@@ -1,5 +1,6 @@
 package org.ui.gui;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -38,7 +39,7 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
 
     @FXML private TableView<Friendship> friendshipsTable;
     @FXML private TableColumn<Friendship, Long> idCol;
-    @FXML private TableColumn<Friendship, String> friendCol;
+    @FXML private TableColumn<Friendship, User> friendCol;
 
     @FXML private Button buttonNext;
     @FXML private Button buttonPrevious;
@@ -69,7 +70,7 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
     }
 
     public void initializeTable() {
-        idCol.setCellValueFactory(new PropertyValueFactory<>("FriendshipId"));
+        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         friendCol.setCellValueFactory(cellData -> {
             Friendship friendship = cellData.getValue();
@@ -81,15 +82,10 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
             } else {
                 friend = friendship.getUser1();
             }
-
-            return new SimpleStringProperty(friend.getEmail() + " (" + friend.getUsername() + ")");
+            return new SimpleObjectProperty<>(friend);
         });
 
-        friendshipsTable.setItems(model);
-    }
-
-    private TableCell<Friendship, User> getClickableUserCell() {
-        return new TableCell<>() {
+        friendCol.setCellFactory(column -> new TableCell<Friendship, User>() {
             @Override
             protected void updateItem(User user, boolean empty) {
                 super.updateItem(user, empty);
@@ -100,9 +96,9 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
                     setOnMouseClicked(null);
                     setStyle("");
                 } else {
-                    setText(String.valueOf(user.getId()));
+                    setText(user.getEmail() + " (" + user.getUsername() + ")");
 
-                    setStyle("-fx-text-fill: #4a90e2; -fx-cursor: hand;");
+                    setStyle("-fx-text-fill: #4a90e2; -fx-cursor: hand; -fx-underline: true;");
 
                     setOnMouseClicked(event -> {
                         if (event.getClickCount() == 1) {
@@ -111,17 +107,20 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
                     });
                 }
             }
-        };
+        });
+
+        friendshipsTable.setItems(model);
     }
 
     private void showUserDetailsPopup(User user) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("User Details");
-        alert.setHeaderText("Details for ID: " + user.getId());
-
-        String details = user.toString();
-
-        alert.setContentText(details);
+        alert.setHeaderText("Details for " + user.getUsername());
+        alert.setContentText(
+                "ID: " + user.getId() + "\n" +
+                        "Email: " + user.getEmail() + "\n" +
+                        "Type: " + user.getUserType()
+        );
         alert.initOwner(friendshipsTable.getScene().getWindow());
         alert.showAndWait();
     }
