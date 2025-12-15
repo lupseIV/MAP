@@ -12,8 +12,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.domain.dtos.DuckData;
 import org.domain.users.User;
 import org.domain.users.duck.Duck;
+import org.domain.users.duck.DuckFactory;
 import org.domain.users.duck.FlyingDuck;
 import org.domain.users.person.Person;
 import org.service.*;
@@ -23,9 +25,11 @@ import org.utils.enums.UserTypes;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 
 public class RegisterController {
 
+    private DuckFactory duckFactory = new DuckFactory();
     private DucksService ducksService;
     private PersonsService personsService;
     private FriendshipService friendshipService;
@@ -196,17 +200,17 @@ public class RegisterController {
                 );
             }
         } else if (type == UserTypes.DUCK) {
-            if (currentSubController instanceof DuckFieldsController) {
-                DuckFieldsController dc = (DuckFieldsController) currentSubController;
+            if (currentSubController instanceof DuckFieldsController dc) {
 
-                return new FlyingDuck(
+                DuckData duckData = new DuckData(List.of(
                         username,
                         password,
                         email,
-                        dc.getDuckType(),
-                        dc.getSpeed(),
-                        dc.getResistance()
-                );
+                        dc.getSpeed().toString(),
+                        dc.getResistance().toString()
+                ));
+
+                return duckFactory.create(dc.getDuckType(), duckData);
             }
         }
 
