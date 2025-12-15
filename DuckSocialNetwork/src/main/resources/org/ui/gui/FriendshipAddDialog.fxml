@@ -24,11 +24,9 @@
     </columnConstraints>
 
     <!-- Login Info -->
-    <Label text="User id 1:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="label-bright"/>
-    <TextField fx:id="user1IdField" promptText="text" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+    <Label text="User id :" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="label-bright"/>
+    <TextField fx:id="userIdField" promptText="text" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
 
-    <Label text="User id 2:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="label-bright"/>
-    <TextField fx:id="user2IdField" promptText="text" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
 </GridPane>
 

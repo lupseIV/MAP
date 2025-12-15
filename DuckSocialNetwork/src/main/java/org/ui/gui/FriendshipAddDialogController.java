@@ -6,25 +6,30 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.domain.users.User;
 import org.domain.users.relationships.Friendship;
+import org.service.AuthService;
 import org.service.FriendshipService;
 import org.service.UsersService;
 
+import java.util.Optional;
+
+
 public class FriendshipAddDialogController {
 
-    @FXML private TextField user1IdField;
-    @FXML private TextField user2IdField;
+    @FXML private TextField userIdField;
 
     private FriendshipService service;
     private UsersService usersService;
+    private AuthService authService;
     private Stage dialogStage;
     private boolean saveClicked = false;
 
-    @FXML
-    public void initialize() {
+
+    public void setUsersService(UsersService usersService) {
+        this.usersService = usersService;
     }
 
-    public void setUsersService(UsersService usersService){
-        this.usersService = usersService;
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
     }
 
     public void setService(FriendshipService service, Stage dialogStage) {
@@ -40,13 +45,14 @@ public class FriendshipAddDialogController {
     private void handleSave() {
         if (isInputValid()) {
             try {
-                Long idUser1 = Long.parseLong(user1IdField.getText());
-                Long idUser2 = Long.parseLong(user2IdField.getText());
+                Long idFriend = Long.parseLong(userIdField.getText());
 
-                User user1 = usersService.findOne(idUser1);
-                User user2 = usersService.findOne(idUser2);
-
-                service.save(new Friendship(user1,user2));
+                User user = usersService.findOne(idFriend);
+                if(user == null){
+                    showAlert("Error", "User with id " + idFriend + " not found");
+                    return;
+                }
+                service.save(new Friendship(authService.getCurrentUser(), user));
 
                 saveClicked = true;
                 dialogStage.close();
@@ -65,8 +71,7 @@ public class FriendshipAddDialogController {
     private boolean isInputValid() {
         StringBuilder errorMessage = new StringBuilder();
 
-        if(user1IdField.getText().isEmpty()){ errorMessage.append("Please enter a user 1 id."); }
-        if(user2IdField.getText().isEmpty()){ errorMessage.append("Please enter a user 2 id."); }
+        if(userIdField.getText().isEmpty()){ errorMessage.append("Please enter a user  id."); }
 
         if (errorMessage.length() == 0) {
             return true;

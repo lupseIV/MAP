@@ -170,6 +170,7 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
             FriendshipAddDialogController controller = loader.getController();
             controller.setService(service, dialogStage);
             controller.setUsersService(usersService);
+            controller.setAuthService(authService);
 
             dialogStage.showAndWait();
 
