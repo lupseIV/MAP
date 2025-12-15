@@ -184,4 +184,8 @@ public class FriendshipService extends EntityService<Long, Friendship>{
     public List<Friendship> getGuiFriendshipsFromPage(Page<Friendship> page) {
         return StreamSupport.stream(page.getElementsOnPage().spliterator(),false).toList();
     }
+
+    public void acceptFriendship(Friendship friendship){
+
+    }
 }

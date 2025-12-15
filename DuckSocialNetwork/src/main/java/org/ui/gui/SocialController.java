@@ -30,6 +30,7 @@ import org.service.AuthService;
 import org.service.FriendshipService;
 import org.service.PersonsService;
 import org.service.UsersService;
+import org.utils.enums.FriendRequestStatus;
 
 import java.io.IOException;
 import java.util.*;
@@ -46,6 +47,7 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
     @FXML private Label labelPage;
 
     @FXML private Label nrOfCommunities;
+    @FXML private ComboBox<FriendRequestStatus> statusCombo;
 
     private FriendshipService service;
     private UsersService usersService;
@@ -63,9 +65,23 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
 
         if(authService.isLoggedIn()) {
             filter.setCurrentUser(Optional.of(authService.getCurrentUser()));
+            filter.setStatus(Optional.of(FriendRequestStatus.APPROVED));
         }
 
         initializeTable();
+        loadData();
+    }
+
+    @FXML
+    private void initialize(){
+        statusCombo.setItems(FXCollections.observableArrayList(FriendRequestStatus.values()));
+        statusCombo.getSelectionModel().select(FriendRequestStatus.APPROVED);
+    }
+
+    @FXML
+    public void onComboboxChange() {
+        FriendRequestStatus selected = statusCombo.getSelectionModel().getSelectedItem();
+        filter.setStatus(Optional.of(selected));
         loadData();
     }
 

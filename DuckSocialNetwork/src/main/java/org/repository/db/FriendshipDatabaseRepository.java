@@ -5,6 +5,8 @@ import org.domain.exceptions.RepositoryException;
 import org.domain.users.User;
 import org.domain.users.relationships.Friendship;
 import org.domain.validators.Validator;
+import org.utils.enums.FriendRequestStatus;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -43,6 +45,7 @@ public class FriendshipDatabaseRepository extends EntityDatabaseRepository<Long,
         Long id = resultSet.getLong("id");
         Long user1Id = resultSet.getLong("user1_id");
         Long user2Id = resultSet.getLong("user2_id");
+        FriendRequestStatus status = FriendRequestStatus.valueOf(resultSet.getString("status"));
 
         User user1 = findUserById(user1Id);
         User user2 = findUserById(user2Id);
@@ -51,9 +54,14 @@ public class FriendshipDatabaseRepository extends EntityDatabaseRepository<Long,
             throw new RepositoryException("User IDs do not exist in the system");
         }
 
-        var friendShip = new Friendship(user1, user2);
+
+        var friendShip = new Friendship(user1, user2, status);
         friendShip.setId(id);
+
+        if (status.equals(FriendRequestStatus.APPROVED)) {
         user1.addFriend(user2);
+        }
+
         return friendShip;
     }
 
