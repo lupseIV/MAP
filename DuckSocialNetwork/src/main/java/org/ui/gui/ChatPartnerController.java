@@ -37,8 +37,7 @@ public class ChatPartnerController {
     }
 
     private void loadModel() {
-        ArrayList<String> stringUsers =  StreamSupport.stream(usersService.findAll().spliterator(),false)
-                .filter(u -> !u.getId().equals(curentUser.getId()))
+        ArrayList<String> stringUsers =  curentUser.getFriends().stream()
                 .map(u -> u.getUsername() + ": " + u.getEmail()).collect(Collectors.toCollection(ArrayList::new));
 
         model.setAll(stringUsers);

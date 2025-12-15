@@ -47,7 +47,7 @@ public class MainController implements ViewController{
 
         loadView("SocialView.fxml", controller -> {
             if (controller instanceof SocialController) {
-                ((SocialController) controller).setService(friendshipService, usersService);
+                ((SocialController) controller).setService(friendshipService, usersService,authService);
             }
         }, contentArea);
     }

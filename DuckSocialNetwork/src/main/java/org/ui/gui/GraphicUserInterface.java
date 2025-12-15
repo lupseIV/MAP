@@ -92,8 +92,8 @@ public class GraphicUserInterface extends Application {
     public void start(Stage primaryStage) throws Exception {
         createLoginWindow(primaryStage, "Duck Social Network - Instance 1");
 
-        Stage secondStage = new Stage();
-        createLoginWindow(secondStage, "Duck Social Network - Instance 2");
+//        Stage secondStage = new Stage();
+//        createLoginWindow(secondStage, "Duck Social Network - Instance 2");
     }
 
     private void createLoginWindow(Stage stage, String title) throws Exception {

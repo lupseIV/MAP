@@ -1,5 +1,6 @@
 package org.ui.gui;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -24,6 +25,7 @@ import org.domain.users.person.Person;
 import org.domain.users.relationships.Friendship;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
+import org.service.AuthService;
 import org.service.FriendshipService;
 import org.service.PersonsService;
 import org.service.UsersService;
@@ -36,8 +38,7 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
 
     @FXML private TableView<Friendship> friendshipsTable;
     @FXML private TableColumn<Friendship, Long> idCol;
-    @FXML private TableColumn<Friendship, User> user1Col;
-    @FXML private TableColumn<Friendship, User> user2Col;
+    @FXML private TableColumn<Friendship, String> friendCol;
 
     @FXML private Button buttonNext;
     @FXML private Button buttonPrevious;
@@ -47,27 +48,42 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
 
     private FriendshipService service;
     private UsersService usersService;
+    private AuthService authService;
 
 
     public SocialController() {
         super(0, 14, 0,  new FriendshipGUIFilter());
     }
 
-    public void setService(FriendshipService service, UsersService usersService) {
+    public void setService(FriendshipService service, UsersService usersService, AuthService authService) {
         this.service = Objects.requireNonNull(service);
         this.usersService = Objects.requireNonNull(usersService);
+        this.authService = Objects.requireNonNull(authService);
+
+        if(authService.isLoggedIn()) {
+            filter.setCurrentUser(Optional.of(authService.getCurrentUser()));
+        }
+
         initializeTable();
         loadData();
     }
 
     public void initializeTable() {
-        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        idCol.setCellValueFactory(new PropertyValueFactory<>("FriendshipId"));
 
-        user1Col.setCellValueFactory(new PropertyValueFactory<>("user1"));
-        user1Col.setCellFactory(column -> getClickableUserCell());
+        friendCol.setCellValueFactory(cellData -> {
+            Friendship friendship = cellData.getValue();
+            User currentUser = authService.getCurrentUser();
 
-        user2Col.setCellValueFactory(new PropertyValueFactory<>("user2"));
-        user2Col.setCellFactory(column -> getClickableUserCell());
+            User friend;
+            if (friendship.getUser1().equals(currentUser)) {
+                friend = friendship.getUser2();
+            } else {
+                friend = friendship.getUser1();
+            }
+
+            return new SimpleStringProperty(friend.getEmail() + " (" + friend.getUsername() + ")");
+        });
 
         friendshipsTable.setItems(model);
     }

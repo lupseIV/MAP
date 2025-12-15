@@ -21,8 +21,7 @@
         <TableView fx:id="friendshipsTable" prefHeight="400" prefWidth="600">
             <columns>
                 <TableColumn fx:id="idCol" text="Id"/>
-                <TableColumn fx:id="user1Col" text="User 1"/>
-                <TableColumn fx:id="user2Col" text="User 2"/>
+                <TableColumn fx:id="friendCol" text="User 1"/>
             </columns>
             <columnResizePolicy>
                 <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
