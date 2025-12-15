@@ -98,14 +98,15 @@ public class FriendshipDatabaseRepository extends EntityDatabaseRepository<Long,
 
     @Override
     public void updateFromDatabase(Friendship friendship) {
-        String sql = "UPDATE friendships SET user1_id = ?, user2_id = ? WHERE id = ?";
+        String sql = "UPDATE friendships SET user1_id = ?, user2_id = ?, status = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setLong(1, friendship.getUser1().getId());
             stmt.setLong(2, friendship.getUser2().getId());
-            stmt.setLong(3, friendship.getId());
+            stmt.setString(3, friendship.getStatus().name());
+            stmt.setLong(4, friendship.getId());
 
             stmt.executeUpdate();
         } catch (SQLException e) {

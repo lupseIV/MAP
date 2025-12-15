@@ -10,6 +10,7 @@ import org.repository.PagingRepository;
 import org.repository.Repository;
 import org.repository.util.paging.Page;
 import org.service.utils.IdGenerator;
+import org.utils.enums.FriendRequestStatus;
 
 import java.util.*;
 import java.util.stream.StreamSupport;
@@ -37,7 +38,6 @@ public class FriendshipService extends EntityService<Long, Friendship>{
         validator.validate(friendship);
         friendship.setId(idGenerator.nextId());
 
-        friendship.getUser1().addFriend(friendship.getUser2());
         friendshipNetwork=null;
 
         return repository.save(friendship);
@@ -186,6 +186,15 @@ public class FriendshipService extends EntityService<Long, Friendship>{
     }
 
     public void acceptFriendship(Friendship friendship){
+        friendship.setStatus(FriendRequestStatus.APPROVED);
+        friendship.getUser1().addFriend(friendship.getUser2());
+        super.update(friendship);
 
+    }
+
+    public void rejectFriendship(Friendship friendship){
+        friendship.setStatus(FriendRequestStatus.REJECTED);
+        friendship.getUser1().removeFriend(friendship.getUser2());
+        super.update(friendship);
     }
 }

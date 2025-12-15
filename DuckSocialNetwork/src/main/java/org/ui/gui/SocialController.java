@@ -11,6 +11,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -117,8 +118,8 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
                     setStyle("-fx-text-fill: #4a90e2; -fx-cursor: hand; -fx-underline: true;");
 
                     setOnMouseClicked(event -> {
-                        if (event.getClickCount() == 1) {
-                            showUserDetailsPopup(user);
+                        if (event.getClickCount() == 1 ) {
+                            showPopup(user,statusCombo.getSelectionModel().getSelectedItem(),getTableRow().getItem());
                         }
                     });
                 }
@@ -127,6 +128,42 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
 
         friendshipsTable.setItems(model);
     }
+
+    private void showPopup(User user, FriendRequestStatus status, Friendship friendship) {
+        if (status == FriendRequestStatus.APPROVED || status == FriendRequestStatus.REJECTED) {
+            showUserDetailsPopup(user);
+        } else if (status == FriendRequestStatus.PENDING) {
+            try{
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("FriendRequestPopup.fxml"));
+                BorderPane root = loader.load();
+
+                Stage dialogStage = new Stage();
+                dialogStage.setTitle("Friend Request");
+                dialogStage.initModality(Modality.WINDOW_MODAL);
+                dialogStage.initOwner(friendshipsTable.getScene().getWindow());
+                Scene scene = new Scene(root);
+                dialogStage.setScene(scene);
+
+                FriendRequestPopup controller = loader.getController();
+                controller.setService(dialogStage,
+                        authService.getCurrentUser().equals(friendship.getUser1()) ?
+                                friendship.getUser2() : friendship.getUser1(),
+                        friendship,
+                        service);
+
+                dialogStage.showAndWait();
+
+                if (controller.isClicked()) {
+                    loadData();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert("Error", "Could not open dialog: " + e.getMessage());
+            }
+        }
+    }
+
 
     private void showUserDetailsPopup(User user) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
