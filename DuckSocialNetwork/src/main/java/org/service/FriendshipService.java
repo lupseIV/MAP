@@ -72,7 +72,9 @@ public class FriendshipService extends EntityService<Long, Friendship>{
         friendshipNetwork=null;
         Friendship f = repository.delete(id);
 
-        notificationService.delete(friendship);
+        FriendRequestNotification notification = new FriendRequestNotification(friendship.getUser2(), friendship.getUser1(), friendship);
+        notification.setMessage("Friendship has been deleted");
+        notificationService.save(notification);
         return f;
     }
 
@@ -213,7 +215,6 @@ public class FriendshipService extends EntityService<Long, Friendship>{
         super.update(friendship);
         FriendRequestNotification notification = new FriendRequestNotification(friendship.getUser2(),
                 friendship.getUser1(), friendship);
-        notification.setStatus(NotificationStatus.READ);
         notification.setMessage("Friendship accepted");
 
         notificationService.save(notification);
@@ -225,7 +226,6 @@ public class FriendshipService extends EntityService<Long, Friendship>{
         super.update(friendship);
         FriendRequestNotification notification = new FriendRequestNotification(friendship.getUser2(),
                 friendship.getUser1(), friendship);
-        notification.setStatus(NotificationStatus.READ);
         notification.setMessage("Friendship rejected");
 
         notificationService.save(notification);
