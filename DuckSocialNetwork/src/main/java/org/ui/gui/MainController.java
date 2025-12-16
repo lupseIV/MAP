@@ -4,18 +4,24 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.domain.Observer;
 import org.domain.users.User;
+import org.domain.users.relationships.notifications.FriendRequestNotification;
 import org.service.*;
+import org.utils.enums.NotificationStatus;
+import org.utils.enums.NotificationType;
 
 import java.io.IOException;
 
-public class MainController implements ViewController{
+public class MainController implements ViewController, Observer<FriendRequestNotification> {
 
     @FXML private StackPane contentArea;
+    @FXML private Button notificationButton;
 
     private DucksService ducksService;
     private PersonsService personsService;
@@ -34,6 +40,15 @@ public class MainController implements ViewController{
         this.authService = as;
         this.messageService = ms;
         this.notificationService = ns;
+        initNotification();
+    }
+
+    private void initNotification() {
+        if(notificationService.findAll(authService.getCurrentUser()).stream().anyMatch(
+                notification -> notification.getStatus() == NotificationStatus.NEW
+        )) {
+            update(null);
+        }
     }
 
     @FXML public void handleShowUsersView(){
@@ -86,6 +101,7 @@ public class MainController implements ViewController{
 
     @FXML
     public void handleShowNotificationsView(){
+        notificationButton.setStyle("-fx-font-weight: regular;");
         loadView("NotificationsView.fxml", controller -> {
             if (controller instanceof NotificationController) {
                 ((NotificationController) controller).setServices(notificationService, authService);
@@ -117,4 +133,8 @@ public class MainController implements ViewController{
         }
     }
 
+    @Override
+    public void update(FriendRequestNotification event) {
+        notificationButton.setStyle("-fx-font-weight: bold;");
+    }
 }

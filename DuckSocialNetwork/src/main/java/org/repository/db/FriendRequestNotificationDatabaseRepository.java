@@ -3,6 +3,7 @@ package org.repository.db;
 import database.DatabaseConnection;
 import org.domain.exceptions.RepositoryException;
 import org.domain.users.User;
+import org.domain.users.relationships.Friendship;
 import org.domain.users.relationships.notifications.FriendRequestNotification;
 import org.domain.validators.Validator;
 import org.utils.enums.NotificationStatus;
@@ -25,8 +26,10 @@ public class FriendRequestNotificationDatabaseRepository extends EntityDatabaseR
         Long user1Id = resultSet.getLong("user1_id");
         Long user2Id = resultSet.getLong("user2_id");
         NotificationStatus notificationStatus = NotificationStatus.valueOf(resultSet.getString("status"));
+        Long friendshipId = resultSet.getLong("friendship_id");
 
 
+        Friendship friendship = friendshipDatabaseRepository.findOne(friendshipId);
         User u1 = friendshipDatabaseRepository.findUserById(user1Id);
         User u2 = friendshipDatabaseRepository.findUserById(user2Id);
 
@@ -34,14 +37,14 @@ public class FriendRequestNotificationDatabaseRepository extends EntityDatabaseR
             return null;
         }
 
-        var not = new FriendRequestNotification(id, u1, u2);
+        var not = new FriendRequestNotification(id, u1, u2, friendship);
         not.setStatus(notificationStatus);
         return not;
     }
 
     @Override
     public void saveToDatabase(FriendRequestNotification entity) {
-        String sql = "INSERT INTO friend_notifications (notification_id, user1_id, user2_id) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO friend_notifications (notification_id, user1_id, user2_id, friendship_id) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -49,6 +52,7 @@ public class FriendRequestNotificationDatabaseRepository extends EntityDatabaseR
             stmt.setLong(1, entity.getId());
             stmt.setLong(2, entity.getFrom().getId());
             stmt.setLong(3, entity.getTo().getId());
+            stmt.setLong(4, entity.getFriendship().getId());
 
             stmt.executeUpdate();
         } catch (SQLException e) {

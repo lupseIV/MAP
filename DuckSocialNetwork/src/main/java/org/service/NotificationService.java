@@ -32,15 +32,17 @@ public class NotificationService extends EntityService<Long, FriendRequestNotifi
 
     @Override
     public FriendRequestNotification save(FriendRequestNotification entity) {
+        var res =super.save(entity);
         notifyObservers(new AddFriendEvent(NotificationType.FRIEND_REQUEST, NotificationStatus.NEW, List.of(entity)));
-        return super.save(entity);
+        return res;
     }
 
     @Override
     public FriendRequestNotification delete(Long aLong) {
+        var res =  super.delete(aLong);
         notifyObservers(new AddFriendEvent(NotificationType.FRIEND_REQUEST, NotificationStatus.DELETED, List.of(findOne(aLong))));
 
-        return super.delete(aLong);
+        return res;
     }
 
     @Override
@@ -71,5 +73,25 @@ public class NotificationService extends EntityService<Long, FriendRequestNotifi
         return StreamSupport.stream(super.findAll().spliterator(), false)
                 .filter(notification -> notification.getTo().equals(currentUser))
                 .collect(Collectors.toList());
+    }
+
+    public FriendRequestNotification findOne(Friendship friendship) {
+        return StreamSupport.stream(findAll().spliterator(),false)
+                .filter(n ->
+                        friendship.equals(n.getFriendship())).findFirst().orElse(null);
+    }
+
+    public FriendRequestNotification delete(Friendship friendship) {
+        return delete(findOne(friendship).getId());
+    }
+
+    public void markAllAsRead(User currentUser) {
+        StreamSupport.stream(repository.findAll().spliterator(), false)
+                .filter(notification -> notification.getTo().equals(currentUser))
+                .filter(notification -> notification.getStatus() == NotificationStatus.NEW)
+                .forEach(notification -> {
+                    notification.setStatus(NotificationStatus.READ);
+                    repository.update(notification);
+                });
     }
 }

@@ -77,4 +77,10 @@ public class NotificationController implements Observer<AddFriendEvent> {
             }
         });
     }
+
+    @FXML
+    public void markAllAsRead() {
+        notificationService.markAllAsRead(currentUser);
+        loadNotifications();
+    }
 }

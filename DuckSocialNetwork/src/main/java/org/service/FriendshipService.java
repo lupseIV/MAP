@@ -12,6 +12,7 @@ import org.repository.Repository;
 import org.repository.util.paging.Page;
 import org.service.utils.IdGenerator;
 import org.utils.enums.FriendRequestStatus;
+import org.utils.enums.NotificationStatus;
 
 import java.util.*;
 import java.util.stream.StreamSupport;
@@ -47,7 +48,7 @@ public class FriendshipService extends EntityService<Long, Friendship>{
                 .filter( f -> f.equals(friendship))
                 .findFirst().orElse(null);
 
-        if (exist != null) {
+        if (exist != null && exist.getStatus().equals(FriendRequestStatus.PENDING)) {
             throw new ServiceException("Friendship already exists between users");
         }
 
@@ -55,7 +56,7 @@ public class FriendshipService extends EntityService<Long, Friendship>{
 
         Friendship res = repository.save(friendship);
 
-        FriendRequestNotification notification = new FriendRequestNotification(friendship.getUser1(), friendship.getUser2());
+        FriendRequestNotification notification = new FriendRequestNotification(friendship.getUser1(), friendship.getUser2(), friendship);
         notificationService.save(notification);
         return res;
     }
@@ -69,7 +70,10 @@ public class FriendshipService extends EntityService<Long, Friendship>{
             throw new ServiceException("Friendship not found");
         friendship.getUser1().removeFriend(friendship.getUser2());
         friendshipNetwork=null;
-        return repository.delete(id);
+        Friendship f = repository.delete(id);
+
+        notificationService.delete(friendship);
+        return f;
     }
 
 
@@ -207,12 +211,23 @@ public class FriendshipService extends EntityService<Long, Friendship>{
         friendship.setStatus(FriendRequestStatus.APPROVED);
         friendship.getUser1().addFriend(friendship.getUser2());
         super.update(friendship);
+        FriendRequestNotification notification = new FriendRequestNotification(friendship.getUser2(),
+                friendship.getUser1(), friendship);
+        notification.setStatus(NotificationStatus.READ);
+        notification.setMessage("Friendship accepted");
 
+        notificationService.save(notification);
     }
 
     public void rejectFriendship(Friendship friendship){
         friendship.setStatus(FriendRequestStatus.REJECTED);
         friendship.getUser1().removeFriend(friendship.getUser2());
         super.update(friendship);
+        FriendRequestNotification notification = new FriendRequestNotification(friendship.getUser2(),
+                friendship.getUser1(), friendship);
+        notification.setStatus(NotificationStatus.READ);
+        notification.setMessage("Friendship rejected");
+
+        notificationService.save(notification);
     }
 }
