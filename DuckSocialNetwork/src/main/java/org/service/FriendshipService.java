@@ -5,6 +5,7 @@ import org.domain.users.duck.Duck;
 import org.domain.users.relationships.Friendship;
 import org.domain.users.User;
 import org.domain.exceptions.ServiceException;
+import org.domain.users.relationships.notifications.FriendRequestNotification;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
 import org.repository.Repository;
@@ -19,6 +20,7 @@ public class FriendshipService extends EntityService<Long, Friendship>{
 
 
     private UsersService usersService;
+    private NotificationService notificationService;
 
     Map<Long,Set<Long>> friendshipNetwork;
 
@@ -26,6 +28,9 @@ public class FriendshipService extends EntityService<Long, Friendship>{
         this.usersService = usersService;
     }
 
+    public void setNotificationService(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
 
     public FriendshipService(Validator<Friendship> validator, PagingRepository<Long, Friendship> repository, IdGenerator<Long> idGenerator) {
         super(validator, repository, idGenerator);
@@ -38,14 +43,21 @@ public class FriendshipService extends EntityService<Long, Friendship>{
         validator.validate(friendship);
         friendship.setId(idGenerator.nextId());
 
+
+//TODO add check so can't add another friendship for the same users
         friendshipNetwork=null;
 
-        return repository.save(friendship);
+        Friendship res = repository.save(friendship);
+
+        FriendRequestNotification notification = new FriendRequestNotification(friendship.getUser1(), friendship.getUser2());
+        notificationService.save(notification);
+        return res;
     }
 
 
     @Override
     public Friendship delete(Long id) {
+
         Friendship friendship = repository.findOne(id);
         if(friendship == null)
             throw new ServiceException("Friendship not found");

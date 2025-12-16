@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.ui.gui.NotificationController">
+<BorderPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: grey;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.ui.gui.NotificationController">
    <bottom>
       <HBox alignment="CENTER" spacing="20.0" BorderPane.alignment="CENTER">
          <children>
@@ -17,13 +17,13 @@
       </HBox>
    </bottom>
    <top>
-      <Label text="Notifications" BorderPane.alignment="CENTER">
+      <Label text="Notifications" textFill="WHITE" BorderPane.alignment="CENTER">
          <font>
             <Font name="System Bold" size="20.0" />
          </font>
       </Label>
    </top>
    <center>
-      <ListView prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <ListView fx:id="notificationListView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

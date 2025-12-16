@@ -1,37 +1,37 @@
 package org.domain.events;
 
 import org.domain.users.User;
+import org.domain.users.relationships.messages.Message;
+import org.domain.users.relationships.notifications.FriendRequestNotification;
+import org.utils.enums.NotificationStatus;
+import org.utils.enums.NotificationType;
+
+import java.util.List;
 
 public class AddFriendEvent {
-    private User from;
-    private User to;
+    private final NotificationType type;
+    private NotificationStatus status;
+    private final List<FriendRequestNotification> messages;
 
-    public AddFriendEvent(User from, User to) {
-        this.from = from;
-        this.to = to;
+    public AddFriendEvent(NotificationType type, NotificationStatus status, List<FriendRequestNotification> messages) {
+        this.type = type;
+        this.status = status;
+        this.messages = messages;
     }
 
-    @Override
-    public String toString() {
-        return "AddFriendEvent{" +
-                "from=" + from +
-                ", to=" + to +
-                '}';
+    public NotificationType getType() {
+        return type;
     }
 
-    public User getFrom() {
-        return from;
+    public NotificationStatus getStatus() {
+        return status;
     }
 
-    public void setFrom(User from) {
-        this.from = from;
+    public void setStatus(NotificationStatus status) {
+        this.status = status;
     }
 
-    public User getTo() {
-        return to;
-    }
-
-    public void setTo(User to) {
-        this.to = to;
+    public List<FriendRequestNotification> getMessages() {
+        return messages;
     }
 }

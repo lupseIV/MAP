@@ -25,7 +25,7 @@ public class FriendshipDatabaseRepository extends EntityDatabaseRepository<Long,
         loadFromDatabase();
     }
 
-    private User findUserById(Long id) {
+    public User findUserById(Long id) {
         User user = StreamSupport.stream(duckDatabaseRepository.findAll().spliterator(), false)
                 .filter(d -> d.getId().equals(id) )
                 .findFirst()

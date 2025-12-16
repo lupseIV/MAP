@@ -25,12 +25,10 @@ import org.domain.users.User;
 import org.domain.users.duck.Duck;
 import org.domain.users.person.Person;
 import org.domain.users.relationships.Friendship;
+import org.domain.users.relationships.notifications.FriendRequestNotification;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
-import org.service.AuthService;
-import org.service.FriendshipService;
-import org.service.PersonsService;
-import org.service.UsersService;
+import org.service.*;
 import org.utils.enums.FriendRequestStatus;
 
 import java.io.IOException;
@@ -53,7 +51,6 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
     private FriendshipService service;
     private UsersService usersService;
     private AuthService authService;
-
 
     public SocialController() {
         super(0, 14, 0,  new FriendshipGUIFilter());
@@ -213,7 +210,7 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
             VBox page = loader.load();
 
             Stage dialogStage = new Stage();
-            dialogStage.setTitle("Add New Person");
+            dialogStage.setTitle("Add New Friend");
             dialogStage.initModality(Modality.WINDOW_MODAL);
             dialogStage.initOwner(friendshipsTable.getScene().getWindow());
             Scene scene = new Scene(page);

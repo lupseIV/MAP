@@ -14,6 +14,7 @@
             <Button onAction="#handleShowUsersView" styleClass="nav-button" text="Users" />
             <Button onAction="#handleShowFriendships" styleClass="nav-button" text="Friendships" />
             <Button onAction="#handleShowMessageView" styleClass="nav-button" text="Messages" />
+            <Button  onAction="#handleShowNotificationsView" styleClass="nav-button" text="Notifications" />
         </VBox>
     </left>
 

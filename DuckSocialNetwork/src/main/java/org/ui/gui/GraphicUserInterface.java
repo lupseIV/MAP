@@ -26,6 +26,7 @@ public class GraphicUserInterface extends Application {
     private RaceEventService raceEventService;
     private UsersService usersService;
     private MessageService messageService;
+    private NotificationService notificationService;
 
     private MessageDatabaseRepository messageRepo;
 
@@ -37,6 +38,7 @@ public class GraphicUserInterface extends Application {
         var flockValidator = new FlockValidator();
         var raceEventValidator = new RaceEventValidator();
         var messageValidator = new MessageValidator();
+        var notificationValidator = new NotificationValidator();
 
         DatabaseConnection.initDatabaseSchema();
 
@@ -46,6 +48,7 @@ public class GraphicUserInterface extends Application {
         FriendshipDatabaseRepository friendshipRepo = null;
         FlockDatabaseRepository flockRepo = null;
         RaceEventDatabaseRepository raceEventRepo = null;
+        FriendRequestNotificationDatabaseRepository friendRequestRepo = null;
 
         personRepo = new PersonDatabaseRepository(personValidator);
         duckRepo = new DuckDatabaseRepository(duckValidator);
@@ -56,6 +59,8 @@ public class GraphicUserInterface extends Application {
         flockRepo = new FlockDatabaseRepository(flockValidator, duckRepo);
         raceEventRepo = new RaceEventDatabaseRepository(raceEventValidator, duckRepo);
         messageRepo = new MessageDatabaseRepository(messageValidator, duckRepo, personRepo);
+        friendRequestRepo =  new FriendRequestNotificationDatabaseRepository(notificationValidator,friendshipRepo);
+
 
         Long maxUsersId = Math.max(
                 EntityRepository.getMaxId(duckRepo.findAll()),
@@ -66,24 +71,27 @@ public class GraphicUserInterface extends Application {
         Long maxFlockId = EntityRepository.getMaxId(flockRepo.findAll());
         Long  maxEventId = EntityRepository.getMaxId(raceEventRepo.findAll());
         Long maxMessageId = EntityRepository. getMaxId(messageRepo.findAll());
+        Long maxNotificationId = EntityRepository.getMaxId(friendRequestRepo.findAll());
         //id generator
         var usersIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxUsersId, 0L) + 1);
         var friendshipIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxFriendshipId, 0L) + 1);
         var flockIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxFlockId, 0L) + 1);
         var eventIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxEventId, 0L) + 1);
         var messageIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxMessageId, 0L) + 1);
+        var notificationIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxNotificationId, 0L) + 1);
         //service
         ducksService = new DucksService(duckValidator, duckRepo, usersIdGenerator);
         personsService = new PersonsService(personValidator, personRepo, usersIdGenerator);
         friendshipService = new FriendshipService(friendshipValidator, friendshipRepo, friendshipIdGenerator);
         flockService = new FlockService(flockValidator, flockRepo, flockIdGenerator, ducksService);
         raceEventService = new RaceEventService(raceEventValidator, raceEventRepo, eventIdGenerator, ducksService);
-
+        notificationService = new NotificationService(notificationValidator, friendRequestRepo, notificationIdGenerator);
 
         usersService = new UsersService(ducksService, personsService,friendshipService);
         messageService = new MessageService(messageValidator, messageRepo, messageIdGenerator);
 
         friendshipService.setUsersService(usersService);
+        friendshipService.setNotificationService(notificationService);
         ducksService.setFlockService(flockService);
 
     }
@@ -92,8 +100,8 @@ public class GraphicUserInterface extends Application {
     public void start(Stage primaryStage) throws Exception {
         createLoginWindow(primaryStage, "Duck Social Network - Instance 1");
 
-//        Stage secondStage = new Stage();
-//        createLoginWindow(secondStage, "Duck Social Network - Instance 2");
+        Stage secondStage = new Stage();
+        createLoginWindow(secondStage, "Duck Social Network - Instance 2");
     }
 
     private void createLoginWindow(Stage stage, String title) throws Exception {
@@ -104,7 +112,7 @@ public class GraphicUserInterface extends Application {
 
         AuthService windowAuthService = new AuthService(usersService);
         controller. setServices(ducksService, personsService, friendshipService,
-                usersService, windowAuthService, messageService);
+                usersService, windowAuthService, messageService, notificationService);
 
         Scene scene = new Scene(root, 1000, 700);
         controller. setStage(stage);

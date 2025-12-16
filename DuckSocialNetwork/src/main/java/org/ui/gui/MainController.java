@@ -23,15 +23,17 @@ public class MainController implements ViewController{
     private UsersService usersService;
     private MessageService messageService;
     private AuthService authService;
+    private NotificationService notificationService;
 
     public void setServices(DucksService ds, PersonsService ps, FriendshipService fs, UsersService us,
-                            AuthService as, MessageService ms) {
+                            AuthService as, MessageService ms, NotificationService ns) {
         this.ducksService = ds;
         this.personsService = ps;
         this.friendshipService = fs;
         this.usersService = us;
         this.authService = as;
         this.messageService = ms;
+        this.notificationService = ns;
     }
 
     @FXML public void handleShowUsersView(){
@@ -83,6 +85,15 @@ public class MainController implements ViewController{
     }
 
     @FXML
+    public void handleShowNotificationsView(){
+        loadView("NotificationsView.fxml", controller -> {
+            if (controller instanceof NotificationController) {
+                ((NotificationController) controller).setServices(notificationService, authService);
+            }
+        }, contentArea);
+    }
+
+    @FXML
     public void handleLogout() {
         try {
             authService.logout();
@@ -92,7 +103,7 @@ public class MainController implements ViewController{
 
             LoginController controller = loader.getController();
             controller.setServices(ducksService, personsService, friendshipService,
-                    usersService, new AuthService(usersService), messageService);
+                    usersService, new AuthService(usersService), messageService, notificationService);
 
             Stage stage = (Stage) contentArea.getScene().getWindow();
             controller.setStage(stage);
