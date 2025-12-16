@@ -43,8 +43,14 @@ public class FriendshipService extends EntityService<Long, Friendship>{
         validator.validate(friendship);
         friendship.setId(idGenerator.nextId());
 
+        Friendship exist = StreamSupport.stream(findAll().spliterator(), false)
+                .filter( f -> f.equals(friendship))
+                .findFirst().orElse(null);
 
-//TODO add check so can't add another friendship for the same users
+        if (exist != null) {
+            throw new ServiceException("Friendship already exists between users");
+        }
+
         friendshipNetwork=null;
 
         Friendship res = repository.save(friendship);

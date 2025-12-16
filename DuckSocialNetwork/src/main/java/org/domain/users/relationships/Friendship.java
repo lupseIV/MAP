@@ -4,6 +4,8 @@ import org.domain.Entity;
 import org.domain.users.User;
 import org.utils.enums.FriendRequestStatus;
 
+import java.util.Objects;
+
 public class Friendship extends Entity<Long> {
     private User user1;
     private User user2;
@@ -52,5 +54,19 @@ public class Friendship extends Entity<Long> {
                 "user1=" + user1 +
                 ", user2=" + user2 +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Friendship that = (Friendship) o;
+        return Objects.equals(user1, that.user1) && Objects.equals(user2, that.user2) ||
+                Objects.equals(user1, that.user2) && Objects.equals(user2, that.user1);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), user1, user2);
     }
 }
