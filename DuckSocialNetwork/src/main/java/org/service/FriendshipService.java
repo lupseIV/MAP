@@ -1,5 +1,7 @@
 package org.service;
 
+import org.domain.Observable;
+import org.domain.events.AddFriendEvent;
 import org.domain.users.relationships.Friendship;
 import org.domain.users.User;
 import org.domain.exceptions.ServiceException;
@@ -9,11 +11,13 @@ import org.repository.PagingRepository;
 import org.repository.util.paging.Page;
 import org.service.utils.IdGenerator;
 import org.utils.enums.FriendRequestStatus;
+import org.utils.enums.NotificationStatus;
+import org.utils.enums.NotificationType;
 
 import java.util.*;
 import java.util.stream.StreamSupport;
 
-public class FriendshipService extends EntityService<Long, Friendship>{
+public class FriendshipService extends EntityService<Long, Friendship>  {
 
 
     private UsersService usersService;
@@ -24,6 +28,7 @@ public class FriendshipService extends EntityService<Long, Friendship>{
 
     public void setAuthService(AuthService authService) {
         this.authService = authService;
+        notificationService.setAuthService(authService);
     }
 
     public void setUsersService(UsersService usersService) {
@@ -73,7 +78,11 @@ public class FriendshipService extends EntityService<Long, Friendship>{
             throw new ServiceException("Friendship not found");
         friendship.getUser1().removeFriend(friendship.getUser2());
         friendshipNetwork=null;
-         return repository.delete(id);
+       Friendship res = repository.delete(id);
+
+       notificationService.notifyObservers(new AddFriendEvent(NotificationType.FRIEND_REQUEST,
+               NotificationStatus.DELETED,List.of(), authService.getCurrentUser()));
+       return res;
     }
 
 
@@ -216,7 +225,6 @@ public class FriendshipService extends EntityService<Long, Friendship>{
 
         FriendNotification notification = new FriendNotification(authService.getCurrentUser(),
                 friend, friendship);
-        System.out.println("from:"+authService.getCurrentUser()+"\nto:"+friend);
         notification.setMessage("Friendship accepted");
 
         notificationService.save(notification);
@@ -232,7 +240,6 @@ public class FriendshipService extends EntityService<Long, Friendship>{
         FriendNotification notification = new FriendNotification(authService.getCurrentUser(),
                 friend, friendship);
         notification.setMessage("Friendship rejected");
-        System.out.println("from:"+authService.getCurrentUser()+"\nto:"+friend);
 
         notificationService.save(notification);
     }

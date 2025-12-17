@@ -21,31 +21,35 @@ import java.util.stream.StreamSupport;
 public class NotificationService extends EntityService<Long, FriendNotification> implements Observable<AddFriendEvent, Observer<AddFriendEvent>> {
 
     private final List<Observer<AddFriendEvent>> observers = new CopyOnWriteArrayList<>();
-
+    private AuthService authService;
 
     public NotificationService(Validator<FriendNotification> validator, PagingRepository<Long, FriendNotification> repository,
                                IdGenerator<Long> idGenerator) {
         super(validator, repository, idGenerator);
     }
 
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
+    }
+
     @Override
     public FriendNotification save(FriendNotification entity) {
         var res =super.save(entity);
-        notifyObservers(new AddFriendEvent(NotificationType.FRIEND_REQUEST, NotificationStatus.NEW, List.of(entity)));
+        notifyObservers(new AddFriendEvent(NotificationType.FRIEND_REQUEST, NotificationStatus.NEW, List.of(entity), authService.getCurrentUser()));
         return res;
     }
 
     @Override
     public FriendNotification delete(Long aLong) {
         var res =  super.delete(aLong);
-        notifyObservers(new AddFriendEvent(NotificationType.FRIEND_REQUEST, NotificationStatus.DELETED, List.of(findOne(aLong))));
+        notifyObservers(new AddFriendEvent(NotificationType.FRIEND_REQUEST, NotificationStatus.DELETED, List.of(findOne(aLong)),authService.getCurrentUser()));
 
         return res;
     }
 
     @Override
     public FriendNotification update(FriendNotification entity) {
-        notifyObservers(new AddFriendEvent(NotificationType.FRIEND_REQUEST, NotificationStatus.READ, List.of(entity)));
+        notifyObservers(new AddFriendEvent(NotificationType.FRIEND_REQUEST, NotificationStatus.READ, List.of(entity), authService.getCurrentUser()));
 
         return super.update(entity);
     }

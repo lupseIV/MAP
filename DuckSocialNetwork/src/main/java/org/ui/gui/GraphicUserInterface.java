@@ -113,6 +113,8 @@ public class GraphicUserInterface extends Application {
         AuthService windowAuthService = new AuthService(usersService);
 
         friendshipService.setAuthService(windowAuthService);
+        notificationService.setAuthService(windowAuthService);
+
         controller. setServices(ducksService, personsService, friendshipService,
                 usersService, windowAuthService, messageService, notificationService);
 

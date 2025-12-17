@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -11,20 +12,28 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.domain.Observer;
 import org.domain.dtos.filters.FriendshipGUIFilter;
 import org.domain.dtos.guiDTOS.UserGuiDTO;
+import org.domain.events.AddFriendEvent;
 import org.domain.users.User;
 import org.domain.users.relationships.Friendship;
+import org.domain.users.relationships.notifications.Notification;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
 import org.service.*;
 import org.utils.enums.FriendRequestStatus;
+import org.utils.enums.NotificationStatus;
+import org.utils.enums.NotificationType;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class SocialController extends AbstractPagingTableViewController<Friendship, FriendshipGUIFilter>{
+public class SocialController extends AbstractPagingTableViewController<Friendship, FriendshipGUIFilter> implements Observer<AddFriendEvent> {
 
     @FXML private TableView<Friendship> friendshipsTable;
     @FXML private TableColumn<Friendship, Long> idCol;
@@ -40,15 +49,26 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
     private FriendshipService service;
     private UsersService usersService;
     private AuthService authService;
+    private NotificationService notificationService;
 
     public SocialController() {
         super(0, 14, 0,  new FriendshipGUIFilter());
     }
 
-    public void setService(FriendshipService service, UsersService usersService, AuthService authService) {
+    @Override
+    public void update(AddFriendEvent event) {
+        if(event.getType() == NotificationType.FRIEND_REQUEST){
+            loadData();
+        }
+    }
+
+    public void setService(FriendshipService service, UsersService usersService, AuthService authService, NotificationService notificationService) {
         this.service = Objects.requireNonNull(service);
         this.usersService = Objects.requireNonNull(usersService);
         this.authService = Objects.requireNonNull(authService);
+        this.notificationService = notificationService;
+
+        notificationService.addObserver(this);
 
         if(authService.isLoggedIn()) {
             filter.setCurrentUser(Optional.of(authService.getCurrentUser()));

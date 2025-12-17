@@ -9,13 +9,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.domain.Observer;
+import org.domain.events.AddFriendEvent;
 import org.domain.users.relationships.notifications.FriendNotification;
 import org.service.*;
 import org.utils.enums.NotificationStatus;
 
 import java.io.IOException;
 
-public class MainController implements ViewController, Observer<FriendNotification> {
+public class MainController implements ViewController, Observer<AddFriendEvent> {
 
     @FXML private StackPane contentArea;
     @FXML private Button notificationButton;
@@ -37,6 +38,9 @@ public class MainController implements ViewController, Observer<FriendNotificati
         this.authService = as;
         this.messageService = ms;
         this.notificationService = ns;
+
+        notificationService.addObserver(this);
+
         initNotification();
     }
 
@@ -61,7 +65,7 @@ public class MainController implements ViewController, Observer<FriendNotificati
 
         loadView("SocialView.fxml", controller -> {
             if (controller instanceof SocialController) {
-                ((SocialController) controller).setService(friendshipService, usersService,authService);
+                ((SocialController) controller).setService(friendshipService, usersService,authService, notificationService);
             }
         }, contentArea);
     }
@@ -131,7 +135,9 @@ public class MainController implements ViewController, Observer<FriendNotificati
     }
 
     @Override
-    public void update(FriendNotification event) {
-        notificationButton.setStyle("-fx-font-weight: bold;");
+    public void update(AddFriendEvent event) {
+        if(!event.getUser().equals(authService.getCurrentUser()) && event.getStatus() == NotificationStatus.NEW) {
+            notificationButton.setStyle("-fx-font-weight: bold;");
+        }
     }
 }
