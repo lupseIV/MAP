@@ -59,7 +59,7 @@ public class FriendshipAddDialogController {
                 dialogStage.close();
 
             } catch (Exception e) {
-                showAlert("Error", "Could not save duck: " + e.getMessage());
+                showAlert("Error", "Could not save : " + e.getMessage());
             }
         }
     }

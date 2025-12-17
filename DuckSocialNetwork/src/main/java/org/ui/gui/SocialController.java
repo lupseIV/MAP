@@ -209,6 +209,7 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
 
             model.setAll(service.getGuiFriendshipsFromPage(personPage));
         } catch (Exception e) {
+//            throw e;
             showAlert("Error", "Could not load data: " + e.getMessage());
         }
     }
@@ -291,6 +292,7 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
+        alert.isResizable();
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();

@@ -13,8 +13,10 @@ import org.domain.events.AddFriendEvent;
 import org.domain.users.relationships.notifications.FriendNotification;
 import org.service.*;
 import org.utils.enums.NotificationStatus;
+import org.utils.enums.NotificationType;
 
 import java.io.IOException;
+import java.util.List;
 
 public class MainController implements ViewController, Observer<AddFriendEvent> {
 
@@ -48,7 +50,8 @@ public class MainController implements ViewController, Observer<AddFriendEvent> 
         if(notificationService.findAll(authService.getCurrentUser()).stream().anyMatch(
                 notification -> notification.getStatus() == NotificationStatus.NEW
         )) {
-            update(null);
+            update(new AddFriendEvent(NotificationType.FRIEND_REQUEST,
+                    NotificationStatus.NEW, List.of(), authService.getCurrentUser()));
         }
     }
 

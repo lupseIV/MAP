@@ -29,7 +29,8 @@ CREATE TABLE IF NOT EXISTS ducks (
 CREATE TABLE IF NOT EXISTS friendships (
                                            id BIGINT PRIMARY KEY,
                                            user1_id BIGINT NOT NULL,
-                                           user2_id BIGINT NOT NULL
+                                           user2_id BIGINT NOT NULL,
+                                           status varchar(20) DEFAULT 'PENDING' CHECK ( status in ('PENDING', 'APPROVED', 'REJECTED'))
 );
 
 -- Create Flocks table
@@ -77,12 +78,16 @@ CREATE TABLE IF NOT EXISTS message_recipients (
                                                   FOREIGN KEY (user_id) REFERENCES persons(id)
 );
 
-CREATE TABLE IF NOT EXISTS friend_notifiation (
+CREATE TABLE IF NOT EXISTS friend_notifications (
     notification_id BIGINT NOT NULL PRIMARY KEY,
     user1_id BIGINT,
     user2_id BIGINT,
     status varchar(20) DEFAULT 'NEW' CHECK ( status in ('NEW', 'READ', 'DELETED') ),
     friendship_id BIGINT
 );
+SELECT * FROM friendships;
+DELEte FROM friendships WHERE status='PENDING';
 
-TRUNCATE TABLE friend_notifications
+SELECT * FROM friend_notifications;
+TRUNCATE TABLE friend_notifications;
+

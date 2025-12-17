@@ -58,6 +58,10 @@ public class FriendshipService extends EntityService<Long, Friendship>  {
             throw new ServiceException("Friendship already exists between users");
         }
 
+        if (friendship.getUser2().equals(friendship.getUser1())) {
+            throw new ServiceException("You cannot send a friend request to yourself");
+        }
+
         friendshipNetwork=null;
 
         Friendship res = repository.save(friendship);
@@ -110,7 +114,9 @@ public class FriendshipService extends EntityService<Long, Friendship>  {
             friendshipNetwork.put(user.getId(), new HashSet<>());
         }
 
-        Iterable<Friendship> allFriendships = repository.findAll();
+        Iterable<Friendship> allFriendships = StreamSupport.stream(repository.findAll().spliterator(),false)
+                .filter(f -> FriendRequestStatus.APPROVED.equals(f.getStatus()))
+                .toList();
         for(Friendship f : allFriendships) {
             Long u1Id = f.getUser1().getId();
             Long u2Id = f.getUser2().getId();
