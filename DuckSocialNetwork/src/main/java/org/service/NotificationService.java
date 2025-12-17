@@ -4,11 +4,9 @@ import javafx.application.Platform;
 import org.domain.Observable;
 import org.domain.Observer;
 import org.domain.events.AddFriendEvent;
-import org.domain.events.MessageEvent;
 import org.domain.users.User;
 import org.domain.users.relationships.Friendship;
-import org.domain.users.relationships.notifications.FriendRequestNotification;
-import org.domain.users.relationships.notifications.Notification;
+import org.domain.users.relationships.notifications.FriendNotification;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
 import org.service.utils.IdGenerator;
@@ -20,25 +18,25 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class NotificationService extends EntityService<Long, FriendRequestNotification> implements Observable<AddFriendEvent, Observer<AddFriendEvent>> {
+public class NotificationService extends EntityService<Long, FriendNotification> implements Observable<AddFriendEvent, Observer<AddFriendEvent>> {
 
     private final List<Observer<AddFriendEvent>> observers = new CopyOnWriteArrayList<>();
 
 
-    public NotificationService(Validator<FriendRequestNotification> validator, PagingRepository<Long, FriendRequestNotification> repository,
+    public NotificationService(Validator<FriendNotification> validator, PagingRepository<Long, FriendNotification> repository,
                                IdGenerator<Long> idGenerator) {
         super(validator, repository, idGenerator);
     }
 
     @Override
-    public FriendRequestNotification save(FriendRequestNotification entity) {
+    public FriendNotification save(FriendNotification entity) {
         var res =super.save(entity);
         notifyObservers(new AddFriendEvent(NotificationType.FRIEND_REQUEST, NotificationStatus.NEW, List.of(entity)));
         return res;
     }
 
     @Override
-    public FriendRequestNotification delete(Long aLong) {
+    public FriendNotification delete(Long aLong) {
         var res =  super.delete(aLong);
         notifyObservers(new AddFriendEvent(NotificationType.FRIEND_REQUEST, NotificationStatus.DELETED, List.of(findOne(aLong))));
 
@@ -46,7 +44,7 @@ public class NotificationService extends EntityService<Long, FriendRequestNotifi
     }
 
     @Override
-    public FriendRequestNotification update(FriendRequestNotification entity) {
+    public FriendNotification update(FriendNotification entity) {
         notifyObservers(new AddFriendEvent(NotificationType.FRIEND_REQUEST, NotificationStatus.READ, List.of(entity)));
 
         return super.update(entity);
@@ -69,19 +67,19 @@ public class NotificationService extends EntityService<Long, FriendRequestNotifi
         }
     }
 
-    public List<FriendRequestNotification> findAll(User currentUser) {
+    public List<FriendNotification> findAll(User currentUser) {
         return StreamSupport.stream(super.findAll().spliterator(), false)
                 .filter(notification -> notification.getTo().equals(currentUser))
                 .collect(Collectors.toList());
     }
 
-    public FriendRequestNotification findOne(Friendship friendship) {
+    public FriendNotification findOne(Friendship friendship) {
         return StreamSupport.stream(findAll().spliterator(),false)
                 .filter(n ->
                         friendship.equals(n.getFriendship())).findFirst().orElse(null);
     }
 
-    public FriendRequestNotification delete(Friendship friendship) {
+    public FriendNotification delete(Friendship friendship) {
         return delete(findOne(friendship).getId());
     }
 

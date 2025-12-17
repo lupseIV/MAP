@@ -1,8 +1,6 @@
 package org.domain.events;
 
-import org.domain.users.User;
-import org.domain.users.relationships.messages.Message;
-import org.domain.users.relationships.notifications.FriendRequestNotification;
+import org.domain.users.relationships.notifications.FriendNotification;
 import org.utils.enums.NotificationStatus;
 import org.utils.enums.NotificationType;
 
@@ -11,9 +9,9 @@ import java.util.List;
 public class AddFriendEvent {
     private final NotificationType type;
     private NotificationStatus status;
-    private final List<FriendRequestNotification> messages;
+    private final List<FriendNotification> messages;
 
-    public AddFriendEvent(NotificationType type, NotificationStatus status, List<FriendRequestNotification> messages) {
+    public AddFriendEvent(NotificationType type, NotificationStatus status, List<FriendNotification> messages) {
         this.type = type;
         this.status = status;
         this.messages = messages;
@@ -31,7 +29,7 @@ public class AddFriendEvent {
         this.status = status;
     }
 
-    public List<FriendRequestNotification> getMessages() {
+    public List<FriendNotification> getMessages() {
         return messages;
     }
 }

@@ -31,7 +31,6 @@ public class AuthService {
             if(SecurityUtils.checkPassword(password, user.get().getPassword())){
                 loggedIn = true;
                 this.user = user.get();
-
             }
         }
     }

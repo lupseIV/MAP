@@ -111,6 +111,8 @@ public class GraphicUserInterface extends Application {
         LoginController controller = loader.getController();
 
         AuthService windowAuthService = new AuthService(usersService);
+
+        friendshipService.setAuthService(windowAuthService);
         controller. setServices(ducksService, personsService, friendshipService,
                 usersService, windowAuthService, messageService, notificationService);
 

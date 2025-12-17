@@ -5,13 +5,13 @@ import org.domain.users.relationships.Friendship;
 import org.utils.enums.NotificationStatus;
 import org.utils.enums.NotificationType;
 
-public class FriendRequestNotification extends Notification{
+public class FriendNotification extends Notification{
     private User from;
     private User to;
     private Friendship friendship;
 
 
-    public FriendRequestNotification(User from, User to, Friendship friendship) {
+    public FriendNotification(User from, User to, Friendship friendship) {
         super(NotificationType.FRIEND_REQUEST, NotificationStatus.NEW);
         super.setMessage("Friend Request Notification");
         this.from = from;
@@ -19,7 +19,7 @@ public class FriendRequestNotification extends Notification{
         this.friendship = friendship;
     }
 
-    public FriendRequestNotification(Long id, User from, User to, Friendship friendship) {
+    public FriendNotification(Long id, User from, User to, Friendship friendship) {
         this(from, to, friendship);
         this.setId(id);
     }

@@ -30,6 +30,7 @@ public class FriendshipAddDialogController {
 
     public void setAuthService(AuthService authService) {
         this.authService = authService;
+        service.setAuthService(authService);
     }
 
     public void setService(FriendshipService service, Stage dialogStage) {

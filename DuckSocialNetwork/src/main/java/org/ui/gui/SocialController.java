@@ -1,13 +1,9 @@
 package org.ui.gui;
 
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -15,17 +11,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.domain.dtos.filters.DuckGUIFilter;
 import org.domain.dtos.filters.FriendshipGUIFilter;
-import org.domain.dtos.filters.PersonGUIFilter;
-import org.domain.dtos.guiDTOS.DuckGuiDTO;
-import org.domain.dtos.guiDTOS.PersonGuiDTO;
 import org.domain.dtos.guiDTOS.UserGuiDTO;
 import org.domain.users.User;
-import org.domain.users.duck.Duck;
-import org.domain.users.person.Person;
 import org.domain.users.relationships.Friendship;
-import org.domain.users.relationships.notifications.FriendRequestNotification;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
 import org.service.*;
@@ -147,6 +136,7 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
                                 friendship.getUser2() : friendship.getUser1(),
                         friendship,
                         service);
+                controller.setAuthService(authService);
 
                 dialogStage.showAndWait();
 

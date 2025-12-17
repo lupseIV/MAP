@@ -2,7 +2,6 @@ package org.ui.gui;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
@@ -10,15 +9,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.domain.Observer;
-import org.domain.users.User;
-import org.domain.users.relationships.notifications.FriendRequestNotification;
+import org.domain.users.relationships.notifications.FriendNotification;
 import org.service.*;
 import org.utils.enums.NotificationStatus;
-import org.utils.enums.NotificationType;
 
 import java.io.IOException;
 
-public class MainController implements ViewController, Observer<FriendRequestNotification> {
+public class MainController implements ViewController, Observer<FriendNotification> {
 
     @FXML private StackPane contentArea;
     @FXML private Button notificationButton;
@@ -134,7 +131,7 @@ public class MainController implements ViewController, Observer<FriendRequestNot
     }
 
     @Override
-    public void update(FriendRequestNotification event) {
+    public void update(FriendNotification event) {
         notificationButton.setStyle("-fx-font-weight: bold;");
     }
 }

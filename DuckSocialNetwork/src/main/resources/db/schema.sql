@@ -77,15 +77,12 @@ CREATE TABLE IF NOT EXISTS message_recipients (
                                                   FOREIGN KEY (user_id) REFERENCES persons(id)
 );
 
-CREATE TABLE friend_notifiation (
+CREATE TABLE IF NOT EXISTS friend_notifiation (
     notification_id BIGINT NOT NULL PRIMARY KEY,
     user1_id BIGINT,
     user2_id BIGINT,
     status varchar(20) DEFAULT 'NEW' CHECK ( status in ('NEW', 'READ', 'DELETED') ),
     friendship_id BIGINT
 );
-ALTER TABLE friend_notifications
-    ADD CONSTRAINT fk_friendship
-        FOREIGN KEY (friendship_id)
-            REFERENCES friendships(id)
-            ON DELETE SET NULL ;
+
+TRUNCATE TABLE friend_notifications

@@ -4,13 +4,11 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
 import javafx.util.Callback;
 import org.domain.Observer;
 import org.domain.events.AddFriendEvent;
 import org.domain.users.User;
-import org.domain.users.relationships.messages.Message;
-import org.domain.users.relationships.notifications.FriendRequestNotification;
+import org.domain.users.relationships.notifications.FriendNotification;
 import org.service.AuthService;
 import org.service.NotificationService;
 import org.utils.enums.NotificationStatus;
@@ -23,7 +21,7 @@ public class NotificationController implements Observer<AddFriendEvent> {
     private AuthService authService;
     private User currentUser;
 
-    @FXML private ListView<FriendRequestNotification> notificationListView;
+    @FXML private ListView<FriendNotification> notificationListView;
 
     public void setServices(NotificationService notificationService, AuthService authService) {
         this.notificationService = notificationService;
@@ -38,7 +36,7 @@ public class NotificationController implements Observer<AddFriendEvent> {
 
     private void loadNotifications() {
         if (currentUser != null) {
-            List<FriendRequestNotification> conversation = notificationService.findAll(currentUser);
+            List<FriendNotification> conversation = notificationService.findAll(currentUser);
             notificationListView.setItems(FXCollections.observableArrayList(conversation));
             notificationListView.scrollTo(conversation.size() - 1);
         }
@@ -55,10 +53,10 @@ public class NotificationController implements Observer<AddFriendEvent> {
     public void initialize() {
         notificationListView.setCellFactory(new Callback<>() {
             @Override
-            public ListCell<FriendRequestNotification> call(ListView<FriendRequestNotification> param) {
-                return new ListCell<FriendRequestNotification>() {
+            public ListCell<FriendNotification> call(ListView<FriendNotification> param) {
+                return new ListCell<FriendNotification>() {
                     @Override
-                    protected void updateItem(FriendRequestNotification notification, boolean empty) {
+                    protected void updateItem(FriendNotification notification, boolean empty) {
                         super.updateItem(notification, empty);
 
                         if (empty || notification == null) {

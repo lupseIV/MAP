@@ -1,12 +1,11 @@
 package org.domain.validators;
 
 import org.domain.exceptions.ValidationException;
-import org.domain.users.relationships.notifications.FriendRequestNotification;
-import org.domain.users.relationships.notifications.Notification;
+import org.domain.users.relationships.notifications.FriendNotification;
 
-public class NotificationValidator implements Validator<FriendRequestNotification> {
+public class NotificationValidator implements Validator<FriendNotification> {
     @Override
-    public void validate(FriendRequestNotification entity) throws ValidationException {
+    public void validate(FriendNotification entity) throws ValidationException {
 
     }
 }

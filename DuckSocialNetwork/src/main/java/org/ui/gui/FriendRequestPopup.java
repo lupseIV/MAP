@@ -5,6 +5,7 @@ import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import org.domain.users.User;
 import org.domain.users.relationships.Friendship;
+import org.service.AuthService;
 import org.service.FriendshipService;
 import org.utils.enums.FriendRequestStatus;
 
@@ -12,6 +13,7 @@ public class FriendRequestPopup {
     private User from;
     private Friendship friendship;
     private FriendshipService service;
+    private AuthService authService;
     private boolean clicked = false;
 
     public boolean isClicked() {
@@ -21,6 +23,11 @@ public class FriendRequestPopup {
     @FXML
     private Label fromLabel;
     private Stage dialogStage;
+
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
+        service.setAuthService(authService);
+    }
 
     public void setService(Stage dialogStage, User from, Friendship friendship, FriendshipService service) {
         this.dialogStage = dialogStage;

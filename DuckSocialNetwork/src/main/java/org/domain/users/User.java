@@ -68,7 +68,7 @@ public abstract class User extends Entity<Long>  {
     public boolean equals(Object o) {
         if (!(o instanceof User user)) return false;
         if (!super.equals(o)) return false;
-        return Objects.equals(username, user.username) && Objects.equals(email, user.email) && Objects.equals(friends, user.friends);
+        return Objects.equals(id, user.id);
     }
 
     @Override
