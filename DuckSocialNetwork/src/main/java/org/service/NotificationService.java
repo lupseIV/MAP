@@ -95,5 +95,6 @@ public class NotificationService extends EntityService<Long, FriendNotification>
                     notification.setStatus(NotificationStatus.READ);
                     repository.update(notification);
                 });
+        notifyObservers(new AddFriendEvent(NotificationType.FRIEND_REQUEST, NotificationStatus.READ, List.of(), authService.getCurrentUser()));
     }
 }

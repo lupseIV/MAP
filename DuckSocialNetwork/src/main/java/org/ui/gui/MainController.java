@@ -105,7 +105,8 @@ public class MainController implements ViewController, Observer<AddFriendEvent> 
 
     @FXML
     public void handleShowNotificationsView(){
-        notificationButton.setStyle("-fx-font-weight: regular;");
+        update(new AddFriendEvent(NotificationType.FRIEND_REQUEST,
+                NotificationStatus.READ, List.of(), authService.getCurrentUser()));
         loadView("NotificationsView.fxml", controller -> {
             if (controller instanceof NotificationController) {
                 ((NotificationController) controller).setServices(notificationService, authService);
@@ -141,6 +142,8 @@ public class MainController implements ViewController, Observer<AddFriendEvent> 
     public void update(AddFriendEvent event) {
         if(!event.getUser().equals(authService.getCurrentUser()) && event.getStatus() == NotificationStatus.NEW) {
             notificationButton.setStyle("-fx-font-weight: bold;");
+        } else if  (event.getStatus() == NotificationStatus.READ){
+            notificationButton.setStyle("-fx-font-weight: regular;");
         }
     }
 }
