@@ -63,7 +63,7 @@ public class FriendshipService extends EntityService<Long, Friendship>  {
         }
 
         friendshipNetwork=null;
-
+        friendship.setStatus(FriendRequestStatus.PENDING);
         Friendship res = repository.save(friendship);
 
         User friend = (authService.getCurrentUser().equals(friendship.getUser2())) ?  friendship.getUser1() : friendship.getUser2();
