@@ -136,7 +136,8 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
     }
 
     private void showPopup(User user, FriendRequestStatus status, Friendship friendship) {
-        if (status == FriendRequestStatus.APPROVED || status == FriendRequestStatus.REJECTED) {
+        if (status == FriendRequestStatus.APPROVED || status == FriendRequestStatus.REJECTED ||
+        friendship.getUser1().equals(authService.getCurrentUser())) {
             showUserDetailsPopup(user);
         } else if (status == FriendRequestStatus.PENDING) {
             try{
