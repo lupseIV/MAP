@@ -1,5 +1,6 @@
 package org.service;
 
+import org.domain.dtos.guiDTOS.EventGuiDTO;
 import org.domain.events.RaceEvent;
 import org.domain.exceptions.ServiceException;
 import org.domain.users.duck.Duck;
@@ -7,11 +8,13 @@ import org.domain.users.duck.SwimmingDuck;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
 import org.repository.Repository;
+import org.repository.util.paging.Page;
 import org.service.utils.IdGenerator;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -65,5 +68,15 @@ public class RaceEventService extends EntityService<Long, RaceEvent> {
         return repository.update(event);
     }
 
-
+    public List<EventGuiDTO> getGuiRaceEventsFromPage(Page<RaceEvent> page) {
+        Iterable<RaceEvent> events = page.getElementsOnPage();
+        return StreamSupport.stream(events.spliterator(), false)
+                .map(event -> new EventGuiDTO(
+                        event.getId(),
+                        event.getMaxTime(),
+                        event.getName(),
+                        event.getState().name()
+                ))
+                .collect(Collectors.toList());
+    }
 }

@@ -50,7 +50,8 @@ CREATE TABLE IF NOT EXISTS flock_members (
 CREATE TABLE IF NOT EXISTS race_events (
                                            id BIGINT PRIMARY KEY,
                                            name VARCHAR(255) NOT NULL,
-                                           max_time DOUBLE PRECISION
+                                           max_time DOUBLE PRECISION,
+                                           state VARCHAR(50) NOT NULL DEFAULT 'SCHEDULED' CHECK ( state in ('SCHEDULED', 'ONGOING', 'COMPLETED'))
 );
 
 -- Create Race Event Participants table (junction table)
@@ -85,9 +86,7 @@ CREATE TABLE IF NOT EXISTS friend_notifications (
     status varchar(20) DEFAULT 'NEW' CHECK ( status in ('NEW', 'READ', 'DELETED') ),
     friendship_id BIGINT
 );
-SELECT * FROM friendships;
-DELEte FROM friendships WHERE status='PENDING';
+
 
 SELECT * FROM friend_notifications;
 TRUNCATE TABLE friend_notifications;
-
