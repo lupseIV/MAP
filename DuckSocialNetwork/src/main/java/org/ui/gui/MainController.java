@@ -14,6 +14,7 @@ import org.domain.users.relationships.notifications.FriendNotification;
 import org.service.*;
 import org.utils.enums.NotificationStatus;
 import org.utils.enums.NotificationType;
+import org.utils.enums.UserTypes;
 
 import java.io.IOException;
 import java.util.List;
@@ -118,11 +119,19 @@ public class MainController implements ViewController, Observer<AddFriendEvent> 
 
     @FXML
     public void handleShowEventsView(){
-        loadView("PersonEventPage.fxml", controller -> {
-            if (controller instanceof PersonEventController) {
-                ((PersonEventController) controller).setServices(raceEventService, authService);
-            }
-        }, contentArea);
+        if(authService.getCurrentUser().getUserType() == UserTypes.PERSON) {
+            loadView("PersonEventPage.fxml", controller -> {
+                if (controller instanceof PersonEventController) {
+                    ((PersonEventController) controller).setServices(raceEventService, authService);
+                }
+            }, contentArea);
+        } else {
+            loadView("DuckEventPage.fxml", controller -> {
+                if (controller instanceof DuckEventController) {
+                    ((DuckEventController) controller).setServices(raceEventService, authService);
+                }
+            }, contentArea);
+        }
     }
 
     @FXML

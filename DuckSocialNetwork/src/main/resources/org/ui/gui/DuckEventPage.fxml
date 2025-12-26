@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.ui.gui.DuckEventController"
+            prefHeight="400.0" prefWidth="600.0">
+    <bottom>
+        <HBox styleClass="control-bar">
+            <Button fx:id="buttonPrevious" onAction="#onPrevious" styleClass="nav-button" text="Previous Page" />
+            <Label fx:id="labelPage" style="-fx-text-fill: white; -fx-padding: 5;" text="Page 1" />
+            <Button fx:id="buttonNext" onAction="#onNext" styleClass="nav-button" text="Next Page" />
+
+            <Region HBox.hgrow="ALWAYS" />
+        </HBox>
+    </bottom>
+    <top>
+        <VBox alignment="CENTER_LEFT" spacing="20" style="-fx-padding: 0 0 20 0;">
+            <Label text="Manage Events" styleClass="h1-label"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <HBox>
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <TableView fx:id="tableView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <columns>
+                <TableColumn fx:id="idCol" prefWidth="75.0" text="id" />
+                <TableColumn fx:id="nameCol" prefWidth="75.0" text="name" />
+                <TableColumn fx:id="maxTimeCol" prefWidth="75.0" text="max time" />
+                <TableColumn fx:id="stateCol" prefWidth="75.0" text="state" />
+            </columns>
+        </TableView>
+    </center>
+</BorderPane>
