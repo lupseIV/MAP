@@ -30,9 +30,11 @@ public class MainController implements ViewController, Observer<AddFriendEvent> 
     private MessageService messageService;
     private AuthService authService;
     private NotificationService notificationService;
+    private RaceEventService raceEventService;
 
     public void setServices(DucksService ds, PersonsService ps, FriendshipService fs, UsersService us,
-                            AuthService as, MessageService ms, NotificationService ns) {
+                            AuthService as, MessageService ms, NotificationService ns, RaceEventService res) {
+        this.raceEventService = res;
         this.ducksService = ds;
         this.personsService = ps;
         this.friendshipService = fs;
@@ -115,6 +117,15 @@ public class MainController implements ViewController, Observer<AddFriendEvent> 
     }
 
     @FXML
+    public void handleShowEventsView(){
+        loadView("PersonEventPage.fxml", controller -> {
+            if (controller instanceof PersonEventController) {
+                ((PersonEventController) controller).setServices(raceEventService, authService);
+            }
+        }, contentArea);
+    }
+
+    @FXML
     public void handleLogout() {
         try {
             authService.logout();
@@ -124,7 +135,7 @@ public class MainController implements ViewController, Observer<AddFriendEvent> 
 
             LoginController controller = loader.getController();
             controller.setServices(ducksService, personsService, friendshipService,
-                    usersService, new AuthService(usersService), messageService, notificationService);
+                    usersService, new AuthService(usersService), messageService, notificationService, raceEventService);
 
             Stage stage = (Stage) contentArea.getScene().getWindow();
             controller.setStage(stage);

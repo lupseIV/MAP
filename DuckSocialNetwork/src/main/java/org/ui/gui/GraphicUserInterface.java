@@ -116,7 +116,7 @@ public class GraphicUserInterface extends Application {
         notificationService.setAuthService(windowAuthService);
 
         controller. setServices(ducksService, personsService, friendshipService,
-                usersService, windowAuthService, messageService, notificationService);
+                usersService, windowAuthService, messageService, notificationService, raceEventService);
 
         Scene scene = new Scene(root, 1000, 700);
         controller. setStage(stage);
