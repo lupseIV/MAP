@@ -8,6 +8,7 @@ import org.domain.users.duck.SwimmingDuck;
 import org.domain.validators.Validator;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
+import org.utils.enums.EventState;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,12 +33,14 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
         Long id = resultSet.getLong("id");
         String name = resultSet.getString("name");
         Double maxTime = resultSet.getDouble("max_time");
+        EventState state = EventState.valueOf(resultSet.getString("state"));
 
         List<SwimmingDuck> participants = loadEventParticipants(id);
 
         RaceEvent event = new RaceEvent(participants, name);
         event.setId(id);
         event.setMaxTime(maxTime);
+        event.setState(state);
 
         return event;
     }
@@ -121,11 +124,12 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
     @Override
     public void updateFromDatabase(RaceEvent event) {
         try (Connection conn = DatabaseConnection.getConnection()) {
-            String sql = "UPDATE race_events SET name = ?, max_time = ? WHERE id = ?";
+            String sql = "UPDATE race_events SET name = ?, max_time = ?, state = ? WHERE id = ?";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, event.getName());
                 stmt.setDouble(2, event.getMaxTime());
                 stmt.setLong(3, event.getId());
+                stmt.setString(4, event.getState().name());
                 stmt.executeUpdate();
             }
 
