@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import org.domain.Observable;
 import org.domain.Observer;
 import org.domain.observer_events.FriendRequestEvent;
+import org.domain.observer_events.NotificationEvent;
 import org.domain.observer_events.ObserverEvent;
 import org.domain.users.User;
 import org.domain.users.relationships.Friendship;
@@ -121,5 +122,6 @@ public class NotificationService extends EntityService<Long, Notification> imple
                     notification.setStatus(NotificationStatus.READ);
                     repository.update(notification);
                 });
+        notifyObservers(new NotificationEvent(NotificationType.SYSTEM_ALERT, NotificationStatus.READ, authService.getCurrentUser()));
     }
 }
