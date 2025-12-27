@@ -17,7 +17,6 @@ public abstract class Event<E, T extends Observer<E>> extends Entity<Long> imple
         state = EventState.SCHEDULED;
     }
 
-    // Default constructor needed for factories/frameworks
     public Event() {
         this.subscribers = new ArrayList<>();
         state = EventState.SCHEDULED;
