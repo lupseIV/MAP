@@ -51,8 +51,10 @@ CREATE TABLE IF NOT EXISTS race_events (
                                            id BIGINT PRIMARY KEY,
                                            name VARCHAR(255) NOT NULL,
                                            max_time DOUBLE PRECISION,
-                                           state VARCHAR(50) NOT NULL DEFAULT 'SCHEDULED' CHECK ( state in ('SCHEDULED', 'ONGOING', 'COMPLETED'))
-);
+                                           state VARCHAR(50) NOT NULL DEFAULT 'SCHEDULED' CHECK ( state in ('SCHEDULED', 'ONGOING', 'COMPLETED')),
+                                           owner_person_id BIGINT NOT NULL,
+                                           FOREIGN KEY (owner_person_id) REFERENCES persons(id)
+                                       );
 
 -- Create Race Event Participants table (junction table)
 CREATE TABLE IF NOT EXISTS race_event_participants (
@@ -87,6 +89,9 @@ CREATE TABLE IF NOT EXISTS friend_notifications (
     friendship_id BIGINT
 );
 
-
-SELECT * FROM friend_notifications;
-TRUNCATE TABLE friend_notifications;
+CREATE TABLE IF NOT EXISTS race_event_notifications (
+    notification_id BIGINT NOT NULL PRIMARY KEY,
+    event_id BIGINT,
+    duck_id BIGINT,
+    status varchar(20) DEFAULT 'NEW' CHECK ( status in ('NEW', 'READ', 'DELETED'))
+);

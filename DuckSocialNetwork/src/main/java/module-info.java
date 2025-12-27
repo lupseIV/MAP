@@ -6,6 +6,7 @@ module org.example {
     requires javafx.graphics;
     requires java.desktop;
     requires org.postgresql.jdbc;
+    requires org.example;
 
     exports org.example;
     exports org.ui.gui;

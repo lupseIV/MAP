@@ -5,6 +5,7 @@ import org.domain.events.RaceEvent;
 import org.domain.exceptions.RepositoryException;
 import org.domain.users.duck.Duck;
 import org.domain.users.duck.SwimmingDuck;
+import org.domain.users.person.Person;
 import org.domain.validators.Validator;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
@@ -20,10 +21,13 @@ import java.util.List;
 public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, RaceEvent>{
 
     private final DuckDatabaseRepository duckDatabaseRepository;
+    private final PersonDatabaseRepository personDatabaseRepository;
 
-    public RaceEventDatabaseRepository(Validator<RaceEvent> validator, DuckDatabaseRepository duckDatabaseRepository) {
+    public RaceEventDatabaseRepository(Validator<RaceEvent> validator, DuckDatabaseRepository duckDatabaseRepository, PersonDatabaseRepository personDatabaseRepository) {
         super(validator, "SELECT * FROM race_events",false);
         this.duckDatabaseRepository = duckDatabaseRepository;
+        this.personDatabaseRepository = personDatabaseRepository;
+
         loadFromDatabase();
     }
 
@@ -34,10 +38,11 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
         String name = resultSet.getString("name");
         Double maxTime = resultSet.getDouble("max_time");
         EventState state = EventState.valueOf(resultSet.getString("state"));
+        Person owner = personDatabaseRepository.findOne(resultSet.getLong("owner_person_id"));
 
         List<SwimmingDuck> participants = loadEventParticipants(id);
 
-        RaceEvent event = new RaceEvent(participants, name);
+        RaceEvent event = new RaceEvent(participants, name,owner);
         event.setId(id);
         event.setMaxTime(maxTime);
         event.setState(state);
@@ -72,11 +77,12 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
     @Override
     public void saveToDatabase(RaceEvent event) {
         try (Connection conn = DatabaseConnection.getConnection()) {
-            String sql = "INSERT INTO race_events (id, name, max_time) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO race_events (id, name, max_time, owner_person_id) VALUES (?, ?, ?, ?)";
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setLong(1, event.getId());
                 stmt.setString(2, event.getName());
                 stmt.setDouble(3, event.getMaxTime());
+                stmt.setLong(4, event.getOwner().getId());
                 stmt.executeUpdate();
             }
 
