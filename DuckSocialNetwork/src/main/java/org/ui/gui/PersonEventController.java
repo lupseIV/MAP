@@ -11,11 +11,13 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.domain.Observer;
 import org.domain.dtos.filters.EventGUIFilter;
 import org.domain.dtos.filters.PersonGUIFilter;
 import org.domain.dtos.guiDTOS.EventGuiDTO;
 import org.domain.dtos.guiDTOS.PersonGuiDTO;
 import org.domain.events.RaceEvent;
+import org.domain.events.UpdateRaceEvent;
 import org.domain.users.person.Person;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
@@ -26,7 +28,7 @@ import org.utils.enums.EventState;
 import java.io.IOException;
 
 
-public class PersonEventController extends AbstractPagingTableViewController<EventGuiDTO, EventGUIFilter>{
+public class PersonEventController extends AbstractPagingTableViewController<EventGuiDTO, EventGUIFilter> implements Observer<UpdateRaceEvent> {
 
     private RaceEventService raceEventService;
     private AuthService authService;
@@ -42,6 +44,11 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
 
     @FXML private Label labelPage;
 
+    @Override
+    public void update(UpdateRaceEvent event) {
+        loadData();
+    }
+
     public PersonEventController() {
         super(0, 2, 0, new EventGUIFilter());
     }
@@ -49,6 +56,8 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
     public void setServices(RaceEventService raceEventService, AuthService authService) {
         this.raceEventService = raceEventService;
         this.authService = authService;
+
+        raceEventService.addObserver(this);
 
         initializeTable();
         loadData();

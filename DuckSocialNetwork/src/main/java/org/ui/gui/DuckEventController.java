@@ -3,9 +3,11 @@ package org.ui.gui;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import org.domain.Observer;
 import org.domain.dtos.filters.EventGUIFilter;
 import org.domain.dtos.guiDTOS.EventGuiDTO;
 import org.domain.events.RaceEvent;
+import org.domain.events.UpdateRaceEvent;
 import org.domain.users.duck.SwimmingDuck;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
@@ -15,7 +17,7 @@ import org.utils.enums.EventState;
 
 import java.util.Optional;
 
-public class DuckEventController extends AbstractPagingTableViewController<EventGuiDTO, EventGUIFilter>{
+public class DuckEventController extends AbstractPagingTableViewController<EventGuiDTO, EventGUIFilter> implements Observer<UpdateRaceEvent> {
     private RaceEventService raceEventService;
     private AuthService authService;
 
@@ -35,9 +37,16 @@ public class DuckEventController extends AbstractPagingTableViewController<Event
         super(0, 2, 0, new EventGUIFilter());
     }
 
+    @Override
+    public void update(UpdateRaceEvent event) {
+        loadData();
+    }
+
     public void setServices(RaceEventService raceEventService, AuthService authService) {
         this.raceEventService = raceEventService;
         this.authService = authService;
+
+        raceEventService.addObserver(this);
 
         initializeTable();
         loadData();

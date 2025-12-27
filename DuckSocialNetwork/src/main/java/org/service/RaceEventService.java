@@ -1,7 +1,12 @@
 package org.service;
 
+import javafx.application.Platform;
+import org.domain.Observable;
+import org.domain.Observer;
 import org.domain.dtos.guiDTOS.EventGuiDTO;
+import org.domain.events.MessageEvent;
 import org.domain.events.RaceEvent;
+import org.domain.events.UpdateRaceEvent;
 import org.domain.exceptions.ServiceException;
 import org.domain.users.duck.Duck;
 import org.domain.users.duck.SwimmingDuck;
@@ -16,16 +21,35 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class RaceEventService extends EntityService<Long, RaceEvent> {
+public class RaceEventService extends EntityService<Long, RaceEvent> implements Observable<UpdateRaceEvent, Observer<UpdateRaceEvent>> {
 
     DucksService ducksService;
+    private final List<Observer<UpdateRaceEvent>> observers = new CopyOnWriteArrayList<>();
 
     public RaceEventService(Validator<RaceEvent> validator, PagingRepository<Long, RaceEvent> repository, IdGenerator<Long> idGenerator, DucksService ducksService) {
         super(validator, repository, idGenerator);
         this.ducksService = ducksService;
+    }
+
+    @Override
+    public void addObserver(Observer<UpdateRaceEvent> observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer<UpdateRaceEvent> observer) {
+    observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(UpdateRaceEvent event) {
+        for (Observer<UpdateRaceEvent> observer : observers) {
+            Platform.runLater(() -> observer.update(event));
+        }
     }
 
     public boolean isDuckSubscribedToEvent(Long eventId, Long duckId) {
@@ -61,6 +85,7 @@ public class RaceEventService extends EntityService<Long, RaceEvent> {
         event.addObserver((SwimmingDuck) duck);
         validator.validate(event);
         repository.update(event);
+        notifyObservers(new UpdateRaceEvent(event, List.of((SwimmingDuck) duck)));
     }
 
     public void removeDuckFromEvent(Long eventId, Long duckId) {
@@ -77,6 +102,8 @@ public class RaceEventService extends EntityService<Long, RaceEvent> {
         event.removeObserver((SwimmingDuck) duck);
         validator.validate(event);
         repository.update(event);
+        notifyObservers(new UpdateRaceEvent(event, List.of((SwimmingDuck) duck)));
+
     }
 
     public RaceEvent addSpecifiedNrOfDucksToAnRaceEvent(Long id, Integer nrOfDucks) {
@@ -116,7 +143,9 @@ public class RaceEventService extends EntityService<Long, RaceEvent> {
             event.addObserver( d);
         }
         validator.validate(event);
-        return repository.update(event);
+        var raceEvent =  repository.update(event);
+        notifyObservers(new UpdateRaceEvent(event, selectedDucks));
+        return raceEvent;
     }
 
     /**
