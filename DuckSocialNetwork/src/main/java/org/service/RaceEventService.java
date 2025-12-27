@@ -28,6 +28,57 @@ public class RaceEventService extends EntityService<Long, RaceEvent> {
         this.ducksService = ducksService;
     }
 
+    public boolean isDuckSubscribedToEvent(Long eventId, Long duckId) {
+        RaceEvent event = repository.findOne(eventId);
+        if (event == null) {
+            throw new ServiceException("Event not found");
+        }
+
+        Duck duck = ducksService.findOne(duckId);
+        if (duck == null ) {
+            throw new ServiceException("Duck not found");
+        }
+        if(!(duck instanceof SwimmingDuck)){
+            return false;
+        }
+        return event.getSubscribers().contains((SwimmingDuck) duck);
+    }
+
+    public void addDuckToEvent(Long eventId, Long duckId) {
+        RaceEvent event = repository.findOne(eventId);
+        if (event == null) {
+            throw new ServiceException("Event not found");
+        }
+
+        Duck duck = ducksService.findOne(duckId);
+        if (duck == null ) {
+            throw new ServiceException("Swimming Duck not found");
+        }
+        if(!(duck instanceof SwimmingDuck)){
+            throw new ServiceException("Event only for Swimming Ducks");
+        }
+
+        event.addObserver((SwimmingDuck) duck);
+        validator.validate(event);
+        repository.update(event);
+    }
+
+    public void removeDuckFromEvent(Long eventId, Long duckId) {
+        RaceEvent event = repository.findOne(eventId);
+        if (event == null) {
+            throw new ServiceException("Event not found");
+        }
+
+        Duck duck = ducksService.findOne(duckId);
+        if (duck == null || !(duck instanceof SwimmingDuck)) {
+            throw new ServiceException("Swimming Duck not found");
+        }
+
+        event.removeObserver((SwimmingDuck) duck);
+        validator.validate(event);
+        repository.update(event);
+    }
+
     public RaceEvent addSpecifiedNrOfDucksToAnRaceEvent(Long id, Integer nrOfDucks) {
 
         long swimmingCount = StreamSupport.stream(ducksService.findAll().spliterator(), false)
@@ -67,6 +118,79 @@ public class RaceEventService extends EntityService<Long, RaceEvent> {
         validator.validate(event);
         return repository.update(event);
     }
+
+    /**
+     * Rezolvă problema "Natație" determinând timpul minim posibil.
+     * Algoritm: Căutare Binară pe răspuns + Verificare Greedy.
+     */
+    public double solveRace(RaceEvent event) {
+        List<SwimmingDuck> ducks = event.getSubscribers();
+        List<Integer> distances = event.getDistances();
+
+        // Validări de bază conform restricțiilor (M <= N)
+        if (ducks == null || distances == null || ducks.size() < distances.size()) {
+            throw new ServiceException("Invalid Race Event parameters for solving.");
+        }
+        List<SwimmingDuck> sortedDucks = new ArrayList<>(ducks);
+        sortedDucks.sort(Comparator.comparingDouble(Duck::getRezistance));
+
+        double minSpeed = ducks.stream().mapToDouble(Duck::getSpeed).min().orElse(0.1);
+        double maxDistance = distances.get(distances.size() - 1) * 2.0;
+
+        double low = 0.0;
+        double high = maxDistance / minSpeed + 100.0;
+        double ans = high;
+
+        for (int i = 0; i < 100; i++) {
+            double mid = low + (high - low) / 2;
+            if (canFinishRaceInTime(mid, sortedDucks, distances)) {
+                ans = mid;
+                high = mid;
+            } else {
+                low = mid;
+            }
+        }
+
+        event.setMaxTime(ans);
+        return ans;
+    }
+
+    /**
+     * Verifică dacă este posibilă o alocare validă a rațelor pe culoare în timpul dat.
+     */
+    private boolean canFinishRaceInTime(double timeLimit, List<SwimmingDuck> sortedDucks, List<Integer> distances) {
+        int duckIndex = 0;
+        int numDucks = sortedDucks.size();
+
+        for (Integer distOneWay : distances) {
+            double totalDist = distOneWay * 2.0;
+            // time = dist / speed => speed = dist / time
+            double requiredSpeed = totalDist / timeLimit;
+
+            boolean foundDuck = false;
+            // Căutăm prima rață disponibilă care are viteza necesară
+            while (duckIndex < numDucks) {
+                SwimmingDuck currentDuck = sortedDucks.get(duckIndex);
+                duckIndex++; // Consumăm rața curentă (fie o folosim, fie o sărim)
+
+                if (currentDuck.getSpeed() >= requiredSpeed) {
+                    // Am găsit o rață validă!
+                    // Deoarece lista e sortată după rezistență, condiția r_i <= r_{i+1}
+                    // este satisfăcută implicit prin faptul că avansăm în listă.
+                    foundDuck = true;
+                    break;
+                }
+                // Dacă rața nu are viteză suficientă, o sărim.
+                // Nu o putem folosi pe culoare ulterioare deoarece acelea sunt și mai lungi (deci cer viteză și mai mare).
+            }
+
+            if (!foundDuck) {
+                return false; // Nu am găsit rață pentru acest culoar
+            }
+        }
+        return true;
+    }
+
 
     public List<EventGuiDTO> getGuiRaceEventsFromPage(Page<RaceEvent> page) {
         Iterable<RaceEvent> events = page.getElementsOnPage();
