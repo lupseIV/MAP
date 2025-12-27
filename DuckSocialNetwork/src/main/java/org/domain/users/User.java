@@ -1,5 +1,7 @@
 package org.domain.users;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.domain.Entity;
 import org.domain.Observer;
 import org.domain.events.Event;
@@ -9,7 +11,11 @@ import org.utils.enums.UserTypes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id",
+        scope = User.class
+)
 public abstract class User extends Entity<Long>  {
     private String username;
     private String password;
