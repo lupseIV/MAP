@@ -1,11 +1,16 @@
 package org.ui.gui;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.domain.dtos.filters.EventGUIFilter;
 import org.domain.dtos.filters.PersonGUIFilter;
 import org.domain.dtos.guiDTOS.EventGuiDTO;
@@ -17,6 +22,8 @@ import org.repository.util.paging.Pageable;
 import org.service.AuthService;
 import org.service.RaceEventService;
 import org.utils.enums.EventState;
+
+import java.io.IOException;
 
 
 public class PersonEventController extends AbstractPagingTableViewController<EventGuiDTO, EventGUIFilter>{
@@ -85,7 +92,32 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
     }
 
     @FXML
-    private void handleAdd(){}
+    private void handleAdd(){
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("PersonAddEventDialog.fxml"));
+            VBox page = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Add New Race Event");
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(tableView.getScene().getWindow());
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            PersonAddEventDialogController controller = loader.getController();
+            controller.setServices(raceEventService, dialogStage);
+
+            dialogStage.showAndWait();
+
+            if (controller.isSaveClicked()) {
+                loadData();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Error", "Could not open dialog: " + e.getMessage());
+        }
+    }
 
     @FXML
     private void handleDelete(){
