@@ -1,11 +1,11 @@
 package org.service;
 
-import org.domain.Observable;
-import org.domain.events.AddFriendEvent;
+import org.domain.observer_events.FriendRequestEvent;
 import org.domain.users.relationships.Friendship;
 import org.domain.users.User;
 import org.domain.exceptions.ServiceException;
-import org.domain.users.relationships.notifications.FriendNotification;
+import org.domain.users.relationships.notifications.FriendRequestData;
+import org.domain.users.relationships.notifications.Notification;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
 import org.repository.util.paging.Page;
@@ -68,7 +68,14 @@ public class FriendshipService extends EntityService<Long, Friendship>  {
 
         User friend = (authService.getCurrentUser().equals(friendship.getUser2())) ?  friendship.getUser1() : friendship.getUser2();
 
-        FriendNotification notification = new FriendNotification(authService.getCurrentUser(), friend, friendship);
+        Notification notification = new Notification(
+                NotificationType.FRIEND_REQUEST,
+               NotificationStatus.NEW,
+                authService.getCurrentUser(),
+                friend);
+        notification.setDescription("New friend request from " + authService.getCurrentUser().getUsername());
+        notification.setData(new FriendRequestData(friendship, FriendRequestStatus.PENDING));
+
         notificationService.save(notification);
         return res;
     }
@@ -83,9 +90,17 @@ public class FriendshipService extends EntityService<Long, Friendship>  {
         friendship.getUser1().removeFriend(friendship.getUser2());
         friendshipNetwork=null;
        Friendship res = repository.delete(id);
+        User friend = (authService.getCurrentUser().equals(friendship.getUser2())) ?  friendship.getUser1() : friendship.getUser2();
 
-       notificationService.notifyObservers(new AddFriendEvent(NotificationType.FRIEND_REQUEST,
-               NotificationStatus.DELETED,List.of(), authService.getCurrentUser()));
+        Notification notification = new Notification(
+                NotificationType.FRIEND_REQUEST,
+                NotificationStatus.NEW,
+                authService.getCurrentUser(),
+                friend);
+        notification.setDescription("Deleted friendship");
+        notification.setData(new FriendRequestData(friendship, FriendRequestStatus.PENDING));
+
+        notificationService.save(notification);
        return res;
     }
 
@@ -229,9 +244,13 @@ public class FriendshipService extends EntityService<Long, Friendship>  {
 
         User friend = (authService.getCurrentUser().equals(friendship.getUser2())) ?  friendship.getUser1() : friendship.getUser2();
 
-        FriendNotification notification = new FriendNotification(authService.getCurrentUser(),
-                friend, friendship);
-        notification.setMessage("Friendship accepted");
+        Notification notification = new Notification(
+                NotificationType.FRIEND_REQUEST,
+                NotificationStatus.NEW,
+                authService.getCurrentUser(),
+                friend);
+        notification.setDescription("Friendship accepted");
+        notification.setData(new FriendRequestData(friendship, FriendRequestStatus.APPROVED));
 
         notificationService.save(notification);
     }
@@ -243,9 +262,13 @@ public class FriendshipService extends EntityService<Long, Friendship>  {
 
         User friend = (authService.getCurrentUser().equals(friendship.getUser2())) ?  friendship.getUser1() : friendship.getUser2();
 
-        FriendNotification notification = new FriendNotification(authService.getCurrentUser(),
-                friend, friendship);
-        notification.setMessage("Friendship rejected");
+        Notification notification = new Notification(
+                NotificationType.FRIEND_REQUEST,
+                NotificationStatus.NEW,
+                authService.getCurrentUser(),
+                friend);
+        notification.setDescription("Friendship rejected");
+        notification.setData(new FriendRequestData(friendship, FriendRequestStatus.REJECTED));
 
         notificationService.save(notification);
     }
