@@ -128,8 +128,8 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
                 stmt.setString(1, event.getName());
                 stmt.setDouble(2, event.getMaxTime());
-                stmt.setLong(3, event.getId());
-                stmt.setString(4, event.getState().name());
+                stmt.setString(3, event.getState().name());
+                stmt.setLong(4, event.getId());
                 stmt.executeUpdate();
             }
 
