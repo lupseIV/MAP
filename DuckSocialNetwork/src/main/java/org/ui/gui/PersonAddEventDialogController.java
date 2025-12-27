@@ -4,6 +4,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.domain.events.RaceEvent;
+import org.domain.users.person.Person;
+import org.service.AuthService;
 import org.service.RaceEventService;
 
 public class PersonAddEventDialogController {
@@ -12,14 +14,16 @@ public class PersonAddEventDialogController {
 
     private Stage dialogStage;
     private RaceEventService service;
+    private AuthService authService;
     private boolean saveClicked = false;
 
     @FXML
     private void initialize() {
     }
 
-    public void setServices(RaceEventService service, Stage dialogStage) {
+    public void setServices(RaceEventService service, AuthService as, Stage dialogStage) {
         this.service = service;
+        this.authService = as;
         this.dialogStage = dialogStage;
     }
 
@@ -32,7 +36,7 @@ public class PersonAddEventDialogController {
         if (isInputValid()) {
             String name = nameField.getText();
 
-            RaceEvent newEvent = new RaceEvent(name);
+            RaceEvent newEvent = new RaceEvent(name, (Person) authService.getCurrentUser());
 
             service.save(newEvent);
 

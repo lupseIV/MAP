@@ -4,7 +4,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -15,15 +14,13 @@ import javafx.stage.Stage;
 import org.domain.Observer;
 import org.domain.dtos.filters.FriendshipGUIFilter;
 import org.domain.dtos.guiDTOS.UserGuiDTO;
-import org.domain.events.AddFriendEvent;
+import org.domain.observer_events.ObserverEvent;
 import org.domain.users.User;
 import org.domain.users.relationships.Friendship;
-import org.domain.users.relationships.notifications.Notification;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
 import org.service.*;
 import org.utils.enums.FriendRequestStatus;
-import org.utils.enums.NotificationStatus;
 import org.utils.enums.NotificationType;
 
 import java.io.IOException;
@@ -33,7 +30,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class SocialController extends AbstractPagingTableViewController<Friendship, FriendshipGUIFilter> implements Observer<AddFriendEvent> {
+public class SocialController extends AbstractPagingTableViewController<Friendship, FriendshipGUIFilter> implements Observer<ObserverEvent> {
 
     @FXML private TableView<Friendship> friendshipsTable;
     @FXML private TableColumn<Friendship, Long> idCol;
@@ -56,7 +53,7 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
     }
 
     @Override
-    public void update(AddFriendEvent event) {
+    public void update(ObserverEvent event) {
         if(event.getType() == NotificationType.FRIEND_REQUEST){
             loadData();
         }

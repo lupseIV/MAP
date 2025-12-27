@@ -9,17 +9,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.domain.Observer;
-import org.domain.events.AddFriendEvent;
-import org.domain.users.relationships.notifications.FriendNotification;
+import org.domain.observer_events.ObserverEvent;
 import org.service.*;
 import org.utils.enums.NotificationStatus;
-import org.utils.enums.NotificationType;
 import org.utils.enums.UserTypes;
 
 import java.io.IOException;
-import java.util.List;
 
-public class MainController implements ViewController, Observer<AddFriendEvent> {
+public class MainController implements ViewController, Observer<ObserverEvent> {
 
     @FXML private StackPane contentArea;
     @FXML private Button notificationButton;
@@ -53,8 +50,7 @@ public class MainController implements ViewController, Observer<AddFriendEvent> 
         if(notificationService.findAll(authService.getCurrentUser()).stream().anyMatch(
                 notification -> notification.getStatus() == NotificationStatus.NEW
         )) {
-            update(new AddFriendEvent(NotificationType.FRIEND_REQUEST,
-                    NotificationStatus.NEW, List.of(), authService.getCurrentUser()));
+            notificationButton.setStyle("-fx-font-weight: bold;");
         }
     }
 
@@ -108,8 +104,7 @@ public class MainController implements ViewController, Observer<AddFriendEvent> 
 
     @FXML
     public void handleShowNotificationsView(){
-        update(new AddFriendEvent(NotificationType.FRIEND_REQUEST,
-                NotificationStatus.READ, List.of(), authService.getCurrentUser()));
+        notificationButton.setStyle("-fx-font-weight: regular;");
         loadView("NotificationsView.fxml", controller -> {
             if (controller instanceof NotificationController) {
                 ((NotificationController) controller).setServices(notificationService, authService);
@@ -159,10 +154,10 @@ public class MainController implements ViewController, Observer<AddFriendEvent> 
     }
 
     @Override
-    public void update(AddFriendEvent event) {
-        if(!event.getUser().equals(authService.getCurrentUser()) && event.getStatus() == NotificationStatus.NEW) {
+    public void update(ObserverEvent event) {
+            if(!event.getUser().equals(authService.getCurrentUser()) && event.getStatus() == NotificationStatus.NEW) {
             notificationButton.setStyle("-fx-font-weight: bold;");
-        } else if  (event.getStatus() == NotificationStatus.READ){
+        } else if (event.getStatus() == NotificationStatus.READ){
             notificationButton.setStyle("-fx-font-weight: regular;");
         }
     }

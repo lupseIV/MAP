@@ -48,7 +48,7 @@ public class GraphicUserInterface extends Application {
         FriendshipDatabaseRepository friendshipRepo = null;
         FlockDatabaseRepository flockRepo = null;
         RaceEventDatabaseRepository raceEventRepo = null;
-        FriendRequestNotificationDatabaseRepository friendRequestRepo = null;
+        NotificationDatabaseRepository notificationRepo = null;
 
         personRepo = new PersonDatabaseRepository(personValidator);
         duckRepo = new DuckDatabaseRepository(duckValidator);
@@ -57,9 +57,9 @@ public class GraphicUserInterface extends Application {
                 duckRepo, personRepo);
 
         flockRepo = new FlockDatabaseRepository(flockValidator, duckRepo);
-        raceEventRepo = new RaceEventDatabaseRepository(raceEventValidator, duckRepo);
+        raceEventRepo = new RaceEventDatabaseRepository(raceEventValidator, duckRepo,personRepo);
         messageRepo = new MessageDatabaseRepository(messageValidator, duckRepo, personRepo);
-        friendRequestRepo =  new FriendRequestNotificationDatabaseRepository(notificationValidator,friendshipRepo);
+        notificationRepo =  new NotificationDatabaseRepository(notificationValidator,friendshipRepo);
 
 
         Long maxUsersId = Math.max(
@@ -71,7 +71,7 @@ public class GraphicUserInterface extends Application {
         Long maxFlockId = EntityRepository.getMaxId(flockRepo.findAll());
         Long  maxEventId = EntityRepository.getMaxId(raceEventRepo.findAll());
         Long maxMessageId = EntityRepository. getMaxId(messageRepo.findAll());
-        Long maxNotificationId = EntityRepository.getMaxId(friendRequestRepo.findAll());
+        Long maxNotificationId = EntityRepository.getMaxId(notificationRepo.findAll());
         //id generator
         var usersIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxUsersId, 0L) + 1);
         var friendshipIdGenerator = new LongIdGenerator(Objects.requireNonNullElse(maxFriendshipId, 0L) + 1);
@@ -85,7 +85,7 @@ public class GraphicUserInterface extends Application {
         friendshipService = new FriendshipService(friendshipValidator, friendshipRepo, friendshipIdGenerator);
         flockService = new FlockService(flockValidator, flockRepo, flockIdGenerator, ducksService);
         raceEventService = new RaceEventService(raceEventValidator, raceEventRepo, eventIdGenerator, ducksService);
-        notificationService = new NotificationService(notificationValidator, friendRequestRepo, notificationIdGenerator);
+        notificationService = new NotificationService(notificationValidator, notificationRepo, notificationIdGenerator);
 
         usersService = new UsersService(ducksService, personsService,friendshipService);
         messageService = new MessageService(messageValidator, messageRepo, messageIdGenerator);

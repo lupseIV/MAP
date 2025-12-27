@@ -114,7 +114,7 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
             dialogStage.setScene(scene);
 
             PersonAddEventDialogController controller = loader.getController();
-            controller.setServices(raceEventService, dialogStage);
+            controller.setServices(raceEventService,authService, dialogStage);
 
             dialogStage.showAndWait();
 
