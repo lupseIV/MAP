@@ -80,18 +80,13 @@ CREATE TABLE IF NOT EXISTS message_recipients (
                                                   FOREIGN KEY (message_id) REFERENCES messages(id),
                                                   FOREIGN KEY (user_id) REFERENCES persons(id)
 );
-
-CREATE TABLE IF NOT EXISTS friend_notifications (
-    notification_id BIGINT NOT NULL PRIMARY KEY,
-    user1_id BIGINT,
-    user2_id BIGINT,
-    status varchar(20) DEFAULT 'NEW' CHECK ( status in ('NEW', 'READ', 'DELETED') ),
-    friendship_id BIGINT
-);
-
-CREATE TABLE IF NOT EXISTS race_event_notifications (
-    notification_id BIGINT NOT NULL PRIMARY KEY,
-    event_id BIGINT,
-    duck_id BIGINT,
-    status varchar(20) DEFAULT 'NEW' CHECK ( status in ('NEW', 'READ', 'DELETED'))
+CREATE TABLE IF NOT EXISTS notifications (
+                                             id SERIAL PRIMARY KEY,
+                                             type VARCHAR(50) NOT NULL,
+                                             status varchar(20) DEFAULT 'NEW' CHECK ( status in ('NEW', 'READ', 'DELETED')),
+                                             description TEXT,
+                                             sender_id BIGINT,
+                                             receiver_id BIGINT NOT NULL,
+                                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                             data TEXT
 );

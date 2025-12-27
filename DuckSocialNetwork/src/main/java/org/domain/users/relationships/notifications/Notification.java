@@ -1,17 +1,48 @@
 package org.domain.users.relationships.notifications;
 
 import org.domain.Entity;
+import org.domain.users.User;
 import org.utils.enums.NotificationStatus;
 import org.utils.enums.NotificationType;
 
-public abstract class Notification extends Entity<Long> {
+public class Notification extends Entity<Long> {
     private NotificationType type;
     private NotificationStatus status;
-    private String message;
+    private String description;
+    private User sender;
+    private User receiver;
+    private NotificationData data;
 
-    public Notification(NotificationType type, NotificationStatus status) {
+
+    public Notification(NotificationType type, NotificationStatus status, User sender, User receiver) {
         this.type = type;
         this.status = status;
+        this.sender = sender;
+        this.receiver = receiver;
+    }
+
+    public User getSender() {
+        return sender;
+    }
+
+    public void setSender(User sender) {
+        this.sender = sender;
+    }
+
+    public User getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(User receiver) {
+        this.receiver = receiver;
+    }
+
+    public NotificationData getData() {
+        return data;
+    }
+
+    public void setData(NotificationData data) {
+        this.data = data;
     }
 
     public NotificationType getType() {
@@ -30,11 +61,11 @@ public abstract class Notification extends Entity<Long> {
         this.status = status;
     }
 
-    public String getMessage() {
-        return message;
+    public String getDescription() {
+        return description;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
