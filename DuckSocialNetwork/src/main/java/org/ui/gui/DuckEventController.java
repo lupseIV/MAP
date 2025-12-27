@@ -1,19 +1,19 @@
 package org.ui.gui;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.domain.dtos.filters.EventGUIFilter;
 import org.domain.dtos.guiDTOS.EventGuiDTO;
 import org.domain.events.RaceEvent;
+import org.domain.users.duck.SwimmingDuck;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
 import org.service.AuthService;
 import org.service.RaceEventService;
 import org.utils.enums.EventState;
+
+import java.util.Optional;
 
 public class DuckEventController extends AbstractPagingTableViewController<EventGuiDTO, EventGUIFilter>{
     private RaceEventService raceEventService;
@@ -50,7 +50,35 @@ public class DuckEventController extends AbstractPagingTableViewController<Event
         maxTimeCol.setCellValueFactory(new PropertyValueFactory<>("maxTime"));
         stateCol.setCellValueFactory(new PropertyValueFactory<>("state"));
 
+        tableView.setRowFactory(tv -> new TableRow<EventGuiDTO>() {
+            @Override
+            protected void updateItem(EventGuiDTO item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setStyle("");
+                } else {
+                    // Check if current duck is subscribed to this event
+                    if (isDuckSubscribed(item.getId())) {
+                        // Apply a CSS style for highlighting (e.g., light green background)
+                        // Ensure this style works with your dark theme, or use a specific color like #388e3c
+                        setStyle("-fx-background-color: #1b5e20;");
+                    } else {
+                        setStyle(""); // Reset style for other rows
+                    }
+                }
+            }
+        });
+
         tableView.setItems(model);
+    }
+
+    private boolean isDuckSubscribed(Long eventId) {
+        if (raceEventService == null || authService == null || authService.getCurrentUser() == null) {
+            return false;
+        }
+
+        Long currentDuckId = authService.getCurrentUser().getId();
+        return raceEventService.isDuckSubscribedToEvent(eventId, currentDuckId);
     }
 
     @Override
@@ -80,4 +108,34 @@ public class DuckEventController extends AbstractPagingTableViewController<Event
         }
     }
 
+    @FXML
+    public void handleSubscribe() {
+        EventGuiDTO selectedEvent = tableView.getSelectionModel().getSelectedItem();
+        if (selectedEvent == null) {
+            showAlert("No Selection", "Please select an event to subscribe.");
+            return;
+        }
+
+        try {
+            raceEventService.addDuckToEvent( selectedEvent.getId(),authService.getCurrentUser().getId());
+            showAlert("Success", "Successfully subscribed to event: " + selectedEvent.getName());
+        } catch (Exception e) {
+            showAlert("Error", "Could not subscribe to event: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void handleUnsubscribe() {
+        EventGuiDTO selectedEvent = tableView.getSelectionModel().getSelectedItem();
+        if (selectedEvent == null) {
+            showAlert("No Selection", "Please select an event to unsubscribe.");
+            return;
+        }
+        try {
+            raceEventService.removeDuckFromEvent(selectedEvent.getId(), authService.getCurrentUser().getId());
+            showAlert("Success", "Successfully unsubscribed from event: " + selectedEvent.getName());
+        } catch (Exception e) {
+            showAlert("Error", "Could not unsubscribe from event: " + e.getMessage());
+        }
+    }
 }

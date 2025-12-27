@@ -1,27 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.ui.gui.DuckEventController"
-            prefHeight="400.0" prefWidth="600.0">
+<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.ui.gui.DuckEventController">
     <bottom>
-        <HBox styleClass="control-bar">
+        <HBox spacing="10.0" styleClass="control-bar">
             <Button fx:id="buttonPrevious" onAction="#onPrevious" styleClass="nav-button" text="Previous Page" />
             <Label fx:id="labelPage" style="-fx-text-fill: white; -fx-padding: 5;" text="Page 1" />
             <Button fx:id="buttonNext" onAction="#onNext" styleClass="nav-button" text="Next Page" />
 
             <Region HBox.hgrow="ALWAYS" />
+         <Button mnemonicParsing="false" onAction="#handleSubscribe" style="-fx-background-color: green;" text="Subscribe" textFill="WHITE">
+            <font>
+               <Font name="System Bold" size="12.0" />
+            </font></Button>
+         <Button mnemonicParsing="false" onAction="#handleUnsubscribe" style="-fx-background-color: red;" text="Unsubscribe" textFill="#fafafa">
+            <HBox.margin>
+               <Insets />
+            </HBox.margin>
+            <font>
+               <Font name="System Bold" size="12.0" />
+            </font>
+         </Button>
+         <padding>
+            <Insets left="10.0" right="10.0" />
+         </padding>
         </HBox>
     </bottom>
     <top>
         <VBox alignment="CENTER_LEFT" spacing="20" style="-fx-padding: 0 0 20 0;">
-            <Label text="Manage Events" styleClass="h1-label"/>
+            <Label styleClass="h1-label" text="Manage Events" />
             <Region HBox.hgrow="ALWAYS" />
             <HBox>
             </HBox>
