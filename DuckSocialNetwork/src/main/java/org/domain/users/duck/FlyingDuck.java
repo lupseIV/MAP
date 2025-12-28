@@ -1,12 +1,18 @@
 package org.domain.users.duck;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.domain.dtos.DuckData;
 import org.utils.enums.types.DuckTypes;
 
+@JsonTypeName("org.domain.users.duck.FlyingDuck")
 public class FlyingDuck extends Duck implements  Flying {
     @Override
     public void fly() {
 
+    }
+
+    public FlyingDuck() {
+        super();
     }
 
     public FlyingDuck(String username, String password, String email, DuckTypes duckType, Double speed, Double rezistance) {

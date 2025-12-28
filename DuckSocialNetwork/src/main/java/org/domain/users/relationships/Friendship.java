@@ -17,6 +17,9 @@ public class Friendship extends Entity<Long> {
         user1.addFriend(user2);
     }
 
+    public Friendship() {
+    }
+
     public Friendship(User user1, User user2, FriendRequestStatus status) {
         this.user1 = user1;
         this.user2 = user2;

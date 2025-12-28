@@ -46,9 +46,11 @@ public  abstract class Duck extends User implements Observer<RaceEvent> {
     }
 
 
+    public Duck() {
+        super();
+    }
 
-
-    public Duck( String username, String password, String email, DuckTypes duckType, Double speed, Double rezistance) {
+    public Duck(String username, String password, String email, DuckTypes duckType, Double speed, Double rezistance) {
         super( username, password, email,UserTypes.DUCK);
         this.duckType = duckType;
         this.speed = speed;

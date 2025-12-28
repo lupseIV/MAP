@@ -26,6 +26,10 @@ public class RaceEvent extends Event<RaceEvent,SwimmingDuck> {
         }
     }
 
+    public RaceEvent() {
+        super();
+    }
+
     public RaceEvent(String name, Person owner) {
         super(new ArrayList<>());
         this.name = name;

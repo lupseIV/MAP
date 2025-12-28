@@ -1,11 +1,13 @@
 package org.domain.users.person;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.domain.dtos.PersonData;
 import org.domain.users.User;
 import org.utils.enums.types.UserTypes;
 
 import java.time.LocalDate;
 
+@JsonTypeName("org.domain.users.person.Person")
 public class Person extends User {
     private String firstName;
     private String lastName;
@@ -14,7 +16,11 @@ public class Person extends User {
 
     private Double empathyLevel;
 
-    public Person( String username, String password, String email, String firstName, String lastName, String occupation, LocalDate dateOfBirth, Double empathyLevel) {
+    public Person() {
+        super();
+    }
+
+    public Person(String username, String password, String email, String firstName, String lastName, String occupation, LocalDate dateOfBirth, Double empathyLevel) {
         super(username, password, email,UserTypes.PERSON);
         this.firstName = firstName;
         this.lastName = lastName;

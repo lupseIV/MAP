@@ -1,6 +1,7 @@
 package org.domain.users;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.domain.Entity;
 import org.utils.enums.types.UserTypes;
@@ -13,6 +14,11 @@ import java.util.Objects;
         property = "id",
         scope = User.class
 )
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@class"
+)
 public abstract class User extends Entity<Long>  {
     private String username;
     private String password;
@@ -20,8 +26,10 @@ public abstract class User extends Entity<Long>  {
     private List<User> friends;
     private UserTypes userType;
 
+    public User() {
+    }
 
-    public User( String username, String password, String email, UserTypes userType ) {
+    public User(String username, String password, String email, UserTypes userType ) {
 
         this.username = username;
         this.password = password;

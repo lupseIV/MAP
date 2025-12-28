@@ -1,5 +1,7 @@
 package org.domain.users.relationships.messages;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.domain.Entity;
 import org.domain.users.User;
 import org.utils.enums.status.MessageStatus;
@@ -8,12 +10,24 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@class"
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = ReplyMessage.class, name = "org.domain.users.relationships.messages.ReplyMessage")
+})
 public class Message extends Entity<Long> {
     private User from;
     private List<User> to;
     private String message;
     private LocalDateTime date;
     private MessageStatus status;
+
+    public Message() {
+    }
 
     public Message(User from, List<User> to, String message) {
         this.from = from;

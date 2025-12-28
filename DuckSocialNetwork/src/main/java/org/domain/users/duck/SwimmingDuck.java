@@ -1,12 +1,18 @@
 package org.domain.users.duck;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import org.domain.dtos.DuckData;
 import org.utils.enums.types.DuckTypes;
 
+@JsonTypeName("org.domain.users.duck.SwimmingDuck")
 public class SwimmingDuck extends Duck implements Swimming {
     @Override
     public void swim() {
 
+    }
+
+    public SwimmingDuck() {
+        super();
     }
 
     public SwimmingDuck(String username, String password, String email, DuckTypes duckType, Double speed, Double rezistance) {
