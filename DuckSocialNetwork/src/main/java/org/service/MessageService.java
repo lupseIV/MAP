@@ -7,10 +7,14 @@ import org.domain.observer_events.MessageEvent;
 import org.domain.users.User;
 import org.domain.users.relationships.messages.Message;
 import org.domain.users.relationships.messages.ReplyMessage;
+import org.domain.users.relationships.notifications.MessageData;
+import org.domain.users.relationships.notifications.Notification;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
 import org.service.utils.IdGenerator;
 import org.utils.enums.actions.MessageAction;
+import org.utils.enums.status.NotificationStatus;
+import org.utils.enums.types.NotificationType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,9 +27,14 @@ public class MessageService extends EntityService<Long, Message> implements Obse
     private final List<Observer<MessageEvent>> observers = new CopyOnWriteArrayList<>();
 
     private AuthService authService;
+    private NotificationService notificationService;
 
     public MessageService(Validator<Message> validator, PagingRepository<Long, Message> repository, IdGenerator<Long> idGenerator) {
         super(validator, repository, idGenerator);
+    }
+
+    public void setNotificationService(NotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 
     public void setAuthService(AuthService authService) {
@@ -35,8 +44,21 @@ public class MessageService extends EntityService<Long, Message> implements Obse
     public void sendMessage(User from, List<User> to, String text) {
         Message message = new Message(from, to, text);
         super.save(message);
+        notifyObservers(new MessageEvent(MessageAction.SENT, List.of(message),authService.getCurrentUser() ));
 
-        notifyObservers(new MessageEvent(authService.getCurrentUser(), List.of(message), MessageAction.SENT));
+        for(User u : to) {
+            Notification notification = new Notification(
+                    NotificationType.MESSAGE,
+                    NotificationStatus.NEW,
+                    from,
+                    u
+            );
+            notification.setDescription("New message from " + authService.getCurrentUser().getUsername());
+            notification.setData(new MessageData(message, MessageAction.SENT));
+
+            notificationService.save(notification);
+        }
+
     }
 
     public void replyMessage(User from, Message messageToReply, String text) {
@@ -45,7 +67,19 @@ public class MessageService extends EntityService<Long, Message> implements Obse
         ReplyMessage reply = new ReplyMessage(from, recipients, text, messageToReply);
         super.save(reply);
 
-        notifyObservers(new MessageEvent(authService.getCurrentUser(), List.of(reply), MessageAction.REPLY));
+        notifyObservers(new MessageEvent(MessageAction.REPLY, List.of(reply),authService.getCurrentUser() ));
+
+        Notification notification = new Notification(
+                NotificationType.MESSAGE,
+                NotificationStatus.NEW,
+                from,
+                messageToReply.getFrom()
+        );
+        notification.setDescription("New message reply from " + authService.getCurrentUser().getUsername());
+        notification.setData(new MessageData(reply, MessageAction.REPLY));
+
+        notificationService.save(notification);
+
 
     }
 

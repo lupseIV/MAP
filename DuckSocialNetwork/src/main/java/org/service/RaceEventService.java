@@ -9,12 +9,18 @@ import org.domain.exceptions.ServiceException;
 import org.domain.observer_events.RaceObserverEvent;
 import org.domain.users.duck.Duck;
 import org.domain.users.duck.SwimmingDuck;
+import org.domain.users.relationships.notifications.MessageData;
+import org.domain.users.relationships.notifications.Notification;
+import org.domain.users.relationships.notifications.RaceEventData;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
 import org.repository.util.paging.Page;
 import org.service.utils.IdGenerator;
+import org.utils.enums.actions.MessageAction;
 import org.utils.enums.actions.RaceEventAction;
+import org.utils.enums.status.NotificationStatus;
 import org.utils.enums.status.RaceEventStatus;
+import org.utils.enums.types.NotificationType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,10 +33,15 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
 
     DucksService ducksService;
     private final List<Observer<RaceObserverEvent>> observers = new CopyOnWriteArrayList<>();
+    private NotificationService notificationService;
 
     public RaceEventService(Validator<RaceEvent> validator, PagingRepository<Long, RaceEvent> repository, IdGenerator<Long> idGenerator, DucksService ducksService) {
         super(validator, repository, idGenerator);
         this.ducksService = ducksService;
+    }
+
+    public void setNotificationService(NotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -83,7 +94,18 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
         event.addObserver((SwimmingDuck) duck);
         validator.validate(event);
         repository.update(event);
-        notifyObservers(new RaceObserverEvent(duck, List.of(event), RaceEventAction.SUBSCRIBE));
+        notifyObservers(new RaceObserverEvent( RaceEventAction.SUBSCRIBE,List.of(event), duck));
+
+        Notification notification = new Notification(
+                NotificationType.MESSAGE,
+                NotificationStatus.NEW,
+                duck,
+                event.getOwner()
+        );
+        notification.setDescription("New subscription to event " + event.getName());
+        notification.setData(new RaceEventData(event,duck, RaceEventAction.SUBSCRIBE));
+
+        notificationService.save(notification);
     }
 
     public void removeDuckFromEvent(Long eventId, Long duckId) {
@@ -100,8 +122,18 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
         event.removeObserver((SwimmingDuck) duck);
         validator.validate(event);
         repository.update(event);
-        notifyObservers(new RaceObserverEvent(duck, List.of(event), RaceEventAction.UNSUBSCRIBE));
+        notifyObservers(new RaceObserverEvent( RaceEventAction.UNSUBSCRIBE, List.of(event),duck));
 
+        Notification notification = new Notification(
+                NotificationType.MESSAGE,
+                NotificationStatus.NEW,
+                duck,
+                event.getOwner()
+        );
+        notification.setDescription("New unsubscription to event " + event.getName());
+        notification.setData(new RaceEventData(event,duck, RaceEventAction.UNSUBSCRIBE));
+
+        notificationService.save(notification);
     }
 
     public RaceEvent addSpecifiedNrOfDucksToAnRaceEvent(Long id, Integer nrOfDucks) {
@@ -143,9 +175,20 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
         validator.validate(event);
         var raceEvent =  repository.update(event);
         for(var d : selectedDucks){
-            notifyObservers(new RaceObserverEvent(d, List.of(raceEvent), RaceEventAction.SUBSCRIBE));
+            notifyObservers(new RaceObserverEvent(RaceEventAction.SUBSCRIBE,List.of(raceEvent), d));
 
-         }
+            Notification notification = new Notification(
+                    NotificationType.MESSAGE,
+                    NotificationStatus.NEW,
+                    event.getOwner(),
+                    d
+            );
+            notification.setDescription("You were added to event " + event.getName());
+            notification.setData(new RaceEventData(event,d, RaceEventAction.SUBSCRIBE));
+
+            notificationService.save(notification);
+
+        }
         return raceEvent;
     }
 
@@ -153,6 +196,7 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
      * Rezolvă problema "Natație" determinând timpul minim posibil.
      * Algoritm: Căutare Binară pe răspuns + Verificare Greedy.
      */
+    //TODO : add start race notification
     public double solveRace(RaceEvent event) {
         List<SwimmingDuck> ducks = event.getSubscribers();
         List<Integer> distances = event.getDistances();

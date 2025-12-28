@@ -3,17 +3,20 @@ package org.service;
 import javafx.application.Platform;
 import org.domain.Observable;
 import org.domain.Observer;
-import org.domain.observer_events.FriendRequestEvent;
-import org.domain.observer_events.NotificationEvent;
-import org.domain.observer_events.ObserverEvent;
+import org.domain.events.RaceEvent;
+import org.domain.observer_events.*;
 import org.domain.users.User;
 import org.domain.users.relationships.Friendship;
+import org.domain.users.relationships.messages.Message;
 import org.domain.users.relationships.notifications.FriendRequestData;
+import org.domain.users.relationships.notifications.MessageData;
 import org.domain.users.relationships.notifications.Notification;
+import org.domain.users.relationships.notifications.RaceEventData;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
 import org.service.utils.IdGenerator;
 import org.utils.enums.actions.FriendRequestAction;
+import org.utils.enums.actions.RaceEventAction;
 import org.utils.enums.status.FriendRequestStatus;
 import org.utils.enums.status.NotificationStatus;
 import org.utils.enums.types.NotificationType;
@@ -52,10 +55,25 @@ public class NotificationService extends EntityService<Long, Notification> imple
     private ObserverEvent createEventFromNotification(Notification notification) {
         if (notification.getType() == NotificationType.FRIEND_REQUEST) {
             if (notification.getData() instanceof FriendRequestData data) {
-                return new FriendRequestEvent(data.getAction(), List.of(notification), authService.getCurrentUser());
+                Friendship friendship = data.getFriendship();
+                return new FriendRequestEvent(data.getAction(), List.of(friendship), authService.getCurrentUser());
             }
         }
-        // TODO: handle other notification types
+        if (notification.getType() == NotificationType.SYSTEM_ALERT) {
+            return new NotificationEvent(notification.getType(), notification.getStatus(), authService.getCurrentUser());
+        }
+        if (notification.getType() == NotificationType.MESSAGE) {
+            if (notification.getData() instanceof MessageData data) {
+                Message message = data.getMessage();
+                return new MessageEvent(data.getAction(), List.of(message), authService.getCurrentUser());
+            }
+        }
+        if (notification.getType() == NotificationType.RACE_EVENT){
+            if (notification.getData() instanceof RaceEventData data) {
+                RaceEvent event = data.getEvent();
+                return new RaceObserverEvent(data.getAction(), List.of(event), authService.getCurrentUser());
+            }
+        }
         return null;
     }
 

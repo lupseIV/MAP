@@ -94,7 +94,8 @@ public class GraphicUserInterface extends Application {
         friendshipService.setNotificationService(notificationService);
         friendshipService.setMessageService(messageService);
         ducksService.setFlockService(flockService);
-
+        raceEventService.setNotificationService(notificationService);
+        messageService.setNotificationService(notificationService);
     }
 
     @Override
