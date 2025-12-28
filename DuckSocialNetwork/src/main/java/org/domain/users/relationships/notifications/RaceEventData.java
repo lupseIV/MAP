@@ -9,7 +9,6 @@ public class RaceEventData implements NotificationData {
     private User user;
     private RaceEventAction action;
 
-    // No-arg constructor for serialization
     public RaceEventData() {}
 
     public RaceEventData(RaceEvent event, User user, RaceEventAction action) {
