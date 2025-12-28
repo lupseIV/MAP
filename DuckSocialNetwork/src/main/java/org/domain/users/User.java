@@ -3,10 +3,7 @@ package org.domain.users;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.domain.Entity;
-import org.domain.Observer;
-import org.domain.events.Event;
-import org.domain.events.RaceEvent;
-import org.utils.enums.UserTypes;
+import org.utils.enums.types.UserTypes;
 
 import java.util.ArrayList;
 import java.util.List;

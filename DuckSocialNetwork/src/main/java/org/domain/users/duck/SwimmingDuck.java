@@ -1,7 +1,7 @@
 package org.domain.users.duck;
 
 import org.domain.dtos.DuckData;
-import org.utils.enums.DuckTypes;
+import org.utils.enums.types.DuckTypes;
 
 public class SwimmingDuck extends Duck implements Swimming {
     @Override

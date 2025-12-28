@@ -1,12 +1,11 @@
 package org.domain.users.duck;
 
 import org.domain.Observer;
-import org.domain.events.Event;
 import org.domain.events.RaceEvent;
 import org.domain.users.User;
 import org.domain.users.duck.flock.Flock;
-import org.utils.enums.DuckTypes;
-import org.utils.enums.UserTypes;
+import org.utils.enums.types.DuckTypes;
+import org.utils.enums.types.UserTypes;
 
 public  abstract class Duck extends User implements Observer<RaceEvent> {
     private DuckTypes duckType;

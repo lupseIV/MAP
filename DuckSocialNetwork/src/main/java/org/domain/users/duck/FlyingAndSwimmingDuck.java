@@ -1,10 +1,7 @@
 package org.domain.users.duck;
 
 import org.domain.dtos.DuckData;
-import org.domain.users.duck.flock.Flock;
-import org.utils.enums.DuckTypes;
-
-import java.util.List;
+import org.utils.enums.types.DuckTypes;
 
 public class FlyingAndSwimmingDuck extends Duck implements Swimming,Flying{
     @Override

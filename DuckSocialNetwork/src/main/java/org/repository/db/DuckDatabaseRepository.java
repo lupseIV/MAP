@@ -6,7 +6,7 @@ import org.domain.exceptions.RepositoryException;
 import org.domain.users.duck.Duck;
 import org.domain.users.duck.DuckFactory;
 import org.domain.validators.Validator;
-import org.utils.enums.DuckTypes;
+import org.utils.enums.types.DuckTypes;
 
 import java.sql.*;
 

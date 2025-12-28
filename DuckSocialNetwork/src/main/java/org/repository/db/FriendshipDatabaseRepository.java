@@ -5,7 +5,7 @@ import org.domain.exceptions.RepositoryException;
 import org.domain.users.User;
 import org.domain.users.relationships.Friendship;
 import org.domain.validators.Validator;
-import org.utils.enums.FriendRequestStatus;
+import org.utils.enums.status.FriendRequestStatus;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

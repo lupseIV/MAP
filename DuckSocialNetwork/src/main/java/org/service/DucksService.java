@@ -1,16 +1,12 @@
 package org.service;
 
-import org.domain.dtos.filters.DuckGUIFilter;
 import org.domain.dtos.guiDTOS.DuckGuiDTO;
-import org.domain.exceptions.ServiceException;
 import org.domain.users.duck.Duck;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
-import org.repository.Repository;
 import org.repository.util.paging.Page;
-import org.repository.util.paging.Pageable;
 import org.service.utils.IdGenerator;
-import org.utils.enums.DuckTypes;
+import org.utils.enums.types.DuckTypes;
 
 import java.util.ArrayList;
 import java.util.List;

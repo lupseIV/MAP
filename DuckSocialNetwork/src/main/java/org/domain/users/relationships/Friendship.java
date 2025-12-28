@@ -2,7 +2,7 @@ package org.domain.users.relationships;
 
 import org.domain.Entity;
 import org.domain.users.User;
-import org.utils.enums.FriendRequestStatus;
+import org.utils.enums.status.FriendRequestStatus;
 
 import java.util.Objects;
 

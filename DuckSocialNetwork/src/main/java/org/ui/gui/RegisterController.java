@@ -14,17 +14,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.domain.dtos.DuckData;
 import org.domain.users.User;
-import org.domain.users.duck.Duck;
 import org.domain.users.duck.DuckFactory;
-import org.domain.users.duck.FlyingDuck;
 import org.domain.users.person.Person;
 import org.service.*;
-import org.utils.enums.DuckTypes;
-import org.utils.enums.UserTypes;
+import org.utils.enums.types.UserTypes;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 
 public class RegisterController {

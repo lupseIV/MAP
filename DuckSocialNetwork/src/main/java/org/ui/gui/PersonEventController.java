@@ -13,17 +13,13 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.domain.Observer;
 import org.domain.dtos.filters.EventGUIFilter;
-import org.domain.dtos.filters.PersonGUIFilter;
 import org.domain.dtos.guiDTOS.EventGuiDTO;
-import org.domain.dtos.guiDTOS.PersonGuiDTO;
 import org.domain.events.RaceEvent;
-import org.domain.events.UpdateRaceEvent;
-import org.domain.users.person.Person;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
 import org.service.AuthService;
 import org.service.RaceEventService;
-import org.utils.enums.EventState;
+import org.utils.enums.status.RaceEventStatus;
 
 import java.io.IOException;
 
@@ -37,7 +33,7 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
     @FXML private TableColumn<EventGuiDTO, Long> idCol;
     @FXML private TableColumn<EventGuiDTO, String> nameCol;
     @FXML private TableColumn<EventGuiDTO, Double> maxTimeCol;
-    @FXML private TableColumn<EventGuiDTO, EventState> stateCol;
+    @FXML private TableColumn<EventGuiDTO, RaceEventStatus> stateCol;
 
     @FXML private Button buttonNext;
     @FXML private Button buttonPrevious;

@@ -1,6 +1,5 @@
 package org.service;
 
-import org.domain.observer_events.FriendRequestEvent;
 import org.domain.users.relationships.Friendship;
 import org.domain.users.User;
 import org.domain.exceptions.ServiceException;
@@ -10,9 +9,10 @@ import org.domain.validators.Validator;
 import org.repository.PagingRepository;
 import org.repository.util.paging.Page;
 import org.service.utils.IdGenerator;
-import org.utils.enums.FriendRequestStatus;
-import org.utils.enums.NotificationStatus;
-import org.utils.enums.NotificationType;
+import org.utils.enums.actions.FriendRequestAction;
+import org.utils.enums.status.FriendRequestStatus;
+import org.utils.enums.status.NotificationStatus;
+import org.utils.enums.types.NotificationType;
 
 import java.util.*;
 import java.util.stream.StreamSupport;
@@ -23,12 +23,18 @@ public class FriendshipService extends EntityService<Long, Friendship>  {
     private UsersService usersService;
     private NotificationService notificationService;
     private AuthService authService;
+    private MessageService messageService;
 
     Map<Long,Set<Long>> friendshipNetwork;
 
     public void setAuthService(AuthService authService) {
         this.authService = authService;
         notificationService.setAuthService(authService);
+        messageService.setAuthService(authService);
+    }
+
+    public void setMessageService(MessageService messageService) {
+        this.messageService = messageService;
     }
 
     public void setUsersService(UsersService usersService) {
@@ -74,7 +80,7 @@ public class FriendshipService extends EntityService<Long, Friendship>  {
                 authService.getCurrentUser(),
                 friend);
         notification.setDescription("New friend request from " + authService.getCurrentUser().getUsername());
-        notification.setData(new FriendRequestData(friendship, FriendRequestStatus.PENDING));
+        notification.setData(new FriendRequestData(friendship, FriendRequestAction.ADD));
 
         notificationService.save(notification);
         return res;
@@ -98,7 +104,7 @@ public class FriendshipService extends EntityService<Long, Friendship>  {
                 authService.getCurrentUser(),
                 friend);
         notification.setDescription("Deleted friendship");
-        notification.setData(new FriendRequestData(friendship, FriendRequestStatus.PENDING));
+        notification.setData(new FriendRequestData(friendship, FriendRequestAction.REMOVE));
 
         notificationService.save(notification);
        return res;
@@ -250,7 +256,7 @@ public class FriendshipService extends EntityService<Long, Friendship>  {
                 authService.getCurrentUser(),
                 friend);
         notification.setDescription("Friendship accepted");
-        notification.setData(new FriendRequestData(friendship, FriendRequestStatus.APPROVED));
+        notification.setData(new FriendRequestData(friendship, FriendRequestAction.ACCEPT));
 
         notificationService.save(notification);
     }
@@ -268,7 +274,7 @@ public class FriendshipService extends EntityService<Long, Friendship>  {
                 authService.getCurrentUser(),
                 friend);
         notification.setDescription("Friendship rejected");
-        notification.setData(new FriendRequestData(friendship, FriendRequestStatus.REJECTED));
+        notification.setData(new FriendRequestData(friendship, FriendRequestAction.REJECT));
 
         notificationService.save(notification);
     }

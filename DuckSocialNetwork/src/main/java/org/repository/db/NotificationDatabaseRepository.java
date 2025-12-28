@@ -4,18 +4,15 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import database.DatabaseConnection;
 import org.domain.exceptions.RepositoryException;
 import org.domain.users.User;
-import org.domain.users.relationships.Friendship;
-import org.domain.users.relationships.notifications.Notification;
 import org.domain.users.relationships.notifications.Notification;
 import org.domain.users.relationships.notifications.NotificationData;
 import org.domain.validators.Validator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.utils.enums.NotificationStatus;
-import org.utils.enums.NotificationType;
+import org.utils.enums.status.NotificationStatus;
+import org.utils.enums.types.NotificationType;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 
 public class NotificationDatabaseRepository extends EntityDatabaseRepository<Long, Notification>{
 

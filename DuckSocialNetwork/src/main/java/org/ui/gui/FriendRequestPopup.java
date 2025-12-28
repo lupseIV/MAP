@@ -7,7 +7,6 @@ import org.domain.users.User;
 import org.domain.users.relationships.Friendship;
 import org.service.AuthService;
 import org.service.FriendshipService;
-import org.utils.enums.FriendRequestStatus;
 
 public class FriendRequestPopup {
     private User from;

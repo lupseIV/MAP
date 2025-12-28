@@ -20,8 +20,8 @@ import org.domain.users.relationships.Friendship;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
 import org.service.*;
-import org.utils.enums.FriendRequestStatus;
-import org.utils.enums.NotificationType;
+import org.utils.enums.status.FriendRequestStatus;
+import org.utils.enums.types.NotificationType;
 
 import java.io.IOException;
 import java.util.ArrayList;

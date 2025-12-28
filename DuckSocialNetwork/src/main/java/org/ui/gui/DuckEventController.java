@@ -7,17 +7,14 @@ import org.domain.Observer;
 import org.domain.dtos.filters.EventGUIFilter;
 import org.domain.dtos.guiDTOS.EventGuiDTO;
 import org.domain.events.RaceEvent;
-import org.domain.events.UpdateRaceEvent;
-import org.domain.users.duck.SwimmingDuck;
+import org.domain.observer_events.ObserverEvent;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
 import org.service.AuthService;
 import org.service.RaceEventService;
-import org.utils.enums.EventState;
+import org.utils.enums.status.RaceEventStatus;
 
-import java.util.Optional;
-
-public class DuckEventController extends AbstractPagingTableViewController<EventGuiDTO, EventGUIFilter> implements Observer<UpdateRaceEvent> {
+public class DuckEventController extends AbstractPagingTableViewController<EventGuiDTO, EventGUIFilter> implements Observer<ObserverEvent> {
     private RaceEventService raceEventService;
     private AuthService authService;
 
@@ -26,7 +23,7 @@ public class DuckEventController extends AbstractPagingTableViewController<Event
     @FXML private TableColumn<EventGuiDTO, Long> idCol;
     @FXML private TableColumn<EventGuiDTO, String> nameCol;
     @FXML private TableColumn<EventGuiDTO, Double> maxTimeCol;
-    @FXML private TableColumn<EventGuiDTO, EventState> stateCol;
+    @FXML private TableColumn<EventGuiDTO, RaceEventStatus> stateCol;
 
     @FXML private Button buttonNext;
     @FXML private Button buttonPrevious;
@@ -38,7 +35,7 @@ public class DuckEventController extends AbstractPagingTableViewController<Event
     }
 
     @Override
-    public void update(UpdateRaceEvent event) {
+    public void update(ObserverEvent event) {
         loadData();
     }
 

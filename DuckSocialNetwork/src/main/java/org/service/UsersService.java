@@ -1,16 +1,11 @@
 package org.service;
 
-import org.domain.dtos.guiDTOS.PersonGuiDTO;
 import org.domain.users.duck.Duck;
 import org.domain.users.relationships.Friendship;
 import org.domain.users.person.Person;
 import org.domain.users.User;
 import org.domain.exceptions.ServiceException;
-import org.repository.util.paging.Page;
-import org.utils.enums.UserTypes;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 

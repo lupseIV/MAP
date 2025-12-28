@@ -7,9 +7,7 @@ import org.domain.users.duck.Duck;
 import org.domain.users.duck.SwimmingDuck;
 import org.domain.users.person.Person;
 import org.domain.validators.Validator;
-import org.repository.util.paging.Page;
-import org.repository.util.paging.Pageable;
-import org.utils.enums.EventState;
+import org.utils.enums.status.RaceEventStatus;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -37,7 +35,7 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
         Long id = resultSet.getLong("id");
         String name = resultSet.getString("name");
         Double maxTime = resultSet.getDouble("max_time");
-        EventState state = EventState.valueOf(resultSet.getString("state"));
+        RaceEventStatus state = RaceEventStatus.valueOf(resultSet.getString("state"));
         Person owner = personDatabaseRepository.findOne(resultSet.getLong("owner_person_id"));
 
         List<SwimmingDuck> participants = loadEventParticipants(id);

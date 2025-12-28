@@ -1,8 +1,6 @@
 package org.ui.gui;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -18,7 +16,7 @@ import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
 import org.service.DucksService;
 import org.service.UsersService;
-import org.utils.enums.DuckTypes;
+import org.utils.enums.types.DuckTypes;
 
 import java.io.IOException;
 import java.util.Optional;

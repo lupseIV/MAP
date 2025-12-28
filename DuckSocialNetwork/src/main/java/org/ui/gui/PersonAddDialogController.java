@@ -10,7 +10,7 @@ import org.domain.dtos.PersonData;
 import org.domain.users.UserFactory;
 import org.domain.users.person.Person;
 import org.service.PersonsService;
-import org.utils.enums.PersonTypes;
+import org.utils.enums.types.PersonTypes;
 
 import java.time.LocalDate;
 import java.util.List;

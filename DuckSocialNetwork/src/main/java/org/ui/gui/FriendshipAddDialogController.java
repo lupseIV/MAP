@@ -9,9 +9,7 @@ import org.domain.users.relationships.Friendship;
 import org.service.AuthService;
 import org.service.FriendshipService;
 import org.service.UsersService;
-import org.utils.enums.FriendRequestStatus;
-
-import java.util.Optional;
+import org.utils.enums.status.FriendRequestStatus;
 
 
 public class FriendshipAddDialogController {

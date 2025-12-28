@@ -2,7 +2,7 @@ package org.domain.dtos.filters;
 
 import org.domain.users.User;
 import org.repository.util.Pair;
-import org.utils.enums.FriendRequestStatus;
+import org.utils.enums.status.FriendRequestStatus;
 
 import java.util.ArrayList;
 import java.util.Collections;
