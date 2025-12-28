@@ -13,6 +13,7 @@ import org.domain.users.relationships.notifications.Notification;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
 import org.service.utils.IdGenerator;
+import org.utils.enums.actions.FriendRequestAction;
 import org.utils.enums.status.FriendRequestStatus;
 import org.utils.enums.status.NotificationStatus;
 import org.utils.enums.types.NotificationType;
