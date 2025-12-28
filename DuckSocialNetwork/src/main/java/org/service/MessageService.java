@@ -10,6 +10,7 @@ import org.domain.users.relationships.messages.ReplyMessage;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
 import org.service.utils.IdGenerator;
+import org.utils.enums.actions.MessageAction;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,7 +36,7 @@ public class MessageService extends EntityService<Long, Message> implements Obse
         Message message = new Message(from, to, text);
         super.save(message);
 
-        notifyObservers(new MessageEvent(authService.getCurrentUser(), List.of(message), message.getStatus()));
+        notifyObservers(new MessageEvent(authService.getCurrentUser(), List.of(message), MessageAction.SENT));
     }
 
     public void replyMessage(User from, Message messageToReply, String text) {
@@ -44,7 +45,7 @@ public class MessageService extends EntityService<Long, Message> implements Obse
         ReplyMessage reply = new ReplyMessage(from, recipients, text, messageToReply);
         super.save(reply);
 
-        notifyObservers(new MessageEvent(authService.getCurrentUser(), List.of(reply), reply.getStatus()));
+        notifyObservers(new MessageEvent(authService.getCurrentUser(), List.of(reply), MessageAction.REPLY));
 
     }
 
