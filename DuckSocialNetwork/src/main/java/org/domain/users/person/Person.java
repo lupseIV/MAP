@@ -2,7 +2,7 @@ package org.domain.users.person;
 
 import org.domain.dtos.PersonData;
 import org.domain.users.User;
-import org.utils.enums.UserTypes;
+import org.utils.enums.types.UserTypes;
 
 import java.time.LocalDate;
 
