@@ -1,11 +1,10 @@
 package org.domain.observer_events;
 
 import org.domain.users.User;
-import org.domain.users.relationships.Friendship;
 import org.domain.users.relationships.notifications.Notification;
-import org.utils.enums.FriendRequestStatus;
-import org.utils.enums.NotificationStatus;
-import org.utils.enums.NotificationType;
+import org.utils.enums.status.FriendRequestStatus;
+import org.utils.enums.status.NotificationStatus;
+import org.utils.enums.types.NotificationType;
 
 import java.util.List;
 

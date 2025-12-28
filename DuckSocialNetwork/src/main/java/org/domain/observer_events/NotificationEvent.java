@@ -1,11 +1,8 @@
 package org.domain.observer_events;
 
 import org.domain.users.User;
-import org.domain.users.relationships.notifications.Notification;
-import org.utils.enums.NotificationStatus;
-import org.utils.enums.NotificationType;
-
-import java.util.List;
+import org.utils.enums.status.NotificationStatus;
+import org.utils.enums.types.NotificationType;
 
 public class NotificationEvent implements ObserverEvent {
     private final NotificationType type;
