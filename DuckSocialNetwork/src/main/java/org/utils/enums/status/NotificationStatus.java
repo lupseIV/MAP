@@ -1,4 +1,4 @@
-package org.utils.enums;
+package org.utils.enums.status;
 
 public enum NotificationStatus {
     READ,

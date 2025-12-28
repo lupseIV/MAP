@@ -1,4 +1,4 @@
-package org.utils.enums;
+package org.utils.enums.types;
 
 public enum PersonTypes {
     DEFAULT
