@@ -3,7 +3,7 @@ package org.domain.users.relationships.notifications;
 import org.domain.users.relationships.messages.Message;
 import org.utils.enums.actions.MessageAction;
 
-public class MessageData {
+public class MessageData implements NotificationData{
     private final Message message;
     private final MessageAction action;
 
