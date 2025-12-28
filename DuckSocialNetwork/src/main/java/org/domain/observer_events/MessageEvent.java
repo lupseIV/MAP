@@ -12,7 +12,7 @@ public class MessageEvent extends NotificationEvent {
     private final List<Message> messages;
     private final MessageAction action;
 
-    public MessageEvent( User user, List<Message> messages, MessageAction action) {
+    public MessageEvent( MessageAction action , List<Message> messages,User user) {
         super(NotificationType.MESSAGE, NotificationStatus.NEW, user);
         this.messages = messages;
         this.action = action;

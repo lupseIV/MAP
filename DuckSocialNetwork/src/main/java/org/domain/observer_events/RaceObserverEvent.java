@@ -12,7 +12,7 @@ public class RaceObserverEvent extends NotificationEvent {
     private final RaceEventAction action;
     private final List<RaceEvent> raceEvents;
 
-    public RaceObserverEvent(User user, List<RaceEvent> raceEvent, RaceEventAction action) {
+    public RaceObserverEvent(RaceEventAction action, List<RaceEvent> raceEvent, User user) {
         super(NotificationType.RACE_EVENT, NotificationStatus.NEW, user);
         this.raceEvents = raceEvent;
         this.action = action;
