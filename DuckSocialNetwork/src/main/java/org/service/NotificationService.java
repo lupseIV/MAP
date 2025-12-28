@@ -52,8 +52,7 @@ public class NotificationService extends EntityService<Long, Notification> imple
     private ObserverEvent createEventFromNotification(Notification notification) {
         if (notification.getType() == NotificationType.FRIEND_REQUEST) {
             if (notification.getData() instanceof FriendRequestData data) {
-                FriendRequestStatus status = FriendRequestStatus.PENDING;
-                return new FriendRequestEvent( status, List.of(notification), authService.getCurrentUser());
+                return new FriendRequestEvent(data.getAction(), List.of(notification), authService.getCurrentUser());
             }
         }
         // TODO: handle other notification types
