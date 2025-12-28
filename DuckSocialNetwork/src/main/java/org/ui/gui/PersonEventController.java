@@ -15,6 +15,7 @@ import org.domain.Observer;
 import org.domain.dtos.filters.EventGUIFilter;
 import org.domain.dtos.guiDTOS.EventGuiDTO;
 import org.domain.events.RaceEvent;
+import org.domain.observer_events.RaceObserverEvent;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
 import org.service.AuthService;
@@ -24,7 +25,7 @@ import org.utils.enums.status.RaceEventStatus;
 import java.io.IOException;
 
 
-public class PersonEventController extends AbstractPagingTableViewController<EventGuiDTO, EventGUIFilter> implements Observer<UpdateRaceEvent> {
+public class PersonEventController extends AbstractPagingTableViewController<EventGuiDTO, EventGUIFilter> implements Observer<RaceObserverEvent> {
 
     private RaceEventService raceEventService;
     private AuthService authService;
@@ -41,7 +42,7 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
     @FXML private Label labelPage;
 
     @Override
-    public void update(UpdateRaceEvent event) {
+    public void update(RaceObserverEvent event) {
         loadData();
     }
 
