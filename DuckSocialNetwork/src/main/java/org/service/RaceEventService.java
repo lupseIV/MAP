@@ -13,6 +13,7 @@ import org.domain.validators.Validator;
 import org.repository.PagingRepository;
 import org.repository.util.paging.Page;
 import org.service.utils.IdGenerator;
+import org.utils.enums.actions.RaceEventAction;
 import org.utils.enums.status.RaceEventStatus;
 
 import java.util.ArrayList;
@@ -22,10 +23,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class RaceEventService extends EntityService<Long, RaceEvent> implements Observable<UpdateRaceEvent, Observer<UpdateRaceEvent>> {
+public class RaceEventService extends EntityService<Long, RaceEvent> implements Observable<RaceObserverEvent, Observer<RaceObserverEvent>> {
 
     DucksService ducksService;
-    private final List<Observer<UpdateRaceEvent>> observers = new CopyOnWriteArrayList<>();
+    private final List<Observer<RaceObserverEvent>> observers = new CopyOnWriteArrayList<>();
 
     public RaceEventService(Validator<RaceEvent> validator, PagingRepository<Long, RaceEvent> repository, IdGenerator<Long> idGenerator, DucksService ducksService) {
         super(validator, repository, idGenerator);
@@ -33,18 +34,18 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
     }
 
     @Override
-    public void addObserver(Observer<UpdateRaceEvent> observer) {
+    public void addObserver(Observer<RaceObserverEvent> observer) {
         observers.add(observer);
     }
 
     @Override
-    public void removeObserver(Observer<UpdateRaceEvent> observer) {
+    public void removeObserver(Observer<RaceObserverEvent> observer) {
     observers.remove(observer);
     }
 
     @Override
-    public void notifyObservers(UpdateRaceEvent event) {
-        for (Observer<UpdateRaceEvent> observer : observers) {
+    public void notifyObservers(RaceObserverEvent event) {
+        for (Observer<RaceObserverEvent> observer : observers) {
             Platform.runLater(() -> observer.update(event));
         }
     }
@@ -82,7 +83,7 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
         event.addObserver((SwimmingDuck) duck);
         validator.validate(event);
         repository.update(event);
-        notifyObservers(new UpdateRaceEvent(event, List.of((SwimmingDuck) duck)));
+        notifyObservers(new RaceObserverEvent(duck, List.of(event), RaceEventAction.SUBSCRIBE));
     }
 
     public void removeDuckFromEvent(Long eventId, Long duckId) {
@@ -99,7 +100,7 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
         event.removeObserver((SwimmingDuck) duck);
         validator.validate(event);
         repository.update(event);
-        notifyObservers(new UpdateRaceEvent(event, List.of((SwimmingDuck) duck)));
+        notifyObservers(new RaceObserverEvent(duck, List.of(event), RaceEventAction.UNSUBSCRIBE));
 
     }
 
@@ -141,7 +142,10 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
         }
         validator.validate(event);
         var raceEvent =  repository.update(event);
-        notifyObservers(new UpdateRaceEvent(event, selectedDucks));
+        for(var d : selectedDucks){
+            notifyObservers(new RaceObserverEvent(d, List.of(raceEvent), RaceEventAction.SUBSCRIBE));
+
+         }
         return raceEvent;
     }
 
