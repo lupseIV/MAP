@@ -37,6 +37,7 @@ public class ChatController implements Observer<MessageEvent> {
         this.chatPartner = chatPartner;
 
         messageService.addObserver(this);
+        messageService.setAuthService(authService);
 
         recipientLabel.setText("Chat with " + chatPartner.getEmail());
         loadMessages();

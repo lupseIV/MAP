@@ -39,6 +39,7 @@ public class MessageService extends EntityService<Long, Message> implements Obse
 
     public void setAuthService(AuthService authService) {
         this.authService = authService;
+        notificationService.setAuthService(authService);
     }
 
     public void sendMessage(User from, List<User> to, String text) {
