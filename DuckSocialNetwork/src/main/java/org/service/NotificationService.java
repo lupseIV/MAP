@@ -16,6 +16,9 @@ import org.service.utils.IdGenerator;
 import org.utils.enums.FriendRequestStatus;
 import org.utils.enums.NotificationStatus;
 import org.utils.enums.NotificationType;
+import org.utils.enums.status.FriendRequestStatus;
+import org.utils.enums.status.NotificationStatus;
+import org.utils.enums.types.NotificationType;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

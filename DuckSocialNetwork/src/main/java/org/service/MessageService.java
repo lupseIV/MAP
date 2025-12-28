@@ -3,16 +3,13 @@ package org.service;
 import javafx.application.Platform;
 import org.domain.Observable;
 import org.domain.Observer;
-import org.domain.events.MessageEvent;
+import org.domain.observer_events.MessageEvent;
 import org.domain.users.User;
-import org.domain.users.relationships.Friendship;
 import org.domain.users.relationships.messages.Message;
 import org.domain.users.relationships.messages.ReplyMessage;
 import org.domain.validators.Validator;
 import org.repository.PagingRepository;
-import org.repository.Repository;
 import org.service.utils.IdGenerator;
-import org.utils.enums.MessageType;
 
 import java.util.ArrayList;
 import java.util.Comparator;

@@ -11,8 +11,8 @@ import javafx.stage.Stage;
 import org.domain.Observer;
 import org.domain.observer_events.ObserverEvent;
 import org.service.*;
-import org.utils.enums.NotificationStatus;
-import org.utils.enums.UserTypes;
+import org.utils.enums.status.NotificationStatus;
+import org.utils.enums.types.UserTypes;
 
 import java.io.IOException;
 

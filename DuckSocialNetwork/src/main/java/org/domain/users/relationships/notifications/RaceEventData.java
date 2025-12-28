@@ -2,7 +2,7 @@ package org.domain.users.relationships.notifications;
 
 import org.domain.events.RaceEvent;
 import org.domain.users.User;
-import org.utils.enums.RaceEventAction;
+import org.utils.enums.actions.RaceEventAction;
 
 public class RaceEventData implements NotificationData {
     private RaceEvent event;

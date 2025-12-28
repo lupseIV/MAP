@@ -11,7 +11,7 @@ import org.domain.users.User;
 import org.domain.users.relationships.notifications.Notification;
 import org.service.AuthService;
 import org.service.NotificationService;
-import org.utils.enums.NotificationStatus;
+import org.utils.enums.status.NotificationStatus;
 
 import java.util.List;
 
