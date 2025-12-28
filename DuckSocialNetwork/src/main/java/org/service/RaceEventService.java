@@ -97,7 +97,7 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
         notifyObservers(new RaceObserverEvent( RaceEventAction.SUBSCRIBE,List.of(event), duck));
 
         Notification notification = new Notification(
-                NotificationType.MESSAGE,
+                NotificationType.RACE_EVENT,
                 NotificationStatus.NEW,
                 duck,
                 event.getOwner()
@@ -125,7 +125,7 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
         notifyObservers(new RaceObserverEvent( RaceEventAction.UNSUBSCRIBE, List.of(event),duck));
 
         Notification notification = new Notification(
-                NotificationType.MESSAGE,
+                NotificationType.RACE_EVENT,
                 NotificationStatus.NEW,
                 duck,
                 event.getOwner()
@@ -178,7 +178,7 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
             notifyObservers(new RaceObserverEvent(RaceEventAction.SUBSCRIBE,List.of(raceEvent), d));
 
             Notification notification = new Notification(
-                    NotificationType.MESSAGE,
+                    NotificationType.RACE_EVENT,
                     NotificationStatus.NEW,
                     event.getOwner(),
                     d
