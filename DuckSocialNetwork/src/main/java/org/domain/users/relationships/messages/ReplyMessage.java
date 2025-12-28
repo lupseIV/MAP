@@ -1,6 +1,7 @@
 package org.domain.users.relationships.messages;
 
 import org.domain.users.User;
+import org.utils.enums.status.MessageStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,8 +14,8 @@ public class ReplyMessage extends Message {
         this.repliedMessage = repliedMessage;
     }
 
-    public ReplyMessage(Long id, User from, List<User> to, String message, LocalDateTime date, Message repliedMessage) {
-        super(id, from, to, message, date);
+    public ReplyMessage(Long id, User from, List<User> to, String message, LocalDateTime date, Message repliedMessage, MessageStatus status) {
+        super(id, from, to, message, date, status);
         this.repliedMessage = repliedMessage;
     }
 

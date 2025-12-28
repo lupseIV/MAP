@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS messages (
                                         message TEXT NOT NULL,
                                         date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                         reply_to_id BIGINT,
+                                        status varchar(20) DEFAULT 'NEW' CHECK ( status in ('NEW', 'READ')),
                                         FOREIGN KEY (from_user_id) REFERENCES persons(id),
                                         FOREIGN KEY (reply_to_id) REFERENCES messages(id)
 );
