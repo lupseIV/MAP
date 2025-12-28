@@ -21,14 +21,21 @@ import java.util.stream.StreamSupport;
 public class MessageService extends EntityService<Long, Message> implements Observable<MessageEvent, Observer<MessageEvent>> {
     private final List<Observer<MessageEvent>> observers = new CopyOnWriteArrayList<>();
 
+    private AuthService authService;
+
     public MessageService(Validator<Message> validator, PagingRepository<Long, Message> repository, IdGenerator<Long> idGenerator) {
         super(validator, repository, idGenerator);
+    }
+
+    public void setAuthService(AuthService authService) {
+        this.authService = authService;
     }
 
     public void sendMessage(User from, List<User> to, String text) {
         Message message = new Message(from, to, text);
         super.save(message);
-        notifyObservers(new MessageEvent(MessageType.NEW_MESSAGE, List.of(message)));
+
+        notifyObservers(new MessageEvent(authService.getCurrentUser(), List.of(message), message.getStatus()));
     }
 
     public void replyMessage(User from, Message messageToReply, String text) {
@@ -36,7 +43,8 @@ public class MessageService extends EntityService<Long, Message> implements Obse
         recipients.add(messageToReply.getFrom());
         ReplyMessage reply = new ReplyMessage(from, recipients, text, messageToReply);
         super.save(reply);
-        notifyObservers(new MessageEvent(MessageType.NEW_MESSAGE, List.of(reply)));
+
+        notifyObservers(new MessageEvent(authService.getCurrentUser(), List.of(reply), reply.getStatus()));
 
     }
 

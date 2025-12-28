@@ -92,6 +92,7 @@ public class GraphicUserInterface extends Application {
 
         friendshipService.setUsersService(usersService);
         friendshipService.setNotificationService(notificationService);
+        friendshipService.setMessageService(messageService);
         ducksService.setFlockService(flockService);
 
     }
@@ -114,6 +115,7 @@ public class GraphicUserInterface extends Application {
 
         friendshipService.setAuthService(windowAuthService);
         notificationService.setAuthService(windowAuthService);
+        messageService.setAuthService(windowAuthService);
 
         controller. setServices(ducksService, personsService, friendshipService,
                 usersService, windowAuthService, messageService, notificationService, raceEventService);
