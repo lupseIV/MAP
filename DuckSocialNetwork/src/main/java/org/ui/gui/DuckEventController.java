@@ -8,13 +8,14 @@ import org.domain.dtos.filters.EventGUIFilter;
 import org.domain.dtos.guiDTOS.EventGuiDTO;
 import org.domain.events.RaceEvent;
 import org.domain.observer_events.ObserverEvent;
+import org.domain.observer_events.RaceObserverEvent;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
 import org.service.AuthService;
 import org.service.RaceEventService;
 import org.utils.enums.status.RaceEventStatus;
 
-public class DuckEventController extends AbstractPagingTableViewController<EventGuiDTO, EventGUIFilter> implements Observer<ObserverEvent> {
+public class DuckEventController extends AbstractPagingTableViewController<EventGuiDTO, EventGUIFilter> implements Observer<RaceObserverEvent> {
     private RaceEventService raceEventService;
     private AuthService authService;
 
@@ -35,7 +36,7 @@ public class DuckEventController extends AbstractPagingTableViewController<Event
     }
 
     @Override
-    public void update(ObserverEvent event) {
+    public void update(RaceObserverEvent event) {
         loadData();
     }
 

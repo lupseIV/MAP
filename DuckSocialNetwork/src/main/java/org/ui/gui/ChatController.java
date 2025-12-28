@@ -12,6 +12,7 @@ import org.domain.users.relationships.messages.ReplyMessage;
 import org.service.AuthService;
 import org.service.MessageService;
 import org.utils.enums.status.MessageStatus;
+import org.utils.enums.status.NotificationStatus;
 import org.utils.enums.types.NotificationType;
 
 import java.util.Collections;
@@ -43,7 +44,7 @@ public class ChatController implements Observer<MessageEvent> {
 
     @Override
     public void update(MessageEvent event) {
-        if (event.getType() == NotificationType.MESSAGE && event.getMessageStatus() == MessageStatus.NEW) {
+        if (event.getType() == NotificationType.MESSAGE && event.getStatus() == NotificationStatus.NEW) {
             loadMessages();
         }
     }
