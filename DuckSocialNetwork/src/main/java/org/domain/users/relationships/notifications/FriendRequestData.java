@@ -1,24 +1,24 @@
 package org.domain.users.relationships.notifications;
 
 import org.domain.users.relationships.Friendship;
-import org.utils.enums.FriendRequestStatus;
+import org.utils.enums.actions.FriendRequestAction;
 
 public class FriendRequestData implements NotificationData {
     private Friendship friendship;
-    private FriendRequestStatus action;
+    private FriendRequestAction action;
 
     public FriendRequestData() {}
 
-    public FriendRequestData(Friendship friendship, FriendRequestStatus action) {
+    public FriendRequestData(Friendship friendship, FriendRequestAction action) {
         this.friendship = friendship;
         this.action = action;
     }
 
-    public FriendRequestStatus getAction() {
+    public FriendRequestAction getAction() {
         return action;
     }
 
-    public void setAction(FriendRequestStatus action) {
+    public void setAction(FriendRequestAction action) {
         this.action = action;
     }
 
