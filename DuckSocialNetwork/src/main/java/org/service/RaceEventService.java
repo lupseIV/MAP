@@ -306,7 +306,10 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
                         event.getId(),
                         event.getMaxTime(),
                         event.getName(),
-                        event.getState().name()
+                        event.getState().name(),
+                        event.getOwner().getUsername(),
+                        (long) event.getSubscribers().size(),
+                        (long) event.getWinners().size()
                 ))
                 .collect(Collectors.toList());
     }
