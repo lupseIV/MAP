@@ -4,10 +4,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -15,6 +12,7 @@ import javafx.stage.Stage;
 import org.domain.Observer;
 import org.domain.dtos.filters.EventGUIFilter;
 import org.domain.dtos.guiDTOS.EventGuiDTO;
+import org.domain.events.Event;
 import org.domain.events.RaceEvent;
 import org.domain.observer_events.RaceObserverEvent;
 import org.domain.users.duck.SwimmingDuck;
@@ -26,6 +24,8 @@ import org.utils.enums.status.RaceEventStatus;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class PersonEventController extends AbstractPagingTableViewController<EventGuiDTO, EventGUIFilter> implements Observer<RaceObserverEvent> {
@@ -38,6 +38,9 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
     @FXML private TableColumn<EventGuiDTO, String> nameCol;
     @FXML private TableColumn<EventGuiDTO, Double> maxTimeCol;
     @FXML private TableColumn<EventGuiDTO, RaceEventStatus> stateCol;
+    @FXML private TableColumn<EventGuiDTO, String> ownerCol;
+    @FXML private TableColumn<EventGuiDTO, Long> ducksCountCol;
+    @FXML private TableColumn<EventGuiDTO, Long> winnersCol;
 
     @FXML private Button buttonNext;
     @FXML private Button buttonPrevious;
@@ -71,14 +74,93 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         maxTimeCol.setCellValueFactory(new PropertyValueFactory<>("maxTime"));
         stateCol.setCellValueFactory(new PropertyValueFactory<>("state"));
+        ownerCol.setCellValueFactory(new PropertyValueFactory<>("owner"));
+
+        ducksCountCol.setCellValueFactory(new PropertyValueFactory<>("ducks"));
+        ducksCountCol.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Long item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    setOnMouseClicked(null);
+                } else {
+                    setText(item.toString());
+                    setStyle("-fx-text-fill: blue; -fx-underline: true; -fx-cursor: hand;");
+                    setOnMouseClicked(event -> showDucksPopup(getTableView().getItems().get(getIndex()).getId()));
+                }
+            }
+        });
+
+        winnersCol.setCellValueFactory(new PropertyValueFactory<>("winners"));
+        winnersCol.setCellFactory(column -> new TableCell<>() {
+            @Override
+            protected void updateItem(Long item, boolean empty) {
+                super.updateItem(item, empty);
+                EventGuiDTO dto = getTableRow().getItem();
+                if (empty || dto == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    if ("COMPLETED".equals(dto.getState())) {
+                        setText("View Results");
+                        setStyle("-fx-text-fill: blue; -fx-underline: true; -fx-cursor: hand;");
+                        setOnMouseClicked(event -> showWinnersPopup(dto.getId()));
+                    } else {
+                        setText("-");
+                        setStyle("");
+                        setOnMouseClicked(null);
+                    }
+                }
+            }
+        });
 
         tableView.setOnMouseClicked(event -> {
             if (event.getClickCount() == 2 && tableView.getSelectionModel().getSelectedItem() != null) {
                 handleManageDistances();
             }
         });
-
         tableView.setItems(model);
+    }
+
+    private void showDucksPopup(Long eventId) {
+        RaceEvent event = raceEventService.findOne(eventId);
+        if (event == null) return;
+
+        List<String> duckNames = event.getSubscribers().stream()
+                .map(d -> d.getUsername() + " (Speed: " + d.getSpeed() + ")")
+                .collect(Collectors.toList());
+
+        showListPopup("Subscribed Ducks", duckNames);
+    }
+
+    private void showWinnersPopup(Long eventId) {
+        RaceEvent event = raceEventService.findOne(eventId);
+        if (event == null) return;
+
+        List<String> winners = event.getWinners().entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(e -> "Lane " + e.getKey() + ": " + e.getValue().getUsername())
+                .collect(Collectors.toList());
+
+        showListPopup("Race Results", winners);
+    }
+
+    private void showListPopup(String title, List<String> items) {
+        Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle(title);
+
+        ListView<String> list = new ListView<>();
+        list.getItems().addAll(items);
+
+        VBox layout = new VBox(10, list);
+        layout.setPadding(new javafx.geometry.Insets(10));
+
+        Scene scene = new Scene(layout, 300, 400);
+        dialog.setScene(scene);
+        dialog.show();
     }
 
     @Override
@@ -125,6 +207,9 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
             controller.setServices(raceEventService,authService, dialogStage);
 
             dialogStage.showAndWait();
+            if(controller.isSaveClicked()){
+                loadData();
+            }
         } catch (IOException e) {
             e.printStackTrace();
             showAlert("Error", "Could not open dialog: " + e.getMessage());
