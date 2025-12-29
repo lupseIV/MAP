@@ -135,8 +135,14 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
     private void handleDelete(){
         EventGuiDTO selected = tableView.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            raceEventService.delete(selected.getId());
-            model.remove(selected);
+            RaceEvent event = raceEventService.findOne(selected.getId());
+            if(event.getOwner().equals(authService.getCurrentUser())) {
+                raceEventService.delete(selected.getId());
+                model.remove(selected);
+            }else {
+                showAlert("Warning", "Can't delete other users events.");
+
+            }
         } else {
             showAlert("Warning", "Please select a duck to delete.");
         }
@@ -152,6 +158,10 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
 
         RaceEvent event = raceEventService.findOne(selected.getId());
 
+        if(!event.getOwner().equals(authService.getCurrentUser())) {
+            showAlert("Error", "You cannot start other users events");
+            return;
+        }
 
         if (event == null) {
             showAlert("Error", "Event not found!");
@@ -176,9 +186,9 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
             return;
         }
 
-        if (distances.size() != ducks.size()) {
+        if (distances.size() >= ducks.size()) {
             showAlert("Error", "The number of subscribed ducks (" + ducks.size() +
-                    ") must be exactly equal to the number of distances/lanes (" + distances.size() + ").");
+                    ") must be higher or equal to the number of distances/lanes (" + distances.size() + ").");
             return;
         }
 
@@ -208,6 +218,12 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
         EventGuiDTO selected = tableView.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showAlert("Warning", "Select an event to manage distances.");
+            return;
+        }
+
+        RaceEvent event1 = raceEventService.findOne(selected.getId());
+        if(event1!=null&&!event1.getOwner().equals(authService.getCurrentUser())) {
+            showAlert("Error", "You cannot manage distances for other users events");
             return;
         }
 
