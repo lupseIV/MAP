@@ -5,7 +5,9 @@ import org.domain.users.duck.SwimmingDuck;
 import org.domain.users.person.Person;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RaceEvent extends Event<RaceEvent,SwimmingDuck> {
 
@@ -13,6 +15,7 @@ public class RaceEvent extends Event<RaceEvent,SwimmingDuck> {
     private List<Integer> distances = new ArrayList<>();
     private String name;
     private Person owner;
+    private Map<Integer, SwimmingDuck> winners = new HashMap<>();
 
     public RaceEvent(List<SwimmingDuck> subscribers, String name, Person owner) {
         super(new ArrayList<>());
@@ -66,6 +69,14 @@ public class RaceEvent extends Event<RaceEvent,SwimmingDuck> {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Map<Integer, SwimmingDuck> getWinners() {
+        return winners;
+    }
+
+    public void setWinners(Map<Integer, SwimmingDuck> winners) {
+        this.winners = winners;
     }
 
     @Override

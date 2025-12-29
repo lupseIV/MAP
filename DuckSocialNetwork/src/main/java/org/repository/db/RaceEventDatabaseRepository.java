@@ -14,7 +14,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, RaceEvent>{
 
@@ -39,11 +41,15 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
         Person owner = personDatabaseRepository.findOne(resultSet.getLong("owner_person_id"));
 
         List<SwimmingDuck> participants = loadEventParticipants(id);
+        List<Integer> distances = loadDistances(id);
+        Map<Integer, SwimmingDuck> winners = loadWinners(id);
 
         RaceEvent event = new RaceEvent(participants, name,owner);
         event.setId(id);
         event.setMaxTime(maxTime);
         event.setState(state);
+        event.setDistances(distances);
+        event.setWinners(winners);
 
         return event;
     }
@@ -72,6 +78,49 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
         return participants;
     }
 
+    private List<Integer> loadDistances(Long eventId) {
+        List<Integer> distances = new ArrayList<>();
+        String sql = "SELECT distance FROM race_event_distances WHERE event_id = ? ORDER BY lane_index ASC";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, eventId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    distances.add(rs.getInt("distance"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RepositoryException("Error loading distances", e);
+        }
+        return distances;
+    }
+
+    private Map<Integer, SwimmingDuck> loadWinners(Long eventId) {
+        Map<Integer, SwimmingDuck> winners = new HashMap<>();
+        String sql = "SELECT duck_id, position FROM race_event_winners WHERE event_id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, eventId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Long duckId = rs.getLong("duck_id");
+                    int position = rs.getInt("position");
+                    Duck duck = duckDatabaseRepository.findOne(duckId);
+                    if (duck instanceof SwimmingDuck) {
+                        winners.put(position, (SwimmingDuck) duck);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RepositoryException("Error loading winners", e);
+        }
+        return winners;
+    }
+
     @Override
     public void saveToDatabase(RaceEvent event) {
         try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection()) {
@@ -85,6 +134,8 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
             }
 
             saveEventParticipants(conn, event);
+            saveDistances(conn, event);
+            saveWinners(conn, event);
 
         } catch (SQLException e) {
             throw new RepositoryException("Error saving race event to database", e);
@@ -106,13 +157,45 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
         }
     }
 
+    private void saveDistances(DatabaseConnection.AutoCloseableConnection conn, RaceEvent event) throws SQLException {
+        List<Integer> distances = event.getDistances();
+        if (distances == null || distances.isEmpty()) return;
+
+        String sql = "INSERT INTO race_event_distances (event_id, distance, lane_index) VALUES (?, ?, ?)";
+        try (PreparedStatement stmt = conn.get().prepareStatement(sql)) {
+            for (int i = 0; i < distances.size(); i++) {
+                stmt.setLong(1, event.getId());
+                stmt.setInt(2, distances.get(i));
+                stmt.setInt(3, i + 1); // 1-based lane index
+                stmt.executeUpdate();
+            }
+        }
+    }
+
+    private void saveWinners(DatabaseConnection.AutoCloseableConnection conn, RaceEvent event) throws SQLException {
+        Map<Integer, SwimmingDuck> winners = event.getWinners();
+        if (winners == null || winners.isEmpty()) return;
+
+        String sql = "INSERT INTO race_event_winners (event_id, duck_id, position) VALUES (?, ?, ?)";
+        try (PreparedStatement stmt = conn.get().prepareStatement(sql)) {
+            for (Map.Entry<Integer, SwimmingDuck> entry : winners.entrySet()) {
+                stmt.setLong(1, event.getId());
+                stmt.setLong(2, entry.getValue().getId());
+                stmt.setInt(3, entry.getKey());
+                stmt.executeUpdate();
+            }
+        }
+    }
+
     @Override
     public void deleteFromDatabase(Long id) {
         try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection()) {
-            String deleteParticipantsSql = "DELETE FROM race_event_participants WHERE event_id = ?";
-            try (PreparedStatement stmt = conn.get().prepareStatement(deleteParticipantsSql)) {
-                stmt.setLong(1, id);
-                stmt.executeUpdate();
+            String[] tables = {"race_event_participants", "race_event_distances", "race_event_winners"};
+            for (String table : tables) {
+                try (PreparedStatement stmt = conn.get().prepareStatement("DELETE FROM " + table + " WHERE event_id = ?")) {
+                    stmt.setLong(1, id);
+                    stmt.executeUpdate();
+                }
             }
 
             String deleteEventSql = "DELETE FROM race_events WHERE id = ?";
@@ -137,13 +220,17 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
                 stmt.executeUpdate();
             }
 
-            String deleteSql = "DELETE FROM race_event_participants WHERE event_id = ?";
-            try (PreparedStatement stmt = conn.get().prepareStatement(deleteSql)) {
-                stmt.setLong(1, event.getId());
-                stmt.executeUpdate();
+            String[] tables = {"race_event_participants", "race_event_distances", "race_event_winners"};
+            for (String table : tables) {
+                try (PreparedStatement stmt = conn.get().prepareStatement("DELETE FROM " + table + " WHERE event_id = ?")) {
+                    stmt.setLong(1, event.getId());
+                    stmt.executeUpdate();
+                }
             }
 
             saveEventParticipants(conn, event);
+            saveDistances(conn, event);
+            saveWinners(conn, event);
 
         } catch (SQLException e) {
             throw new RepositoryException("Error updating race event in database", e);

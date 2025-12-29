@@ -91,3 +91,18 @@ CREATE TABLE IF NOT EXISTS notifications (
                                              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                              data TEXT
 );
+CREATE TABLE IF NOT EXISTS race_event_distances (
+                                      event_id BIGINT NOT NULL,
+                                      distance INT NOT NULL,
+                                      lane_index INT NOT NULL,
+                                      PRIMARY KEY (event_id, lane_index),
+                                      FOREIGN KEY (event_id) REFERENCES race_events(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS race_event_winners (
+                                        event_id BIGINT NOT NULL,
+                                        duck_id BIGINT NOT NULL,
+                                        position INT NOT NULL,
+                                        PRIMARY KEY (event_id, position),
+                                        FOREIGN KEY (event_id) REFERENCES  race_events(id) ON DELETE CASCADE
+)
+
