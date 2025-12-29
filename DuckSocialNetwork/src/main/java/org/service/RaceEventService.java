@@ -7,6 +7,7 @@ import org.domain.dtos.guiDTOS.EventGuiDTO;
 import org.domain.events.RaceEvent;
 import org.domain.exceptions.ServiceException;
 import org.domain.observer_events.RaceObserverEvent;
+import org.domain.users.User;
 import org.domain.users.duck.Duck;
 import org.domain.users.duck.SwimmingDuck;
 import org.domain.users.relationships.notifications.MessageData;
@@ -22,15 +23,15 @@ import org.utils.enums.status.NotificationStatus;
 import org.utils.enums.status.RaceEventStatus;
 import org.utils.enums.types.NotificationType;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import static java.lang.Thread.sleep;
 
 public class RaceEventService extends EntityService<Long, RaceEvent> implements Observable<RaceObserverEvent, Observer<RaceObserverEvent>> {
 
@@ -62,8 +63,30 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
     @Override
     public void notifyObservers(RaceObserverEvent event) {
         for (Observer<RaceObserverEvent> observer : observers) {
-            Platform.runLater(() -> observer.update(event));
+            observer.update(event);
         }
+    }
+
+    @Override
+    public RaceEvent save(RaceEvent entity) {
+        var e = super.save(entity);
+        notifyObservers(new RaceObserverEvent(RaceEventAction.CREATE, List.of(entity), entity.getOwner()));
+        return e;
+    }
+
+    @Override
+    public RaceEvent delete(Long aLong) {
+        RaceEvent event = repository.findOne(aLong);
+        var e = super.delete(aLong);
+        notifyObservers(new RaceObserverEvent(RaceEventAction.DELETE, List.of(event), event.getOwner()));
+        return e;
+    }
+
+    @Override
+    public RaceEvent update(RaceEvent entity) {
+        var e = super.update(entity);
+        notifyObservers(new RaceObserverEvent(RaceEventAction.UPDATE, List.of(entity), entity.getOwner()));
+        return e;
     }
 
     public  boolean isDuckSubscribedToEvent(Long eventId, Long duckId) {
@@ -225,14 +248,33 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
             List<SwimmingDuck> ducks = event.getSubscribers();
             List<Integer> distances = event.getDistances();
 
-            // Validări de bază
             if (ducks == null || distances == null || ducks.size() < distances.size()) {
                 throw new ServiceException("Invalid Race Event parameters for solving.");
             }
 
-            // Computationally intensive part
+            event.setState(RaceEventStatus.ONGOING);
+
             List<SwimmingDuck> sortedDucks = new ArrayList<>(ducks);
             sortedDucks.sort(Comparator.comparingDouble(Duck::getRezistance));
+
+            for(var d : sortedDucks){
+                Notification notification = new Notification(
+                        NotificationType.RACE_EVENT,
+                        NotificationStatus.NEW,
+                        event.getOwner(),
+                        d
+                );
+                notification.setDescription("The race " + event.getName() + " has started!");
+                notification.setData(new RaceEventData(event, d, RaceEventAction.START));
+
+                notificationService.save(notification);
+            }
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
 
             double minSpeed = ducks.stream().mapToDouble(Duck::getSpeed).min().orElse(0.1);
             double maxDistance = distances.get(distances.size() - 1) * 2.0;
@@ -253,10 +295,49 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
 
             event.setMaxTime(ans);
 
-            // Persist the result
-            repository.update(event);
+            Map<Integer, SwimmingDuck> solution = new HashMap<>();
+            int duckIndex = 0;
+            int numDucks = sortedDucks.size();
 
-            // Optionally: Send notifications here or let the controller chain it
+            for (int i = 0; i < distances.size(); i++) {
+                double totalDist = distances.get(i) * 2.0;
+                double requiredSpeed = totalDist / ans;
+
+                while (duckIndex < numDucks) {
+                    SwimmingDuck currentDuck = sortedDucks.get(duckIndex);
+                    duckIndex++;
+                    if (currentDuck.getSpeed() >= requiredSpeed - 0.00001) {
+                        solution.put(i + 1, currentDuck);
+
+                        Notification notification = new Notification(
+                                NotificationType.RACE_EVENT,
+                                NotificationStatus.NEW,
+                                event.getOwner(),
+                                currentDuck
+                        );
+                        notification.setDescription("You won the " + event.getName() + " race event. Go see your results!");
+                        notification.setData(new RaceEventData(event, currentDuck, RaceEventAction.FINISH));
+
+                        notificationService.save(notification);
+
+                        break;
+                    }
+                }
+            }
+            event.setWinners(solution);
+            event.setState(RaceEventStatus.COMPLETED);
+
+            Notification notification = new Notification(
+                    NotificationType.RACE_EVENT,
+                    NotificationStatus.NEW,
+                    event.getOwner(),
+                    event.getOwner()
+            );
+            notification.setDescription("The raced finished! Check out the results for event " + event.getName());
+            notification.setData(new RaceEventData(event, event.getOwner(), RaceEventAction.FINISH));
+
+
+            repository.update(event);
 
             return ans;
         }, executorService);
@@ -271,28 +352,21 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
 
         for (Integer distOneWay : distances) {
             double totalDist = distOneWay * 2.0;
-            // time = dist / speed => speed = dist / time
             double requiredSpeed = totalDist / timeLimit;
 
             boolean foundDuck = false;
-            // Căutăm prima rață disponibilă care are viteza necesară
             while (duckIndex < numDucks) {
                 SwimmingDuck currentDuck = sortedDucks.get(duckIndex);
-                duckIndex++; // Consumăm rața curentă (fie o folosim, fie o sărim)
+                duckIndex++;
 
                 if (currentDuck.getSpeed() >= requiredSpeed) {
-                    // Am găsit o rață validă!
-                    // Deoarece lista e sortată după rezistență, condiția r_i <= r_{i+1}
-                    // este satisfăcută implicit prin faptul că avansăm în listă.
                     foundDuck = true;
                     break;
                 }
-                // Dacă rața nu are viteză suficientă, o sărim.
-                // Nu o putem folosi pe culoare ulterioare deoarece acelea sunt și mai lungi (deci cer viteză și mai mare).
             }
 
             if (!foundDuck) {
-                return false; // Nu am găsit rață pentru acest culoar
+                return false;
             }
         }
         return true;

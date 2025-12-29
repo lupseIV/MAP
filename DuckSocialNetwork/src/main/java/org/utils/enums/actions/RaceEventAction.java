@@ -4,5 +4,8 @@ public enum RaceEventAction {
     START,
     SUBSCRIBE,
     UNSUBSCRIBE,
-    FINISH
+    FINISH,
+    CREATE,
+    DELETE,
+    UPDATE
 }
