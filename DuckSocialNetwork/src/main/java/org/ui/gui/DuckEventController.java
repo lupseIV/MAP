@@ -1,5 +1,6 @@
 package org.ui.gui;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -7,28 +8,25 @@ import org.domain.Observer;
 import org.domain.dtos.filters.EventGUIFilter;
 import org.domain.dtos.guiDTOS.EventGuiDTO;
 import org.domain.events.RaceEvent;
-import org.domain.observer_events.ObserverEvent;
 import org.domain.observer_events.RaceObserverEvent;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
 import org.service.AuthService;
 import org.service.RaceEventService;
-import org.utils.enums.status.RaceEventStatus;
+import org.utils.enums.status.RaceEventStatus; // Check this import
 
 public class DuckEventController extends AbstractPagingTableViewController<EventGuiDTO, EventGUIFilter> implements Observer<RaceObserverEvent> {
     private RaceEventService raceEventService;
     private AuthService authService;
 
-    @FXML
-    private TableView<EventGuiDTO> tableView;
+    @FXML private TableView<EventGuiDTO> tableView;
     @FXML private TableColumn<EventGuiDTO, Long> idCol;
     @FXML private TableColumn<EventGuiDTO, String> nameCol;
     @FXML private TableColumn<EventGuiDTO, Double> maxTimeCol;
-    @FXML private TableColumn<EventGuiDTO, RaceEventStatus> stateCol;
+    @FXML private TableColumn<EventGuiDTO, String> stateCol; // Changed to String to avoid enum mismatch issues in table
 
     @FXML private Button buttonNext;
     @FXML private Button buttonPrevious;
-
     @FXML private Label labelPage;
 
     public DuckEventController() {
@@ -43,9 +41,7 @@ public class DuckEventController extends AbstractPagingTableViewController<Event
     public void setServices(RaceEventService raceEventService, AuthService authService) {
         this.raceEventService = raceEventService;
         this.authService = authService;
-
         raceEventService.addObserver(this);
-
         initializeTable();
         loadData();
     }
@@ -64,55 +60,56 @@ public class DuckEventController extends AbstractPagingTableViewController<Event
                 if (item == null || empty) {
                     setStyle("");
                 } else {
-                    // Check if current duck is subscribed to this event
                     if (isDuckSubscribed(item.getId())) {
-                        // Apply a CSS style for highlighting (e.g., light green background)
-                        // Ensure this style works with your dark theme, or use a specific color like #388e3c
                         setStyle("-fx-background-color: #1b5e20;");
                     } else {
-                        setStyle(""); // Reset style for other rows
+                        setStyle("");
                     }
                 }
             }
         });
-
         tableView.setItems(model);
     }
 
     private boolean isDuckSubscribed(Long eventId) {
-        if (raceEventService == null || authService == null || authService.getCurrentUser() == null) {
-            return false;
-        }
-
-        Long currentDuckId = authService.getCurrentUser().getId();
-        return raceEventService.isDuckSubscribedToEvent(eventId, currentDuckId);
+        if (raceEventService == null || authService == null || authService.getCurrentUser() == null) return false;
+        return raceEventService.isDuckSubscribedToEvent(eventId, authService.getCurrentUser().getId());
     }
 
     @Override
     public void loadData() {
         if (raceEventService == null) return;
 
-        Pageable pageable = new Pageable(currentPage, pageSize);
-        try {
-            Page<RaceEvent> eventPage = raceEventService.findAllOnPage(pageable, filter);
-            int maxPage = (int) Math.ceil((double) eventPage.getTotalNumberOfElements() / pageSize) - 1;
-            if (maxPage == -1) {
-                maxPage = 0;
-            }
-            if (currentPage > maxPage) {
-                currentPage = maxPage;
-                eventPage = raceEventService.findAllOnPage(pageable, filter);
-            }
-            totalNrOfElements = eventPage.getTotalNumberOfElements();
+        new Thread(() -> {
+            try {
+                Pageable pageable = new Pageable(currentPage, pageSize);
+                Page<RaceEvent> eventPage = raceEventService.findAllOnPage(pageable, filter);
 
-            labelPage.setText("Page " + (currentPage + 1) + " of " + (maxPage + 1));
-            buttonPrevious.setDisable(currentPage == 0);
-            buttonNext.setDisable((currentPage + 1) * pageSize >= totalNrOfElements);
+                int maxPage = (int) Math.ceil((double) eventPage.getTotalNumberOfElements() / pageSize) - 1;
+                if (maxPage == -1) maxPage = 0;
 
-            model.setAll(raceEventService.getGuiRaceEventsFromPage(eventPage));
-        } catch (Exception e) {
-            showAlert("Error", "Could not load data: " + e.getMessage());
-        }
+                if (currentPage > maxPage) {
+                    currentPage = maxPage;
+                    eventPage = raceEventService.findAllOnPage(pageable, filter);
+                }
+
+                final int total = eventPage.getTotalNumberOfElements();
+                final int finalMaxPage = maxPage;
+                final var events = raceEventService.getGuiRaceEventsFromPage(eventPage);
+
+                Platform.runLater(() -> {
+                    totalNrOfElements = total;
+                    labelPage.setText("Page " + (currentPage + 1) + " of " + (finalMaxPage + 1));
+                    buttonPrevious.setDisable(currentPage == 0);
+                    buttonNext.setDisable((currentPage + 1) * pageSize >= totalNrOfElements);
+
+                    model.setAll(events);
+                    tableView.refresh();
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> showAlert("Error", "Could not load data: " + e.getMessage()));
+            }
+        }).start();
     }
 
     @FXML
@@ -123,12 +120,15 @@ public class DuckEventController extends AbstractPagingTableViewController<Event
             return;
         }
 
-        try {
-            raceEventService.addDuckToEvent( selectedEvent.getId(),authService.getCurrentUser().getId());
-            showAlert("Success", "Successfully subscribed to event: " + selectedEvent.getName());
-        } catch (Exception e) {
-            showAlert("Error", "Could not subscribe to event: " + e.getMessage());
-        }
+        // Just trigger the action. The UI update happens in 'update()' via Observer.
+        raceEventService.addDuckToEvent(selectedEvent.getId(), authService.getCurrentUser().getId())
+                .thenRun(() -> Platform.runLater(() ->
+                        showAlert("Success", "Successfully subscribed to: " + selectedEvent.getName())
+                ))
+                .exceptionally(ex -> {
+                    Platform.runLater(() -> showAlert("Error", "Could not subscribe: " + ex.getCause().getMessage()));
+                    return null;
+                });
     }
 
     @FXML
@@ -138,11 +138,14 @@ public class DuckEventController extends AbstractPagingTableViewController<Event
             showAlert("No Selection", "Please select an event to unsubscribe.");
             return;
         }
-        try {
-            raceEventService.removeDuckFromEvent(selectedEvent.getId(), authService.getCurrentUser().getId());
-            showAlert("Success", "Successfully unsubscribed from event: " + selectedEvent.getName());
-        } catch (Exception e) {
-            showAlert("Error", "Could not unsubscribe from event: " + e.getMessage());
-        }
+
+        raceEventService.removeDuckFromEvent(selectedEvent.getId(), authService.getCurrentUser().getId())
+                .thenRun(() -> Platform.runLater(() ->
+                        showAlert("Success", "Successfully unsubscribed from: " + selectedEvent.getName())
+                ))
+                .exceptionally(ex -> {
+                    Platform.runLater(() -> showAlert("Error", "Could not unsubscribe: " + ex.getCause().getMessage()));
+                    return null;
+                });
     }
 }

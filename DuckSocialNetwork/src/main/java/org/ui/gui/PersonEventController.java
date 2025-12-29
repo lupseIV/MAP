@@ -1,5 +1,6 @@
 package org.ui.gui;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -16,6 +17,7 @@ import org.domain.dtos.filters.EventGUIFilter;
 import org.domain.dtos.guiDTOS.EventGuiDTO;
 import org.domain.events.RaceEvent;
 import org.domain.observer_events.RaceObserverEvent;
+import org.domain.users.duck.SwimmingDuck;
 import org.repository.util.paging.Page;
 import org.repository.util.paging.Pageable;
 import org.service.AuthService;
@@ -23,6 +25,7 @@ import org.service.RaceEventService;
 import org.utils.enums.status.RaceEventStatus;
 
 import java.io.IOException;
+import java.util.List;
 
 
 public class PersonEventController extends AbstractPagingTableViewController<EventGuiDTO, EventGUIFilter> implements Observer<RaceObserverEvent> {
@@ -40,6 +43,8 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
     @FXML private Button buttonPrevious;
 
     @FXML private Label labelPage;
+
+    @FXML private Button startRaceButton;
 
     @Override
     public void update(RaceObserverEvent event) {
@@ -66,6 +71,12 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         maxTimeCol.setCellValueFactory(new PropertyValueFactory<>("maxTime"));
         stateCol.setCellValueFactory(new PropertyValueFactory<>("state"));
+
+        tableView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && tableView.getSelectionModel().getSelectedItem() != null) {
+                handleManageDistances();
+            }
+        });
 
         tableView.setItems(model);
     }
@@ -114,11 +125,6 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
             controller.setServices(raceEventService,authService, dialogStage);
 
             dialogStage.showAndWait();
-
-            if (controller.isSaveClicked()) {
-                loadData();
-            }
-
         } catch (IOException e) {
             e.printStackTrace();
             showAlert("Error", "Could not open dialog: " + e.getMessage());
@@ -131,9 +137,107 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
         if (selected != null) {
             raceEventService.delete(selected.getId());
             model.remove(selected);
-            loadData();
         } else {
             showAlert("Warning", "Please select a duck to delete.");
+        }
+    }
+
+    @FXML
+    private void handleStartRace() {
+        EventGuiDTO selected = tableView.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert("Warning", "Select an event to start.");
+            return;
+        }
+
+        RaceEvent event = raceEventService.findOne(selected.getId());
+
+
+        if (event == null) {
+            showAlert("Error", "Event not found!");
+            return;
+        }
+
+        if (event.getState() == RaceEventStatus.COMPLETED) {
+            showAlert("Info", "Event is already finished.");
+            return;
+        }
+
+        List<Integer> distances = event.getDistances();
+        List<SwimmingDuck> ducks = event.getSubscribers();
+
+        if (distances == null || distances.isEmpty()) {
+            showAlert("Error", "No distances defined for this race.");
+            return;
+        }
+
+        if (ducks == null || ducks.isEmpty()) {
+            showAlert("Error", "No ducks subscribed to this race.");
+            return;
+        }
+
+        if (distances.size() != ducks.size()) {
+            showAlert("Error", "The number of subscribed ducks (" + ducks.size() +
+                    ") must be exactly equal to the number of distances/lanes (" + distances.size() + ").");
+            return;
+        }
+
+        startRaceButton.setDisable(true);
+        startRaceButton.setText("Running...");
+
+        raceEventService.solveRace(event)
+                .thenAccept(bestTime -> {
+                    Platform.runLater(() -> {
+                        showAlert("Success", "Race finished! Best time: " + String.format("%.3f", bestTime));
+                        startRaceButton.setDisable(false);
+                        startRaceButton.setText("Start Race");
+                    });
+                })
+                .exceptionally(ex -> {
+                    Platform.runLater(() -> {
+                        showAlert("Error", "Race calculation failed: " + ex.getCause().getMessage());
+                        startRaceButton.setDisable(false);
+                        startRaceButton.setText("Start Race");
+                    });
+                    return null;
+                });
+    }
+
+    @FXML
+    private void handleManageDistances(){
+        EventGuiDTO selected = tableView.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert("Warning", "Select an event to manage distances.");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("DistancesDialog.fxml"));
+            VBox page = loader.load();
+
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Manage Distances for " + selected.getName());
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(tableView.getScene().getWindow());
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            RaceEvent event = raceEventService.findOne(selected.getId());
+
+            if (event != null) {
+                DistancesDialogController controller = loader.getController();
+                controller.setService(raceEventService, event, dialogStage);
+                dialogStage.showAndWait();
+                if (controller.isSaveClicked()) {
+                    loadData();
+                }
+            } else {
+                showAlert("Error", "Could not fetch event details.");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert("Error", "Could not open dialog: " + e.getMessage());
         }
     }
 }

@@ -101,7 +101,7 @@ public class NotificationService extends EntityService<Long, Notification> imple
     @Override
     public void notifyObservers(ObserverEvent event) {
         for (Observer<ObserverEvent> observer : observers) {
-            Platform.runLater(() -> observer.update(event));
+            observer.update(event);
         }
     }
 
