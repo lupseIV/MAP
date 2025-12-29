@@ -11,6 +11,8 @@
            <Button fx:id="buttonNext" onAction="#onNext" styleClass="nav-button" text="Next Page" />
 
            <Region HBox.hgrow="ALWAYS" />
+           <Button fx:id="startRaceButton" mnemonicParsing="false" onAction="#handleStartRace" style="-fx-background-color: #2196F3; -fx-text-fill: white;" text="Start Race" />
+           <Button mnemonicParsing="false" onAction="#handleManageDistances" text="Manage Distances" />
 
            <Button onAction="#handleAdd" styleClass="action-button" text="Add" />
            <Button onAction="#handleDelete" styleClass="danger-button" text="Delete" />
