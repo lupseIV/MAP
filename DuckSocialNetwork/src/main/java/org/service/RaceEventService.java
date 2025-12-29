@@ -25,7 +25,10 @@ import org.utils.enums.types.NotificationType;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -34,6 +37,8 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
     DucksService ducksService;
     private final List<Observer<RaceObserverEvent>> observers = new CopyOnWriteArrayList<>();
     private NotificationService notificationService;
+
+    private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     public RaceEventService(Validator<RaceEvent> validator, PagingRepository<Long, RaceEvent> repository, IdGenerator<Long> idGenerator, DucksService ducksService) {
         super(validator, repository, idGenerator);
@@ -61,7 +66,7 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
         }
     }
 
-    public boolean isDuckSubscribedToEvent(Long eventId, Long duckId) {
+    public  boolean isDuckSubscribedToEvent(Long eventId, Long duckId) {
         RaceEvent event = repository.findOne(eventId);
         if (event == null) {
             throw new ServiceException("Event not found");
@@ -77,119 +82,137 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
         return event.getSubscribers().contains((SwimmingDuck) duck);
     }
 
-    public void addDuckToEvent(Long eventId, Long duckId) {
-        RaceEvent event = repository.findOne(eventId);
-        if (event == null) {
-            throw new ServiceException("Event not found");
-        }
+    public  CompletableFuture<Void> addDuckToEvent(Long eventId, Long duckId) {
+        return CompletableFuture.runAsync(() -> {
+            RaceEvent event = repository.findOne(eventId);
+            if (event == null) {
+                throw new ServiceException("Event not found");
+            }
 
-        Duck duck = ducksService.findOne(duckId);
-        if (duck == null ) {
-            throw new ServiceException("Swimming Duck not found");
-        }
-        if(!(duck instanceof SwimmingDuck)){
-            throw new ServiceException("Event only for Swimming Ducks");
-        }
+            Duck duck = ducksService.findOne(duckId);
+            if (duck == null ) {
+                throw new ServiceException("Swimming Duck not found");
+            }
+            if(!(duck instanceof SwimmingDuck)){
+                throw new ServiceException("Event only for Swimming Ducks");
+            }
+            boolean exists = event.getSubscribers().stream()
+                    .anyMatch(d -> d.getId().equals(duck.getId()));
+            if (exists) {
+                throw new ServiceException("Duck already subscribed to event");
+            }
+            event.addObserver((SwimmingDuck) duck);
+            validator.validate(event);
+            repository.update(event);
 
-        event.addObserver((SwimmingDuck) duck);
-        validator.validate(event);
-        repository.update(event);
-        notifyObservers(new RaceObserverEvent( RaceEventAction.SUBSCRIBE,List.of(event), duck));
-
-        Notification notification = new Notification(
-                NotificationType.RACE_EVENT,
-                NotificationStatus.NEW,
-                duck,
-                event.getOwner()
-        );
-        notification.setDescription("New subscription to event " + event.getName());
-        notification.setData(new RaceEventData(event,duck, RaceEventAction.SUBSCRIBE));
-
-        notificationService.save(notification);
-    }
-
-    public void removeDuckFromEvent(Long eventId, Long duckId) {
-        RaceEvent event = repository.findOne(eventId);
-        if (event == null) {
-            throw new ServiceException("Event not found");
-        }
-
-        Duck duck = ducksService.findOne(duckId);
-        if (duck == null || !(duck instanceof SwimmingDuck)) {
-            throw new ServiceException("Swimming Duck not found");
-        }
-
-        event.removeObserver((SwimmingDuck) duck);
-        validator.validate(event);
-        repository.update(event);
-        notifyObservers(new RaceObserverEvent( RaceEventAction.UNSUBSCRIBE, List.of(event),duck));
-
-        Notification notification = new Notification(
-                NotificationType.RACE_EVENT,
-                NotificationStatus.NEW,
-                duck,
-                event.getOwner()
-        );
-        notification.setDescription("New unsubscription to event " + event.getName());
-        notification.setData(new RaceEventData(event,duck, RaceEventAction.UNSUBSCRIBE));
-
-        notificationService.save(notification);
-    }
-
-    public RaceEvent addSpecifiedNrOfDucksToAnRaceEvent(Long id, Integer nrOfDucks) {
-
-        long swimmingCount = StreamSupport.stream(ducksService.findAll().spliterator(), false)
-                .filter(SwimmingDuck.class::isInstance)
-                .count();
-
-        if (nrOfDucks > swimmingCount) {
-            throw new ServiceException("Not enough Swimming Ducks");
-        }
-
-        RaceEvent event = repository.findOne(id);
-        if (event == null) {
-            throw new ServiceException("Event not found");
-        }
-
-        if(!event.getSubscribers().isEmpty()) {
-            event.setSubscribers(new ArrayList<>());
-        }
-
-        List<SwimmingDuck> allDucks = StreamSupport.stream(ducksService.findAll().spliterator(), false)
-                .filter(SwimmingDuck.class::isInstance)
-                .map(SwimmingDuck.class::cast)
-                .toList();
-
-        List<SwimmingDuck> sortedDucks = allDucks.stream()
-                .sorted(Comparator.comparing(Duck::getRezistance)
-                        .thenComparing(Duck::getSpeed))
-                .toList();
-
-        List<SwimmingDuck> selectedDucks = sortedDucks.stream()
-                .limit(nrOfDucks)
-                .toList();
-
-        for (SwimmingDuck d : selectedDucks) {
-            event.addObserver( d);
-        }
-        validator.validate(event);
-        var raceEvent =  repository.update(event);
-        for(var d : selectedDucks){
-            notifyObservers(new RaceObserverEvent(RaceEventAction.SUBSCRIBE,List.of(raceEvent), d));
+            notifyObservers(new RaceObserverEvent(RaceEventAction.SUBSCRIBE, List.of(event), duck));
 
             Notification notification = new Notification(
                     NotificationType.RACE_EVENT,
                     NotificationStatus.NEW,
-                    event.getOwner(),
-                    d
+                    duck,
+                    event.getOwner()
             );
-            notification.setDescription("You were added to event " + event.getName());
-            notification.setData(new RaceEventData(event,d, RaceEventAction.SUBSCRIBE));
+            notification.setDescription("New subscription to event " + event.getName());
+            notification.setData(new RaceEventData(event, duck, RaceEventAction.SUBSCRIBE));
 
             notificationService.save(notification);
+        }, executorService);
+    }
 
-        }
-        return raceEvent;
+
+    public  CompletableFuture<Void> removeDuckFromEvent(Long eventId, Long duckId) {
+        return CompletableFuture.runAsync(() -> {
+            RaceEvent event = repository.findOne(eventId);
+            if (event == null) {
+                throw new ServiceException("Event not found");
+            }
+
+            Duck duck = ducksService.findOne(duckId);
+            if (duck == null || !(duck instanceof SwimmingDuck)) {
+                throw new ServiceException("Swimming Duck not found");
+            }
+            boolean exists = event.getSubscribers().stream()
+                    .anyMatch(d -> d.getId().equals(duck.getId()));
+            if (!exists) {
+                throw new ServiceException("Duck not subscribed to event");
+            }
+
+            event.removeObserver((SwimmingDuck) duck);
+            validator.validate(event);
+            repository.update(event);
+
+            notifyObservers(new RaceObserverEvent(RaceEventAction.UNSUBSCRIBE, List.of(event), duck));
+
+            Notification notification = new Notification(
+                    NotificationType.RACE_EVENT,
+                    NotificationStatus.NEW,
+                    duck,
+                    event.getOwner()
+            );
+            notification.setDescription("New unsubscription to event " + event.getName());
+            notification.setData(new RaceEventData(event, duck, RaceEventAction.UNSUBSCRIBE));
+
+            notificationService.save(notification);
+        }, executorService);
+    }
+
+    public  CompletableFuture<RaceEvent> addSpecifiedNrOfDucksToAnRaceEvent(Long id, Integer nrOfDucks) {
+        return CompletableFuture.supplyAsync(() -> {
+            long swimmingCount = StreamSupport.stream(ducksService.findAll().spliterator(), false)
+                    .filter(SwimmingDuck.class::isInstance)
+                    .count();
+
+            if (nrOfDucks > swimmingCount) {
+                throw new ServiceException("Not enough Swimming Ducks");
+            }
+
+            RaceEvent event = repository.findOne(id);
+            if (event == null) {
+                throw new ServiceException("Event not found");
+            }
+
+            if(!event.getSubscribers().isEmpty()) {
+                event.setSubscribers(new ArrayList<>());
+            }
+
+            List<SwimmingDuck> allDucks = StreamSupport.stream(ducksService.findAll().spliterator(), false)
+                    .filter(SwimmingDuck.class::isInstance)
+                    .map(SwimmingDuck.class::cast)
+                    .toList();
+
+            List<SwimmingDuck> sortedDucks = allDucks.stream()
+                    .sorted(Comparator.comparing(Duck::getRezistance)
+                            .thenComparing(Duck::getSpeed))
+                    .toList();
+
+            List<SwimmingDuck> selectedDucks = sortedDucks.stream()
+                    .limit(nrOfDucks)
+                    .toList();
+
+            for (SwimmingDuck d : selectedDucks) {
+                event.addObserver(d);
+            }
+
+            validator.validate(event);
+            var raceEvent = repository.update(event);
+
+            for(var d : selectedDucks){
+                notifyObservers(new RaceObserverEvent(RaceEventAction.SUBSCRIBE, List.of(raceEvent), d));
+
+                Notification notification = new Notification(
+                        NotificationType.RACE_EVENT,
+                        NotificationStatus.NEW,
+                        event.getOwner(),
+                        d
+                );
+                notification.setDescription("You were added to event " + event.getName());
+                notification.setData(new RaceEventData(event, d, RaceEventAction.SUBSCRIBE));
+
+                notificationService.save(notification);
+            }
+            return raceEvent;
+        }, executorService);
     }
 
     /**
@@ -197,36 +220,46 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
      * Algoritm: Căutare Binară pe răspuns + Verificare Greedy.
      */
     //TODO : add start race notification
-    public double solveRace(RaceEvent event) {
-        List<SwimmingDuck> ducks = event.getSubscribers();
-        List<Integer> distances = event.getDistances();
+    public  CompletableFuture<Double> solveRace(RaceEvent event) {
+        return CompletableFuture.supplyAsync(() -> {
+            List<SwimmingDuck> ducks = event.getSubscribers();
+            List<Integer> distances = event.getDistances();
 
-        // Validări de bază conform restricțiilor (M <= N)
-        if (ducks == null || distances == null || ducks.size() < distances.size()) {
-            throw new ServiceException("Invalid Race Event parameters for solving.");
-        }
-        List<SwimmingDuck> sortedDucks = new ArrayList<>(ducks);
-        sortedDucks.sort(Comparator.comparingDouble(Duck::getRezistance));
-
-        double minSpeed = ducks.stream().mapToDouble(Duck::getSpeed).min().orElse(0.1);
-        double maxDistance = distances.get(distances.size() - 1) * 2.0;
-
-        double low = 0.0;
-        double high = maxDistance / minSpeed + 100.0;
-        double ans = high;
-
-        for (int i = 0; i < 100; i++) {
-            double mid = low + (high - low) / 2;
-            if (canFinishRaceInTime(mid, sortedDucks, distances)) {
-                ans = mid;
-                high = mid;
-            } else {
-                low = mid;
+            // Validări de bază
+            if (ducks == null || distances == null || ducks.size() < distances.size()) {
+                throw new ServiceException("Invalid Race Event parameters for solving.");
             }
-        }
 
-        event.setMaxTime(ans);
-        return ans;
+            // Computationally intensive part
+            List<SwimmingDuck> sortedDucks = new ArrayList<>(ducks);
+            sortedDucks.sort(Comparator.comparingDouble(Duck::getRezistance));
+
+            double minSpeed = ducks.stream().mapToDouble(Duck::getSpeed).min().orElse(0.1);
+            double maxDistance = distances.get(distances.size() - 1) * 2.0;
+
+            double low = 0.0;
+            double high = maxDistance / minSpeed + 100.0;
+            double ans = high;
+
+            for (int i = 0; i < 100; i++) {
+                double mid = low + (high - low) / 2;
+                if (canFinishRaceInTime(mid, sortedDucks, distances)) {
+                    ans = mid;
+                    high = mid;
+                } else {
+                    low = mid;
+                }
+            }
+
+            event.setMaxTime(ans);
+
+            // Persist the result
+            repository.update(event);
+
+            // Optionally: Send notifications here or let the controller chain it
+
+            return ans;
+        }, executorService);
     }
 
     /**

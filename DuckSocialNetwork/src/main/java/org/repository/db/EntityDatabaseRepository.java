@@ -49,6 +49,8 @@ public abstract class EntityDatabaseRepository<ID, E extends Entity<ID>> extends
                     tuplesOnPage.add(e);
                 }
             }
+        }finally {
+            DatabaseConnection.closeAllConnections();
         }
         return tuplesOnPage;
     }
@@ -86,6 +88,8 @@ public abstract class EntityDatabaseRepository<ID, E extends Entity<ID>> extends
             return new Page<>(tuplesOnPage, totalNumberOfTuples);
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        }finally {
+            DatabaseConnection.closeAllConnections();
         }
     }
 
@@ -108,6 +112,8 @@ public abstract class EntityDatabaseRepository<ID, E extends Entity<ID>> extends
             return new Page<E>(entries, entities.size());
         } catch (SQLException e) {
             throw new RepositoryException("Error getting page", e);
+        }finally {
+            DatabaseConnection.closeAllConnections();
         }
     }
 
@@ -119,8 +125,8 @@ public abstract class EntityDatabaseRepository<ID, E extends Entity<ID>> extends
 
     public abstract E extractEntityFromResultSet(ResultSet resultSet) throws SQLException;
     protected void loadFromDatabase() {
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sqlSelectAllStatement);
+        try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection();
+             PreparedStatement stmt = conn.get().prepareStatement(sqlSelectAllStatement);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {

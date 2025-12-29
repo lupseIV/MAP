@@ -52,8 +52,8 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
         List<SwimmingDuck> participants = new ArrayList<>();
         String sql = "SELECT * FROM race_event_participants WHERE event_id = ?";
 
-        try (Connection con = DatabaseConnection.getConnection();
-        PreparedStatement stmt = con.prepareStatement(sql)){
+        try (DatabaseConnection.AutoCloseableConnection con = DatabaseConnection.getAutoCloseableConnection();
+        PreparedStatement stmt = con.get().prepareStatement(sql)){
 
             stmt.setLong(1, id);
 
@@ -74,9 +74,9 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
 
     @Override
     public void saveToDatabase(RaceEvent event) {
-        try (Connection conn = DatabaseConnection.getConnection()) {
+        try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection()) {
             String sql = "INSERT INTO race_events (id, name, max_time, owner_person_id) VALUES (?, ?, ?, ?)";
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            try (PreparedStatement stmt = conn.get().prepareStatement(sql)) {
                 stmt.setLong(1, event.getId());
                 stmt.setString(2, event.getName());
                 stmt.setDouble(3, event.getMaxTime());
@@ -91,10 +91,10 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
         }
     }
 
-    private void saveEventParticipants(Connection conn, RaceEvent event) throws SQLException {
+    private void saveEventParticipants(DatabaseConnection.AutoCloseableConnection conn, RaceEvent event) throws SQLException {
         List<SwimmingDuck> participants = event.getSubscribers();
         String sql = "INSERT INTO race_event_participants (event_id, duck_id) VALUES (?, ?)";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.get().prepareStatement(sql)) {
             for(SwimmingDuck duck : participants){
                 stmt.setLong(1, event.getId());
                 stmt.setLong(2, duck.getId());
@@ -108,15 +108,15 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
 
     @Override
     public void deleteFromDatabase(Long id) {
-        try (Connection conn = DatabaseConnection.getConnection()) {
+        try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection()) {
             String deleteParticipantsSql = "DELETE FROM race_event_participants WHERE event_id = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(deleteParticipantsSql)) {
+            try (PreparedStatement stmt = conn.get().prepareStatement(deleteParticipantsSql)) {
                 stmt.setLong(1, id);
                 stmt.executeUpdate();
             }
 
             String deleteEventSql = "DELETE FROM race_events WHERE id = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(deleteEventSql)) {
+            try (PreparedStatement stmt = conn.get().prepareStatement(deleteEventSql)) {
                 stmt.setLong(1, id);
                 stmt.executeUpdate();
             }
@@ -127,9 +127,9 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
 
     @Override
     public void updateFromDatabase(RaceEvent event) {
-        try (Connection conn = DatabaseConnection.getConnection()) {
+        try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection()) {
             String sql = "UPDATE race_events SET name = ?, max_time = ?, state = ? WHERE id = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            try (PreparedStatement stmt = conn.get().prepareStatement(sql)) {
                 stmt.setString(1, event.getName());
                 stmt.setDouble(2, event.getMaxTime());
                 stmt.setString(3, event.getState().name());
@@ -138,7 +138,7 @@ public class RaceEventDatabaseRepository extends EntityDatabaseRepository<Long, 
             }
 
             String deleteSql = "DELETE FROM race_event_participants WHERE event_id = ?";
-            try (PreparedStatement stmt = conn.prepareStatement(deleteSql)) {
+            try (PreparedStatement stmt = conn.get().prepareStatement(deleteSql)) {
                 stmt.setLong(1, event.getId());
                 stmt.executeUpdate();
             }
