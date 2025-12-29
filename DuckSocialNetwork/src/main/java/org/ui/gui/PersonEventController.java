@@ -129,7 +129,7 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
         if (event == null) return;
 
         List<String> duckNames = event.getSubscribers().stream()
-                .map(d -> d.getUsername() + " (Speed: " + d.getSpeed() + ")")
+                .map(d -> d.getUsername() + " (Speed: " + d.getSpeed() + ")" +" (Resistance: " + d.getRezistance() + ")" )
                 .collect(Collectors.toList());
 
         showListPopup("Subscribed Ducks", duckNames);
