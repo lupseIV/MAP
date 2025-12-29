@@ -74,7 +74,7 @@ public class DistancesDialogController {
                         }
                     }
                     event.setDistances(newDistances);
-                    service.save(event); // Persist
+                    service.update(event);
                 } catch (NumberFormatException e) {
                     showAlert("Error", "Invalid number format. Use comma separated integers.");
                     return;
