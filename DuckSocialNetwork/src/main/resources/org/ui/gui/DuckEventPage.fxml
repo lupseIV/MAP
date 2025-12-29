@@ -45,6 +45,9 @@
                 <TableColumn fx:id="nameCol" prefWidth="75.0" text="name" />
                 <TableColumn fx:id="maxTimeCol" prefWidth="75.0" text="max time" />
                 <TableColumn fx:id="stateCol" prefWidth="75.0" text="state" />
+                <TableColumn fx:id="ownerCol" prefWidth="75.0" text="owner" />
+                <TableColumn fx:id="ducksCountCol" prefWidth="75.0" text="ducks" />
+                <TableColumn fx:id="winnersCol" prefWidth="75.0" text="winners" />
             </columns>
         </TableView>
     </center>
