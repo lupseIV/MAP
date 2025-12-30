@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.layout.StackPane?>
 <VBox alignment="TOP_CENTER" prefHeight="500.0" prefWidth="600.0" spacing="20.0" style="-fx-background-color: #2b2b2b;" stylesheets="@css/styling.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.ui.gui.UserProfileController">
     <padding>
         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
@@ -30,11 +31,31 @@
             <children>
                 <VBox alignment="TOP_CENTER" spacing="15.0" style="-fx-background-color: #3b3b3b; -fx-padding: 20; -fx-background-radius: 10;">
                     <children>
-                        <Label alignment="CENTER" prefHeight="80.0" prefWidth="80.0" style="-fx-background-color: #4a90e2; -fx-background-radius: 40;" text="IMG" textFill="WHITE">
-                            <font>
-                                <Font name="System Bold" size="18.0" />
-                            </font>
-                        </Label>
+
+                        <StackPane prefHeight="120.0" prefWidth="120.0">
+                            <children>
+                                <!-- ImageView for actual photo -->
+                                <ImageView fx:id="profileImageView" fitHeight="120.0" fitWidth="120.0"
+                                           preserveRatio="false"
+                                           style="-fx-background-radius: 60;"
+                                           managed="false" visible="false">
+                                    <clip>
+                                        <javafx.scene.shape.Circle centerX="60.0" centerY="60.0" radius="60.0" />
+                                    </clip>
+                                </ImageView>
+
+                                <!-- Placeholder Label -->
+                                <Label fx:id="profileImagePlaceholder" alignment="CENTER"
+                                       prefHeight="120.0" prefWidth="120.0"
+                                       style="-fx-background-color: #4a90e2; -fx-background-radius: 60;"
+                                       text="IMG" textFill="WHITE">
+                                    <font>
+                                        <Font name="System Bold" size="24.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </StackPane>
+
                         <Label fx:id="usernameLabel" text="\@username" textFill="#e0e0e0">
                             <font>
                                 <Font size="18.0" />

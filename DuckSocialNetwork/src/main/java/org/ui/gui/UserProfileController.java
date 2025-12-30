@@ -5,6 +5,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -17,6 +19,7 @@ import org.service.FriendshipService;
 import org.service.UsersService;
 import org.utils.enums.types.UserTypes;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -30,6 +33,9 @@ public class UserProfileController {
     @FXML private Label typeLabel;
     @FXML private Label descriptionLabel;
     @FXML private GridPane detailsGrid;
+
+    @FXML private ImageView profileImageView;
+    @FXML private Label profileImagePlaceholder;
 
     @FXML private Label totalFriendsLabel;
 
@@ -74,6 +80,8 @@ public class UserProfileController {
         String desc = displayedUser.getDescription();
         descriptionLabel.setText((desc != null && !desc.isEmpty()) ? desc : "No description set.");
 
+        loadProfilePhoto();
+
         detailsGrid.getChildren().clear();
         if (displayedUser instanceof Person) {
             Person p = (Person) displayedUser;
@@ -88,6 +96,33 @@ public class UserProfileController {
         }
 
         calculateStats();
+    }
+
+    private void loadProfilePhoto() {
+        if (displayedUser.getPhoto() != null && displayedUser.getPhoto().length > 0) {
+            try {
+                ByteArrayInputStream bis = new ByteArrayInputStream(displayedUser.getPhoto());
+                Image image = new Image(bis);
+                profileImageView.setImage(image);
+                profileImageView.setVisible(true);
+                profileImageView.setManaged(true);
+                profileImagePlaceholder.setVisible(false);
+                profileImagePlaceholder.setManaged(false);
+            } catch (Exception e) {
+                System.err.println("Error loading profile photo: " + e.getMessage());
+                showPlaceholder();
+            }
+        } else {
+            showPlaceholder();
+        }
+    }
+
+    private void showPlaceholder() {
+        profileImageView.setVisible(false);
+        profileImageView.setManaged(false);
+        profileImagePlaceholder.setVisible(true);
+        profileImagePlaceholder.setManaged(true);
+        profileImagePlaceholder.setText("IMG");
     }
 
     private void addDetailRow(String key, String value, int row) {
