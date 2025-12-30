@@ -104,5 +104,9 @@ CREATE TABLE IF NOT EXISTS race_event_winners (
                                         position INT NOT NULL,
                                         PRIMARY KEY (event_id, position),
                                         FOREIGN KEY (event_id) REFERENCES  race_events(id) ON DELETE CASCADE
-)
+);
+ALTER TABLE ducks
+ADD COLUMN IF NOT EXISTS description TEXT;
 
+ALTER TABLE persons
+ADD COLUMN IF NOT EXISTS description TEXT;

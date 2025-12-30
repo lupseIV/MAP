@@ -31,6 +31,7 @@ public class DuckDatabaseRepository extends EntityDatabaseRepository<Long, Duck>
         DuckTypes type = DuckTypes.valueOf(resultSet.getString("duck_type"));
         Double speed =  resultSet.getDouble("speed");
         Double rezistance = resultSet.getDouble("rezistance");
+        String description = resultSet.getString("description");
 
         List<String> dataAttributes = List.of(
                 username, password, email,
@@ -40,6 +41,7 @@ public class DuckDatabaseRepository extends EntityDatabaseRepository<Long, Duck>
         DuckData data = new DuckData(dataAttributes);
         Duck duck = duckFactory.create(type, data);
         duck.setId(id);
+        duck.setDescription(description);
 
         return duck;
     }
@@ -47,8 +49,8 @@ public class DuckDatabaseRepository extends EntityDatabaseRepository<Long, Duck>
     @Override
     public void saveToDatabase(Duck duck) {
         String sql = """
-            INSERT INTO ducks (id, username, password, email, duck_type, speed, rezistance)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO ducks (id, username, password, email, duck_type, speed, rezistance, description)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """;
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -61,6 +63,7 @@ public class DuckDatabaseRepository extends EntityDatabaseRepository<Long, Duck>
             stmt.setString(5, duck.getDuckType().name());
             stmt.setDouble(6, duck.getSpeed());
             stmt.setDouble(7, duck.getRezistance());
+            stmt.setString(8, duck.getDescription());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -86,7 +89,7 @@ public class DuckDatabaseRepository extends EntityDatabaseRepository<Long, Duck>
     public void updateFromDatabase(Duck duck) {
         String sql = """
             UPDATE ducks 
-            SET username = ?, password = ?, email = ?, duck_type = ?, speed = ?, rezistance = ?
+            SET username = ?, password = ?, email = ?, duck_type = ?, speed = ?, rezistance = ?, description = ?
             WHERE id = ?
         """;
 
@@ -99,7 +102,9 @@ public class DuckDatabaseRepository extends EntityDatabaseRepository<Long, Duck>
             stmt.setString(4, duck.getDuckType().name());
             stmt.setDouble(5, duck.getSpeed());
             stmt.setDouble(6, duck.getRezistance());
-            stmt.setLong(7, duck.getId());
+            stmt.setString(7, duck.getDescription());
+            stmt.setLong(8, duck.getId());
+
 
             stmt.executeUpdate();
         } catch (SQLException e) {

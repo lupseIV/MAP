@@ -25,12 +25,13 @@ public abstract class User extends Entity<Long>  {
     private String email;
     private List<User> friends;
     private UserTypes userType;
+    private String description;
 
     public User() {
     }
 
     public User(String username, String password, String email, UserTypes userType ) {
-
+        this.description = "";
         this.username = username;
         this.password = password;
         this.email = email;
@@ -64,6 +65,14 @@ public abstract class User extends Entity<Long>  {
 
     public List<User> getFriends() {
         return friends;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override

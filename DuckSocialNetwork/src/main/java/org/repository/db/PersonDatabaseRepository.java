@@ -37,6 +37,7 @@ public class PersonDatabaseRepository extends EntityDatabaseRepository<Long, Per
         String occupation = resultSet.getString("occupation");
         LocalDate date_of_birth = resultSet.getDate("date_of_birth").toLocalDate();
         Double empathy = resultSet.getDouble("empathy_level");
+        String description = resultSet.getString("description");
 
         List<String> dataAttributes = List.of(
                 username,password,email,first_name,last_name,occupation,
@@ -47,6 +48,7 @@ public class PersonDatabaseRepository extends EntityDatabaseRepository<Long, Per
         PersonData personData = new PersonData(dataAttributes);
         Person person = personFactory.create(PersonTypes.DEFAULT, personData);
         person.setId(id);
+        person.setDescription(description);
 
         return person;
 
@@ -55,8 +57,8 @@ public class PersonDatabaseRepository extends EntityDatabaseRepository<Long, Per
     @Override
     public void saveToDatabase(Person entity) {
         String sql = """
-            INSERT INTO persons(id, username, password, email, first_name, last_name, occupation, date_of_birth, empathy_level)
-            VALUES (?,?,?,?,?,?,?,?,?)    
+            INSERT INTO persons(id, username, password, email, first_name, last_name, occupation, date_of_birth, empathy_level, description)
+            VALUES (?,?,?,?,?,?,?,?,?, ?);
         """;
 
         try (Connection con = DatabaseConnection.getConnection();
@@ -71,6 +73,7 @@ public class PersonDatabaseRepository extends EntityDatabaseRepository<Long, Per
             stmt.setString(7, entity.getOccupation());
             stmt.setDate(8, java.sql.Date.valueOf(entity.getDateOfBirth()));
             stmt.setDouble(9, entity.getEmpathyLevel());
+            stmt.setString(10, entity.getDescription());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -101,7 +104,7 @@ public class PersonDatabaseRepository extends EntityDatabaseRepository<Long, Per
             UPDATE persons 
             SET username=?, password=?, email=?,
             first_name=?, last_name=?, occupation=?,
-            date_of_birth=?, empathy_level=? WHERE id=?;
+            date_of_birth=?, empathy_level=?, description = ? WHERE id=?;
         """;
 
         try (Connection con = DatabaseConnection.getConnection();
@@ -115,7 +118,8 @@ public class PersonDatabaseRepository extends EntityDatabaseRepository<Long, Per
             stmt.setString(6, entity.getOccupation());
             stmt.setDate(7, java.sql.Date.valueOf(entity.getDateOfBirth()));
             stmt.setDouble(8, entity.getEmpathyLevel());
-            stmt.setLong(9, entity.getId());
+            stmt.setString(9, entity.getDescription());
+            stmt.setLong(10, entity.getId());
 
 
             stmt.executeUpdate();
