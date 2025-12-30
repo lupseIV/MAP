@@ -26,6 +26,7 @@ public abstract class User extends Entity<Long>  {
     private List<User> friends;
     private UserTypes userType;
     private String description;
+    private byte[] photo;
 
     public User() {
     }
@@ -73,6 +74,14 @@ public abstract class User extends Entity<Long>  {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public byte[] getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
     }
 
     @Override
