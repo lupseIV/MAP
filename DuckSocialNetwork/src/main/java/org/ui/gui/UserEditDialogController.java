@@ -1,6 +1,7 @@
 package org.ui.gui;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -21,6 +22,8 @@ public class UserEditDialogController {
     @FXML private TextField speedField;
     @FXML private TextField resistanceField;
 
+    @FXML private TextArea descriptionField;
+
     private UsersService usersService;
     private User user;
     private Stage stage;
@@ -33,6 +36,9 @@ public class UserEditDialogController {
     }
 
     private void populateFields() {
+
+        descriptionField.setText(user.getDescription());
+
         if (user instanceof Person) {
             Person p = (Person) user;
             personContainer.setVisible(true);
@@ -53,6 +59,8 @@ public class UserEditDialogController {
     @FXML
     private void handleSave() {
         try {
+            user.setDescription(descriptionField.getText());
+
             if (user instanceof Person) {
                 Person p = (Person) user;
                 p.setFirstName(firstNameField.getText());

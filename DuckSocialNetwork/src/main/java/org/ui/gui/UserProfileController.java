@@ -28,6 +28,7 @@ public class UserProfileController {
     @FXML private Label usernameLabel;
     @FXML private Label emailLabel;
     @FXML private Label typeLabel;
+    @FXML private Label descriptionLabel;
     @FXML private GridPane detailsGrid;
 
     @FXML private Label totalFriendsLabel;
@@ -69,6 +70,9 @@ public class UserProfileController {
         usernameLabel.setText("@" + displayedUser.getUsername());
         emailLabel.setText(displayedUser.getEmail());
         typeLabel.setText(displayedUser.getUserType().toString());
+
+        String desc = displayedUser.getDescription();
+        descriptionLabel.setText((desc != null && !desc.isEmpty()) ? desc : "No description set.");
 
         detailsGrid.getChildren().clear();
         if (displayedUser instanceof Person) {
