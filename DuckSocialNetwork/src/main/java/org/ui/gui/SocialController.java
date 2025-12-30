@@ -75,7 +75,25 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
         initializeTable();
         loadData();
     }
+    private void showUserProfile(User user) {
+        try {
 
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("UserProfileView.fxml"));
+            VBox root = loader.load();
+
+            UserProfileController controller = loader.getController();
+            controller.setServices(service, usersService, user,false);
+
+            Stage stage = new Stage();
+            stage.setTitle("Profile: " + user.getUsername());
+            stage.setScene(new Scene(root));
+            controller.setStage(stage);
+
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     @FXML
     private void initialize(){
         statusCombo.setItems(FXCollections.observableArrayList(FriendRequestStatus.values()));
@@ -135,7 +153,8 @@ public class SocialController extends AbstractPagingTableViewController<Friendsh
     private void showPopup(User user, FriendRequestStatus status, Friendship friendship) {
         if (status == FriendRequestStatus.APPROVED || status == FriendRequestStatus.REJECTED ||
         friendship.getUser1().equals(authService.getCurrentUser())) {
-            showUserDetailsPopup(user);
+            showUserProfile(user);
+
         } else if (status == FriendRequestStatus.PENDING) {
             try{
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("FriendRequestPopup.fxml"));
