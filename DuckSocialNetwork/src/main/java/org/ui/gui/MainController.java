@@ -130,6 +130,15 @@ public class MainController implements ViewController, Observer<ObserverEvent> {
     }
 
     @FXML
+    public void handleShowProfileView(){
+        loadView("UserProfileView.fxml", controller -> {
+            if (controller instanceof UserProfileController) {
+                ((UserProfileController) controller).setServices(friendshipService,usersService,  authService.getCurrentUser(),true);
+            }
+        }, contentArea);
+    }
+
+    @FXML
     public void handleLogout() {
         try {
             authService.logout();

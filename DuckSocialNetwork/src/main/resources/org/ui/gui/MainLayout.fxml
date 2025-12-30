@@ -16,6 +16,7 @@
             <Button onAction="#handleShowMessageView" styleClass="nav-button" text="Messages" />
             <Button onAction="#handleShowEventsView" styleClass="nav-button" text="Events" />
             <Button fx:id="notificationButton" onAction="#handleShowNotificationsView" styleClass="nav-button" text="Notifications" />
+            <Button  onAction="#handleShowProfileView" styleClass="nav-button" text="Profile" />
         </VBox>
     </left>
 
