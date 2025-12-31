@@ -60,23 +60,10 @@ public class DatabaseConnection {
         }
     }
 
-    /**
-     * Alternative: Auto-closing connection wrapper
-     * Use this with try-with-resources for automatic cleanup
-     *
-     * Example usage:
-     * try (AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection()) {
-     *     // Use conn.get() to get the actual Connection
-     *     PreparedStatement stmt = conn.get().prepareStatement(...);
-     * } // Connection automatically closed here
-     */
     public static AutoCloseableConnection getAutoCloseableConnection() throws SQLException {
         return new AutoCloseableConnection(getConnection());
     }
 
-    /**
-     * Wrapper class for auto-closing connections
-     */
     public static class AutoCloseableConnection implements AutoCloseable {
         private final Connection connection;
 
@@ -97,12 +84,7 @@ public class DatabaseConnection {
         }
     }
 
-    /**
-     * Force close all connections (call on application shutdown)
-     *
-     * This is a best-effort cleanup. In a multi-threaded environment,
-     * each thread should close its own connection before termination.
-     */
+
     public static void closeAllConnections() {
         try {
             Connection conn = threadLocalConnection.get();
@@ -116,12 +98,7 @@ public class DatabaseConnection {
         }
     }
 
-    /**
-     * Initialize database schema - THREAD SAFE
-     * Creates tables and sets up the database structure
-     *
-     * @throws SQLException if schema initialization fails
-     */
+
     public static void initDatabaseSchema() throws SQLException {
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
@@ -146,9 +123,7 @@ public class DatabaseConnection {
         }
     }
 
-    /**
-     * Read schema file from resources
-     */
+
     private static String readSchemaFile() throws IOException {
         try (InputStream inputStream = DatabaseConnection.class.getResourceAsStream(SCHEMA_FILE)) {
             if (inputStream == null) {
@@ -161,9 +136,7 @@ public class DatabaseConnection {
         }
     }
 
-    /**
-     * Remove SQL comments from a statement
-     */
+
     private static String removeComments(String sql) {
         StringBuilder result = new StringBuilder();
         String[] lines = sql.split("\n");
@@ -181,9 +154,7 @@ public class DatabaseConnection {
         return result.toString().trim();
     }
 
-    /**
-     * Get connection statistics (for debugging/monitoring)
-     */
+
     public static boolean hasActiveConnection() {
         try {
             Connection conn = threadLocalConnection.get();
@@ -193,10 +164,7 @@ public class DatabaseConnection {
         }
     }
 
-    /**
-     * Register shutdown hook to clean up connections
-     * Call this once at application startup
-     */
+
     public static void registerShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             closeAllConnections();
