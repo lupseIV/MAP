@@ -209,7 +209,6 @@ public class DuckEventController extends AbstractPagingTableViewController<Event
             return;
         }
 
-        // Just trigger the action. The UI update happens in 'update()' via Observer.
         raceEventService.addDuckToEvent(selectedEvent.getId(), authService.getCurrentUser().getId())
                 .thenRun(() -> Platform.runLater(() ->
                         showAlert("Success", "Successfully subscribed to: " + selectedEvent.getName())
