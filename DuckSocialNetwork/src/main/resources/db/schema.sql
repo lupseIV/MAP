@@ -116,3 +116,7 @@ ADD COLUMN IF NOT EXISTS photo BYTEA;
 
 ALTER TABLE persons
 ADD COLUMN IF NOT EXISTS photo BYTEA;
+
+SELECT * FROM race_events;
+UPDATE race_events set state='SCHEDULED', max_time=0 where id = 6;
+DELETE FROM race_event_winners where event_id = 6;
