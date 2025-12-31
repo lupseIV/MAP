@@ -85,7 +85,6 @@ public class NotificationController implements Observer<ObserverEvent> {
 
     @FXML
     public void markAllAsRead() {
-        notificationService.markAllAsRead(currentUser);
-        loadNotifications();
+        notificationService.markAllAsRead(currentUser).thenRun(this::loadNotifications);
     }
 }
