@@ -96,6 +96,8 @@ public class GraphicUserInterface extends Application {
         ducksService.setFlockService(flockService);
         raceEventService.setNotificationService(notificationService);
         messageService.setNotificationService(notificationService);
+
+        DatabaseConnection.registerShutdownHook();
     }
 
     @Override
