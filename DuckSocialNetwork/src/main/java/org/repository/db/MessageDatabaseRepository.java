@@ -56,15 +56,18 @@ public class MessageDatabaseRepository extends EntityDatabaseRepository<Long, Me
         } else {
             message = new Message(id, from, to, text, date, status);
         }
-
+        if(message.getFrom() == null || message.getTo().isEmpty()){
+            deleteFromDatabase(id);
+            return null;
+        }
         return message;
     }
 
     private Message getParentMessage(Long id) {
         String sql = "SELECT * FROM messages WHERE id = ? ";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection();
+             PreparedStatement stmt = conn.get().prepareStatement(sql)) {
 
             stmt.setLong(1, id);
 
@@ -92,6 +95,10 @@ public class MessageDatabaseRepository extends EntityDatabaseRepository<Long, Me
         User from = findOneUserById(fromId);
         List<User> to = getRecipientsForMessage(id);
 
+        if(from == null || to.isEmpty()){
+            deleteFromDatabase(id);
+        }
+
         return new Message(id, from, to, text, date,status);
     }
 
@@ -99,8 +106,8 @@ public class MessageDatabaseRepository extends EntityDatabaseRepository<Long, Me
     public void saveToDatabase(Message message) {
         String sql = "INSERT INTO messages (id, from_user_id, message, date, reply_to_id) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection();
+             PreparedStatement stmt = conn.get().prepareStatement(sql)) {
 
             stmt.setLong(1, message.getId());
             stmt.setLong(2, message.getFrom().getId());
@@ -127,13 +134,13 @@ public class MessageDatabaseRepository extends EntityDatabaseRepository<Long, Me
         String deleteRecipientsSql = "DELETE FROM message_recipients WHERE message_id = ?";
         String deleteMessageSql = "DELETE FROM messages WHERE id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection()) {
-            try (PreparedStatement stmt = conn.prepareStatement(deleteRecipientsSql)) {
+        try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection()) {
+            try (PreparedStatement stmt = conn.get().prepareStatement(deleteRecipientsSql)) {
                 stmt.setLong(1, id);
                 stmt.executeUpdate();
             }
 
-            try (PreparedStatement stmt = conn.prepareStatement(deleteMessageSql)) {
+            try (PreparedStatement stmt = conn.get().prepareStatement(deleteMessageSql)) {
                 stmt.setLong(1, id);
                 stmt.executeUpdate();
             }
@@ -147,8 +154,8 @@ public class MessageDatabaseRepository extends EntityDatabaseRepository<Long, Me
     public void updateFromDatabase(Message message) {
         String sql = "UPDATE messages SET message = ?, date = ?, status = ? WHERE id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection();
+             PreparedStatement stmt = conn.get().prepareStatement(sql)) {
 
             stmt.setString(1, message.getMessage());
             stmt.setTimestamp(2, Timestamp.valueOf(message.getDate()));
@@ -166,8 +173,9 @@ public class MessageDatabaseRepository extends EntityDatabaseRepository<Long, Me
         List<User> recipients = new ArrayList<>();
         String sql = "SELECT recipient_id FROM message_recipients WHERE message_id = ?";
 
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection();
+             PreparedStatement statement = conn.get().prepareStatement(sql)) {
+
 
             statement.setLong(1, messageId);
             try (ResultSet rs = statement.executeQuery()) {
@@ -185,8 +193,9 @@ public class MessageDatabaseRepository extends EntityDatabaseRepository<Long, Me
     private void saveRecipients(Message message) throws SQLException {
         String sql = "INSERT INTO message_recipients (message_id, recipient_id) VALUES (?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection();
+             PreparedStatement ps = conn.get().prepareStatement(sql)) {
+
 
             for (User recipient : message.getTo()) {
                 ps.setLong(1, message.getId());

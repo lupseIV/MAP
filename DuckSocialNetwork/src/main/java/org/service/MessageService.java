@@ -57,7 +57,11 @@ public class MessageService extends EntityService<Long, Message> implements Obse
             notification.setDescription("New message from " + authService.getCurrentUser().getUsername());
             notification.setData(new MessageData(message, MessageAction.SENT));
 
-            notificationService.save(notification);
+            notificationService.saveAsync(notification)
+                    .exceptionally(ex -> {
+                        System.err.println("Failed to send notification: " + ex.getMessage());
+                        return null;
+                    });
         }
 
     }
@@ -79,7 +83,11 @@ public class MessageService extends EntityService<Long, Message> implements Obse
         notification.setDescription("New message reply from " + authService.getCurrentUser().getUsername());
         notification.setData(new MessageData(reply, MessageAction.REPLY));
 
-        notificationService.save(notification);
+        notificationService.saveAsync(notification)
+                .exceptionally(ex -> {
+                    System.err.println("Failed to send notification: " + ex.getMessage());
+                    return null;
+                });
 
 
     }

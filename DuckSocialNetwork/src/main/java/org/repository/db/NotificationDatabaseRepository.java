@@ -67,8 +67,8 @@ public class NotificationDatabaseRepository extends EntityDatabaseRepository<Lon
     public void saveToDatabase(Notification entity) {
         String sql = "INSERT INTO notifications (type, status, description, sender_id, receiver_id, data) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection();
+             PreparedStatement stmt = conn.get().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, entity.getType().name());
             stmt.setString(2, entity.getStatus().name());
@@ -102,8 +102,8 @@ public class NotificationDatabaseRepository extends EntityDatabaseRepository<Lon
     public void deleteFromDatabase(Long id) {
         String sql = "DELETE FROM notifications WHERE id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection();
+             PreparedStatement stmt = conn.get().prepareStatement(sql)) {
 
             stmt.setLong(1, id);
             stmt.executeUpdate();
@@ -116,8 +116,8 @@ public class NotificationDatabaseRepository extends EntityDatabaseRepository<Lon
     public void updateFromDatabase(Notification entity) {
         String sql = "UPDATE notifications SET status = ? WHERE id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection();
+             PreparedStatement stmt = conn.get().prepareStatement(sql)) {
 
             stmt.setString(1, entity.getStatus().name());
             stmt.setLong(2, entity.getId());

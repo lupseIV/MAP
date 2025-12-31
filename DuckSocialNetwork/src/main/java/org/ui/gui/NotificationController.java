@@ -1,5 +1,6 @@
 package org.ui.gui;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
@@ -36,9 +37,15 @@ public class NotificationController implements Observer<ObserverEvent> {
 
     private void loadNotifications() {
         if (currentUser != null) {
-            List<Notification> conversation = notificationService.findAll(currentUser);
-            notificationListView.setItems(FXCollections.observableArrayList(conversation));
-            notificationListView.scrollTo(conversation.size() - 1);
+            notificationService.findAll(currentUser)
+                    .thenAccept(notifications -> {
+                        Platform.runLater(() -> {
+                            notificationListView.setItems(FXCollections.observableArrayList(notifications));
+                            if (!notifications.isEmpty()) {
+                                notificationListView.scrollTo(notifications.size() - 1);
+                            }
+                        });
+                    });
         }
     }
 
