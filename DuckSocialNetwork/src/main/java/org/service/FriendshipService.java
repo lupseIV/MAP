@@ -82,7 +82,11 @@ public class FriendshipService extends EntityService<Long, Friendship>  {
         notification.setDescription("New friend request from " + authService.getCurrentUser().getUsername());
         notification.setData(new FriendRequestData(friendship, FriendRequestAction.ADD));
 
-        notificationService.save(notification);
+        notificationService.saveAsync(notification)
+                .exceptionally(ex -> {
+                    System.err.println("Failed to send notification: " + ex.getMessage());
+                    return null;
+                });
         return res;
     }
 
@@ -106,7 +110,11 @@ public class FriendshipService extends EntityService<Long, Friendship>  {
         notification.setDescription("Deleted friendship");
         notification.setData(new FriendRequestData(friendship, FriendRequestAction.REMOVE));
 
-        notificationService.save(notification);
+        notificationService.saveAsync(notification)
+                .exceptionally(ex -> {
+                    System.err.println("Failed to send notification: " + ex.getMessage());
+                    return null;
+                });
        return res;
     }
 
@@ -258,7 +266,11 @@ public class FriendshipService extends EntityService<Long, Friendship>  {
         notification.setDescription("Friendship accepted");
         notification.setData(new FriendRequestData(friendship, FriendRequestAction.ACCEPT));
 
-        notificationService.save(notification);
+        notificationService.saveAsync(notification)
+                .exceptionally(ex -> {
+                    System.err.println("Failed to send notification: " + ex.getMessage());
+                    return null;
+                });
     }
 
     public void rejectFriendship(Friendship friendship){
@@ -276,6 +288,10 @@ public class FriendshipService extends EntityService<Long, Friendship>  {
         notification.setDescription("Friendship rejected");
         notification.setData(new FriendRequestData(friendship, FriendRequestAction.REJECT));
 
-        notificationService.save(notification);
+        notificationService.saveAsync(notification)
+                .exceptionally(ex -> {
+                    System.err.println("Failed to send notification: " + ex.getMessage());
+                    return null;
+                });
     }
 }

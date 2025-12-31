@@ -69,8 +69,9 @@ public class FriendshipDatabaseRepository extends EntityDatabaseRepository<Long,
     public void saveToDatabase(Friendship friendship) {
         String sql = "INSERT INTO friendships (id, user1_id, user2_id) VALUES (?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection();
+             PreparedStatement stmt = conn.get().prepareStatement(sql)) {
+
 
             stmt.setLong(1, friendship.getId());
             stmt.setLong(2, friendship.getUser1().getId());
@@ -86,8 +87,9 @@ public class FriendshipDatabaseRepository extends EntityDatabaseRepository<Long,
     public void deleteFromDatabase(Long id) {
         String sql = "DELETE FROM friendships WHERE id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection();
+             PreparedStatement stmt = conn.get().prepareStatement(sql)) {
+
 
             stmt.setLong(1, id);
             stmt.executeUpdate();
@@ -100,8 +102,9 @@ public class FriendshipDatabaseRepository extends EntityDatabaseRepository<Long,
     public void updateFromDatabase(Friendship friendship) {
         String sql = "UPDATE friendships SET user1_id = ?, user2_id = ?, status = ? WHERE id = ?";
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (DatabaseConnection.AutoCloseableConnection conn = DatabaseConnection.getAutoCloseableConnection();
+             PreparedStatement stmt = conn.get().prepareStatement(sql)) {
+
 
             stmt.setLong(1, friendship.getUser1().getId());
             stmt.setLong(2, friendship.getUser2().getId());
