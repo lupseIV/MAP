@@ -131,7 +131,9 @@ public abstract class EntityDatabaseRepository<ID, E extends Entity<ID>> extends
 
             while (rs.next()) {
                 E entity = extractEntityFromResultSet(rs);
-                super.save(entity);
+                if(entity != null) {
+                    super.save(entity);
+                }
             }
         } catch (SQLException e) {
             throw new RepositoryException("Error loading entities:" + sqlSelectAllStatement +"from database", e);
