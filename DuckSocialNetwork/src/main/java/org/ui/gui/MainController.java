@@ -1,5 +1,6 @@
 package org.ui.gui;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -10,6 +11,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.domain.Observer;
 import org.domain.observer_events.ObserverEvent;
+import org.domain.users.User;
 import org.service.*;
 import org.utils.enums.status.NotificationStatus;
 import org.utils.enums.types.UserTypes;
@@ -47,10 +49,18 @@ public class MainController implements ViewController, Observer<ObserverEvent> {
     }
 
     private void initNotification() {
-        if(notificationService.findAll(authService.getCurrentUser()).stream().anyMatch(
-                notification -> notification.getStatus() == NotificationStatus.NEW
-        )) {
-            notificationButton.setStyle("-fx-font-weight: bold;");
+        User currentUser = authService.getCurrentUser();
+        if (currentUser != null) {
+            notificationService.findAll(currentUser)
+                    .thenAccept(notifications -> {
+                        boolean hasNew = notifications.stream()
+                                .anyMatch(n -> n.getStatus() == NotificationStatus.NEW);
+                        if (hasNew) {
+                            Platform.runLater(() ->
+                                    notificationButton.setStyle("-fx-font-weight: bold;")
+                            );
+                        }
+                    });
         }
     }
 
