@@ -279,6 +279,7 @@ public class PersonEventController extends AbstractPagingTableViewController<Eve
 
         startRaceButton.setDisable(true);
         startRaceButton.setText("Running...");
+        raceEventService.setAuthService(authService);
 
         raceEventService.solveRace(event)
                 .thenAccept(bestTime -> {

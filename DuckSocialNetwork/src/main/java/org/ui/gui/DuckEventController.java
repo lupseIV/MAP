@@ -208,7 +208,7 @@ public class DuckEventController extends AbstractPagingTableViewController<Event
             showAlert("No Selection", "Please select an event to subscribe.");
             return;
         }
-
+        raceEventService.setAuthService(authService);
         raceEventService.addDuckToEvent(selectedEvent.getId(), authService.getCurrentUser().getId())
                 .thenRun(() -> Platform.runLater(() ->
                         showAlert("Success", "Successfully subscribed to: " + selectedEvent.getName())
@@ -226,6 +226,7 @@ public class DuckEventController extends AbstractPagingTableViewController<Event
             showAlert("No Selection", "Please select an event to unsubscribe.");
             return;
         }
+        raceEventService.setAuthService(authService);
 
         raceEventService.removeDuckFromEvent(selectedEvent.getId(), authService.getCurrentUser().getId())
                 .thenRun(() -> Platform.runLater(() ->

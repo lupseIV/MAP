@@ -50,6 +50,10 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
         this.notificationService = notificationService;
     }
 
+    public void setAuthService(AuthService authService) {
+        notificationService.setAuthService(authService);
+    }
+
     @Override
     public void addObserver(Observer<RaceObserverEvent> observer) {
         observers.add(observer);
@@ -63,7 +67,7 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
     @Override
     public void notifyObservers(RaceObserverEvent event) {
         for (Observer<RaceObserverEvent> observer : observers) {
-            observer.update(event);
+           Platform.runLater(()->observer.update(event));
         }
     }
 
@@ -138,8 +142,11 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
             );
             notification.setDescription("New subscription to event " + event.getName());
             notification.setData(new RaceEventData(event, duck, RaceEventAction.SUBSCRIBE));
-
-            notificationService.save(notification);
+            notificationService.saveAsync(notification)
+                    .exceptionally(ex -> {
+                        System.err.println("Failed to send notification: " + ex.getMessage());
+                        return null;
+                    });
         }, executorService);
     }
 
@@ -176,7 +183,11 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
             notification.setDescription("New unsubscription to event " + event.getName());
             notification.setData(new RaceEventData(event, duck, RaceEventAction.UNSUBSCRIBE));
 
-            notificationService.save(notification);
+            notificationService.saveAsync(notification)
+                    .exceptionally(ex -> {
+                        System.err.println("Failed to send notification: " + ex.getMessage());
+                        return null;
+                    });
         }, executorService);
     }
 
@@ -232,17 +243,16 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
                 notification.setDescription("You were added to event " + event.getName());
                 notification.setData(new RaceEventData(event, d, RaceEventAction.SUBSCRIBE));
 
-                notificationService.save(notification);
+                notificationService.saveAsync(notification)
+                        .exceptionally(ex -> {
+                            System.err.println("Failed to send notification: " + ex.getMessage());
+                            return null;
+                        });
             }
             return raceEvent;
         }, executorService);
     }
 
-    /**
-     * Rezolvă problema "Natație" determinând timpul minim posibil.
-     * Algoritm: Căutare Binară pe răspuns + Verificare Greedy.
-     */
-    //TODO : add start race notification
     public  CompletableFuture<Double> solveRace(RaceEvent event) {
         return CompletableFuture.supplyAsync(() -> {
             List<SwimmingDuck> ducks = event.getSubscribers();
@@ -253,6 +263,7 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
             }
 
             event.setState(RaceEventStatus.ONGOING);
+            notifyObservers(new RaceObserverEvent(RaceEventAction.START, List.of(event), event.getOwner()));
 
             List<SwimmingDuck> sortedDucks = new ArrayList<>(ducks);
             sortedDucks.sort(Comparator.comparingDouble(Duck::getRezistance));
@@ -267,11 +278,15 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
                 notification.setDescription("The race " + event.getName() + " has started!");
                 notification.setData(new RaceEventData(event, d, RaceEventAction.START));
 
-                notificationService.save(notification);
+                notificationService.saveAsync(notification)
+                        .exceptionally(ex -> {
+                            System.err.println("Failed to send notification: " + ex.getMessage());
+                            return null;
+                        });
             }
 
             try {
-                Thread.sleep(2000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -318,7 +333,11 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
                         notification.setDescription("You won the " + event.getName() + " race event. Go see your results!");
                         notification.setData(new RaceEventData(event, currentDuck, RaceEventAction.FINISH));
 
-                        notificationService.save(notification);
+                        notificationService.saveAsync(notification)
+                                .exceptionally(ex -> {
+                                    System.err.println("Failed to send notification: " + ex.getMessage());
+                                    return null;
+                                });
 
                         break;
                     }
@@ -326,6 +345,9 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
             }
             event.setWinners(solution);
             event.setState(RaceEventStatus.COMPLETED);
+            repository.update(event);
+
+            notifyObservers(new RaceObserverEvent(RaceEventAction.FINISH, List.of(event), event.getOwner()));
 
             Notification notification = new Notification(
                     NotificationType.RACE_EVENT,
@@ -337,7 +359,7 @@ public class RaceEventService extends EntityService<Long, RaceEvent> implements 
             notification.setData(new RaceEventData(event, event.getOwner(), RaceEventAction.FINISH));
 
 
-            repository.update(event);
+
 
             return ans;
         }, executorService);
