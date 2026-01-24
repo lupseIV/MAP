@@ -39,6 +39,9 @@ public class GraphicUserInterface extends Application implements ViewLoader{
 
     @Override
     public void init() throws Exception {
+        DatabaseConnection.initPool();
+
+
         Validator<Client> clientValidator = new ClientValidator();
         Validator<Staff> staffValidator = new StaffValidator();
         Validator<VipClient> vipClientValidator = new VipClientValidator();

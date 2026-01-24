@@ -12,7 +12,7 @@ import org.example.paginarefiltraredb.domain.entities.VipClient;
 
 public class VipClientDto extends ClientDto {
 
-    private final IntegerProperty loyaltyPoints;
+    private  IntegerProperty loyaltyPoints;
     private final StringProperty managerName;
 
     public VipClientDto(VipClient vip) {
@@ -28,6 +28,10 @@ public class VipClientDto extends ClientDto {
 
     public int getLoyaltyPoints() { return loyaltyPoints.get(); }
     public IntegerProperty loyaltyPointsProperty() { return loyaltyPoints; }
+
+    public void setLoyaltyPoints(int loyaltyPoints) {
+        this.loyaltyPoints.set(loyaltyPoints);
+    }
 
     public String getManagerName() { return managerName.get(); }
     public StringProperty managerNameProperty() { return managerName; }

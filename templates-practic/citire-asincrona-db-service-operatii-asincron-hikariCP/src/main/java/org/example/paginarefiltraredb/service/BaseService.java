@@ -62,11 +62,11 @@ public abstract class BaseService<ID, E extends Entity<ID>> extends Observable<E
             // Validation happens on worker thread
             validator.validate(entity);
 
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+//            try {
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                throw new RuntimeException(e);
+//            }
             // Repository call happens on worker thread
             // Repository internally gets its own connection via AutoCloseableConnection
             E saved = repository.save(entity);

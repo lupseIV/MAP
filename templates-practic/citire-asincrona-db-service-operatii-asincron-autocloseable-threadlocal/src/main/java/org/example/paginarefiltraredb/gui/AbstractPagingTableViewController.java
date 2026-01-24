@@ -54,6 +54,8 @@ public abstract class AbstractPagingTableViewController<ID, E extends Entity<ID>
     public void setBaseService(BaseService<ID, E> service) {
         this.baseService = service;
         this.baseService.addObserver(this); // Hook up observer here
+
+        loadData();
     }
 
     protected abstract Function<E, DTO> getDtoMapper();
