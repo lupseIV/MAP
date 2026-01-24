@@ -9,7 +9,7 @@ import org.domain.dtos.DuckData;
 import org.domain.users.UserFactory;
 import org.domain.users.duck.Duck;
 import org.service.DucksService;
-import org.utils.enums.DuckTypes;
+import org.utils.enums.types.DuckTypes;
 
 import java.util.List;
 

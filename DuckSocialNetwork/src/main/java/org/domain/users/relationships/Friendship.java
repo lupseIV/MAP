@@ -2,7 +2,7 @@ package org.domain.users.relationships;
 
 import org.domain.Entity;
 import org.domain.users.User;
-import org.utils.enums.FriendRequestStatus;
+import org.utils.enums.status.FriendRequestStatus;
 
 import java.util.Objects;
 
@@ -15,6 +15,9 @@ public class Friendship extends Entity<Long> {
         this.user1 = user1;
         this.user2 = user2;
         user1.addFriend(user2);
+    }
+
+    public Friendship() {
     }
 
     public Friendship(User user1, User user2, FriendRequestStatus status) {

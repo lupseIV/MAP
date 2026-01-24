@@ -1,27 +1,28 @@
 package org.ui.gui;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
 import org.domain.Observer;
-import org.domain.events.AddFriendEvent;
+import org.domain.observer_events.ObserverEvent;
 import org.domain.users.User;
-import org.domain.users.relationships.notifications.FriendNotification;
+import org.domain.users.relationships.notifications.Notification;
 import org.service.AuthService;
 import org.service.NotificationService;
-import org.utils.enums.NotificationStatus;
+import org.utils.enums.status.NotificationStatus;
 
 import java.util.List;
 
-public class NotificationController implements Observer<AddFriendEvent> {
+public class NotificationController implements Observer<ObserverEvent> {
 
     private NotificationService notificationService;
     private AuthService authService;
     private User currentUser;
 
-    @FXML private ListView<FriendNotification> notificationListView;
+    @FXML private ListView<Notification> notificationListView;
 
     public void setServices(NotificationService notificationService, AuthService authService) {
         this.notificationService = notificationService;
@@ -36,14 +37,20 @@ public class NotificationController implements Observer<AddFriendEvent> {
 
     private void loadNotifications() {
         if (currentUser != null) {
-            List<FriendNotification> conversation = notificationService.findAll(currentUser);
-            notificationListView.setItems(FXCollections.observableArrayList(conversation));
-            notificationListView.scrollTo(conversation.size() - 1);
+            notificationService.findAll(currentUser)
+                    .thenAccept(notifications -> {
+                        Platform.runLater(() -> {
+                            notificationListView.setItems(FXCollections.observableArrayList(notifications));
+                            if (!notifications.isEmpty()) {
+                                notificationListView.scrollTo(notifications.size() - 1);
+                            }
+                        });
+                    });
         }
     }
 
     @Override
-    public void update(AddFriendEvent event) {
+    public void update(ObserverEvent event) {
         if (event.getStatus() == NotificationStatus.NEW) {
             loadNotifications();
         }
@@ -53,19 +60,19 @@ public class NotificationController implements Observer<AddFriendEvent> {
     public void initialize() {
         notificationListView.setCellFactory(new Callback<>() {
             @Override
-            public ListCell<FriendNotification> call(ListView<FriendNotification> param) {
-                return new ListCell<FriendNotification>() {
+            public ListCell<Notification> call(ListView<Notification> param) {
+                return new ListCell<Notification>() {
                     @Override
-                    protected void updateItem(FriendNotification notification, boolean empty) {
+                    protected void updateItem(Notification notification, boolean empty) {
                         super.updateItem(notification, empty);
 
                         if (empty || notification == null) {
                             setText(null);
                             setGraphic(null);
                         } else {
-                            User sender = notification.getFrom();
+                            User sender = notification.getSender();
                             String senderName = (sender != null) ? sender.getUsername() : "Unknown";
-                            String message = notification.getMessage();
+                            String message = notification.getDescription();
                             String status = notification.getStatus() != null ? notification.getStatus().toString() : "";
 
                             setText(String.format("From: %s\nMessage: %s\nStatus: %s", senderName, message, status));
@@ -78,7 +85,6 @@ public class NotificationController implements Observer<AddFriendEvent> {
 
     @FXML
     public void markAllAsRead() {
-        notificationService.markAllAsRead(currentUser);
-        loadNotifications();
+        notificationService.markAllAsRead(currentUser).thenRun(this::loadNotifications);
     }
 }

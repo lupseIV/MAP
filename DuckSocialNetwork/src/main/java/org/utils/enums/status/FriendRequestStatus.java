@@ -1,7 +1,8 @@
-package org.utils.enums;
+package org.utils.enums.status;
 
 public enum FriendRequestStatus {
     PENDING,
     APPROVED,
-    REJECTED
+    REJECTED,
+    DELETED
 }

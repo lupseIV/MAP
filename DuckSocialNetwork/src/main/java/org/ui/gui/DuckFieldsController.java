@@ -4,7 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import org.utils.enums.DuckTypes;
+import org.utils.enums.types.DuckTypes;
 
 public class DuckFieldsController implements FieldsController{
     @FXML private ComboBox<DuckTypes> duckTypeComboBox;

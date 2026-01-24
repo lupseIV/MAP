@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.ImageView?>
+<VBox prefWidth="350.0" spacing="15.0" style="-fx-background-color: #2b2b2b;" stylesheets="@css/styling.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.ui.gui.UserEditDialogController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+    <children>
+        <Label text="Edit Profile" textFill="WHITE">
+            <font>
+                <Font name="System Bold" size="18.0" />
+            </font>
+        </Label>
+
+        <VBox alignment="CENTER" spacing="10.0" style="-fx-background-color: #3b3b3b; -fx-padding: 15; -fx-background-radius: 10;">
+            <Label text="Profile Photo" textFill="#4a90e2">
+                <font>
+                    <Font name="System Bold" size="14.0" />
+                </font>
+            </Label>
+
+            <ImageView fx:id="photoPreview" fitHeight="120.0" fitWidth="120.0" preserveRatio="true"
+                       style="-fx-background-color: #555; -fx-background-radius: 60;">
+                <VBox.margin>
+                    <Insets top="5.0" bottom="5.0" />
+                </VBox.margin>
+            </ImageView>
+
+            <HBox alignment="CENTER" spacing="10.0">
+                <Button fx:id="uploadPhotoButton" onAction="#handleUploadPhoto"
+                        style="-fx-background-color: #4a90e2;" text="Upload Photo" textFill="WHITE">
+                    <font>
+                        <Font size="12.0" />
+                    </font>
+                </Button>
+                <Button fx:id="removePhotoButton" onAction="#handleRemovePhoto"
+                        style="-fx-background-color: #ff4444;" text="Remove" textFill="WHITE" disable="true">
+                    <font>
+                        <Font size="12.0" />
+                    </font>
+                </Button>
+            </HBox>
+        </VBox>
+
+        <VBox spacing="5.0">
+            <Label text="Description" textFill="#b0b0b0" />
+            <TextArea fx:id="descriptionField" prefHeight="60.0" wrapText="true" />
+        </VBox>
+
+        <!-- Person Fields -->
+        <VBox fx:id="personContainer" spacing="10.0" managed="false" visible="false">
+            <Label text="First Name" textFill="#b0b0b0" />
+            <TextField fx:id="firstNameField" />
+
+            <Label text="Last Name" textFill="#b0b0b0" />
+            <TextField fx:id="lastNameField" />
+
+            <Label text="Job / Occupation" textFill="#b0b0b0" />
+            <TextField fx:id="jobField" />
+
+            <Label text="Empathy Level" textFill="#b0b0b0" />
+            <TextField fx:id="empathyField" />
+        </VBox>
+
+        <!-- Duck Fields -->
+        <VBox fx:id="duckContainer" spacing="10.0" managed="false" visible="false">
+            <!-- Assuming description maps to nothing based on class file, using speed/res -->
+            <Label text="Speed" textFill="#b0b0b0" />
+            <TextField fx:id="speedField" />
+
+            <Label text="Resistance" textFill="#b0b0b0" />
+            <TextField fx:id="resistanceField" />
+        </VBox>
+
+        <HBox alignment="CENTER_RIGHT" spacing="10.0">
+            <Button cancelButton="true" onAction="#handleCancel" style="-fx-background-color: #ff4444;" text="Cancel" textFill="WHITE" />
+            <Button defaultButton="true" onAction="#handleSave" style="-fx-background-color: #4CAF50;" text="Save" textFill="WHITE" />
+        </HBox>
+    </children>
+</VBox>

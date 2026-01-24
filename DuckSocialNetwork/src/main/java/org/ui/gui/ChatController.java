@@ -5,13 +5,15 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.util.Callback;
 import org.domain.Observer;
-import org.domain.events.MessageEvent;
+import org.domain.observer_events.MessageEvent;
 import org.domain.users.User;
 import org.domain.users.relationships.messages.Message;
 import org.domain.users.relationships.messages.ReplyMessage;
 import org.service.AuthService;
 import org.service.MessageService;
-import org.utils.enums.MessageType;
+import org.utils.enums.status.MessageStatus;
+import org.utils.enums.status.NotificationStatus;
+import org.utils.enums.types.NotificationType;
 
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +37,7 @@ public class ChatController implements Observer<MessageEvent> {
         this.chatPartner = chatPartner;
 
         messageService.addObserver(this);
+        messageService.setAuthService(authService);
 
         recipientLabel.setText("Chat with " + chatPartner.getEmail());
         loadMessages();
@@ -42,7 +45,7 @@ public class ChatController implements Observer<MessageEvent> {
 
     @Override
     public void update(MessageEvent event) {
-        if (event.getType() == MessageType.NEW_MESSAGE) {
+        if (event.getType() == NotificationType.MESSAGE && event.getStatus() == NotificationStatus.NEW) {
             loadMessages();
         }
     }

@@ -29,7 +29,8 @@ CREATE TABLE IF NOT EXISTS ducks (
 CREATE TABLE IF NOT EXISTS friendships (
                                            id BIGINT PRIMARY KEY,
                                            user1_id BIGINT NOT NULL,
-                                           user2_id BIGINT NOT NULL
+                                           user2_id BIGINT NOT NULL,
+                                           status varchar(20) DEFAULT 'PENDING' CHECK ( status in ('PENDING', 'APPROVED', 'REJECTED'))
 );
 
 -- Create Flocks table
@@ -49,8 +50,11 @@ CREATE TABLE IF NOT EXISTS flock_members (
 CREATE TABLE IF NOT EXISTS race_events (
                                            id BIGINT PRIMARY KEY,
                                            name VARCHAR(255) NOT NULL,
-                                           max_time DOUBLE PRECISION
-);
+                                           max_time DOUBLE PRECISION,
+                                           state VARCHAR(50) NOT NULL DEFAULT 'SCHEDULED' CHECK ( state in ('SCHEDULED', 'ONGOING', 'COMPLETED')),
+                                           owner_person_id BIGINT NOT NULL,
+                                           FOREIGN KEY (owner_person_id) REFERENCES persons(id)
+                                       );
 
 -- Create Race Event Participants table (junction table)
 CREATE TABLE IF NOT EXISTS race_event_participants (
@@ -64,6 +68,7 @@ CREATE TABLE IF NOT EXISTS messages (
                                         message TEXT NOT NULL,
                                         date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                         reply_to_id BIGINT,
+                                        status varchar(20) DEFAULT 'NEW' CHECK ( status in ('NEW', 'READ')),
                                         FOREIGN KEY (from_user_id) REFERENCES persons(id),
                                         FOREIGN KEY (reply_to_id) REFERENCES messages(id)
 );
@@ -76,13 +81,42 @@ CREATE TABLE IF NOT EXISTS message_recipients (
                                                   FOREIGN KEY (message_id) REFERENCES messages(id),
                                                   FOREIGN KEY (user_id) REFERENCES persons(id)
 );
-
-CREATE TABLE IF NOT EXISTS friend_notifiation (
-    notification_id BIGINT NOT NULL PRIMARY KEY,
-    user1_id BIGINT,
-    user2_id BIGINT,
-    status varchar(20) DEFAULT 'NEW' CHECK ( status in ('NEW', 'READ', 'DELETED') ),
-    friendship_id BIGINT
+CREATE TABLE IF NOT EXISTS notifications (
+                                             id SERIAL PRIMARY KEY,
+                                             type VARCHAR(50) NOT NULL,
+                                             status varchar(20) DEFAULT 'NEW' CHECK ( status in ('NEW', 'READ', 'DELETED')),
+                                             description TEXT,
+                                             sender_id BIGINT,
+                                             receiver_id BIGINT NOT NULL,
+                                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                             data TEXT
 );
+CREATE TABLE IF NOT EXISTS race_event_distances (
+                                      event_id BIGINT NOT NULL,
+                                      distance INT NOT NULL,
+                                      lane_index INT NOT NULL,
+                                      PRIMARY KEY (event_id, lane_index),
+                                      FOREIGN KEY (event_id) REFERENCES race_events(id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS race_event_winners (
+                                        event_id BIGINT NOT NULL,
+                                        duck_id BIGINT NOT NULL,
+                                        position INT NOT NULL,
+                                        PRIMARY KEY (event_id, position),
+                                        FOREIGN KEY (event_id) REFERENCES  race_events(id) ON DELETE CASCADE
+);
+ALTER TABLE ducks
+ADD COLUMN IF NOT EXISTS description TEXT;
 
-TRUNCATE TABLE friend_notifications
+ALTER TABLE persons
+ADD COLUMN IF NOT EXISTS description TEXT;
+
+ALTER TABLE ducks
+ADD COLUMN IF NOT EXISTS photo BYTEA;
+
+ALTER TABLE persons
+ADD COLUMN IF NOT EXISTS photo BYTEA;
+
+SELECT * FROM race_events;
+UPDATE race_events set state='SCHEDULED', max_time=0 where id = 6;
+DELETE FROM race_event_winners where event_id = 6;

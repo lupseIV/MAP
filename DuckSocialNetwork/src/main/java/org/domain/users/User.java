@@ -1,25 +1,38 @@
 package org.domain.users;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.domain.Entity;
-import org.domain.Observer;
-import org.domain.events.Event;
-import org.domain.events.RaceEvent;
-import org.utils.enums.UserTypes;
+import org.utils.enums.types.UserTypes;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id",
+        scope = User.class
+)
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.CLASS,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "@class"
+)
 public abstract class User extends Entity<Long>  {
     private String username;
     private String password;
     private String email;
     private List<User> friends;
     private UserTypes userType;
+    private String description;
+    private byte[] photo;
 
+    public User() {
+    }
 
-    public User( String username, String password, String email, UserTypes userType ) {
-
+    public User(String username, String password, String email, UserTypes userType ) {
+        this.description = "";
         this.username = username;
         this.password = password;
         this.email = email;
@@ -53,6 +66,22 @@ public abstract class User extends Entity<Long>  {
 
     public List<User> getFriends() {
         return friends;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public byte[] getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
     }
 
     @Override

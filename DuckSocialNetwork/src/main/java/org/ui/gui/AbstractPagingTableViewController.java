@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
 
 import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
 import org.domain.dtos.filters.FriendshipGUIFilter;
 import org.domain.dtos.filters.SqlFilter;
 import org.domain.users.relationships.Friendship;
@@ -40,5 +41,11 @@ public abstract class AbstractPagingTableViewController<E,Filter> implements Pag
             loadData();
         }
     }
-
+    protected void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
 }

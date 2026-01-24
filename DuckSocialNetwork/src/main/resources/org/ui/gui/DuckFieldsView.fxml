@@ -18,7 +18,7 @@
         <Label text="Flight Speed" textFill="WHITE" GridPane.rowIndex="0" />
         <TextField fx:id="speedField" promptText="e.g. 15.5" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-        <Label text="Wing Span" textFill="WHITE" GridPane.rowIndex="1" />
+        <Label text="Resistance" textFill="WHITE" GridPane.rowIndex="1" />
         <TextField fx:id="resistanceField" promptText="e.g. 20.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
       <ComboBox fx:id="duckTypeComboBox" prefHeight="31.0" prefWidth="250.0" promptText="Select Duck Type" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 

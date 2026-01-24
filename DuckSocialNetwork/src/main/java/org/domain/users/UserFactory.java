@@ -1,14 +1,11 @@
 package org.domain.users;
 
-import org.domain.Factory;
 import org.domain.dtos.DuckData;
 import org.domain.dtos.PersonData;
-import org.domain.users.duck.Duck;
 import org.domain.users.duck.DuckFactory;
-import org.domain.users.person.Person;
 import org.domain.users.person.PersonFactory;
-import org.utils.enums.DuckTypes;
-import org.utils.enums.PersonTypes;
+import org.utils.enums.types.DuckTypes;
+import org.utils.enums.types.PersonTypes;
 
 public class UserFactory {
 

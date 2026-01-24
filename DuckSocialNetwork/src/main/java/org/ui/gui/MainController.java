@@ -1,5 +1,6 @@
 package org.ui.gui;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -9,14 +10,15 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.domain.Observer;
-import org.domain.events.AddFriendEvent;
-import org.domain.users.relationships.notifications.FriendNotification;
+import org.domain.observer_events.ObserverEvent;
+import org.domain.users.User;
 import org.service.*;
-import org.utils.enums.NotificationStatus;
+import org.utils.enums.status.NotificationStatus;
+import org.utils.enums.types.UserTypes;
 
 import java.io.IOException;
 
-public class MainController implements ViewController, Observer<AddFriendEvent> {
+public class MainController implements ViewController, Observer<ObserverEvent> {
 
     @FXML private StackPane contentArea;
     @FXML private Button notificationButton;
@@ -28,9 +30,11 @@ public class MainController implements ViewController, Observer<AddFriendEvent> 
     private MessageService messageService;
     private AuthService authService;
     private NotificationService notificationService;
+    private RaceEventService raceEventService;
 
     public void setServices(DucksService ds, PersonsService ps, FriendshipService fs, UsersService us,
-                            AuthService as, MessageService ms, NotificationService ns) {
+                            AuthService as, MessageService ms, NotificationService ns, RaceEventService res) {
+        this.raceEventService = res;
         this.ducksService = ds;
         this.personsService = ps;
         this.friendshipService = fs;
@@ -45,10 +49,18 @@ public class MainController implements ViewController, Observer<AddFriendEvent> 
     }
 
     private void initNotification() {
-        if(notificationService.findAll(authService.getCurrentUser()).stream().anyMatch(
-                notification -> notification.getStatus() == NotificationStatus.NEW
-        )) {
-            update(null);
+        User currentUser = authService.getCurrentUser();
+        if (currentUser != null) {
+            notificationService.findAll(currentUser)
+                    .thenAccept(notifications -> {
+                        boolean hasNew = notifications.stream()
+                                .anyMatch(n -> n.getStatus() == NotificationStatus.NEW);
+                        if (hasNew) {
+                            Platform.runLater(() ->
+                                    notificationButton.setStyle("-fx-font-weight: bold;")
+                            );
+                        }
+                    });
         }
     }
 
@@ -111,6 +123,32 @@ public class MainController implements ViewController, Observer<AddFriendEvent> 
     }
 
     @FXML
+    public void handleShowEventsView(){
+        if(authService.getCurrentUser().getUserType() == UserTypes.PERSON) {
+            loadView("PersonEventPage.fxml", controller -> {
+                if (controller instanceof PersonEventController) {
+                    ((PersonEventController) controller).setServices(raceEventService, authService);
+                }
+            }, contentArea);
+        } else {
+            loadView("DuckEventPage.fxml", controller -> {
+                if (controller instanceof DuckEventController) {
+                    ((DuckEventController) controller).setServices(raceEventService, authService);
+                }
+            }, contentArea);
+        }
+    }
+
+    @FXML
+    public void handleShowProfileView(){
+        loadView("UserProfileView.fxml", controller -> {
+            if (controller instanceof UserProfileController) {
+                ((UserProfileController) controller).setServices(friendshipService,usersService,  authService.getCurrentUser(),true);
+            }
+        }, contentArea);
+    }
+
+    @FXML
     public void handleLogout() {
         try {
             authService.logout();
@@ -120,7 +158,7 @@ public class MainController implements ViewController, Observer<AddFriendEvent> 
 
             LoginController controller = loader.getController();
             controller.setServices(ducksService, personsService, friendshipService,
-                    usersService, new AuthService(usersService), messageService, notificationService);
+                    usersService, new AuthService(usersService), messageService, notificationService, raceEventService);
 
             Stage stage = (Stage) contentArea.getScene().getWindow();
             controller.setStage(stage);
@@ -135,9 +173,11 @@ public class MainController implements ViewController, Observer<AddFriendEvent> 
     }
 
     @Override
-    public void update(AddFriendEvent event) {
-        if(!event.getUser().equals(authService.getCurrentUser()) && event.getStatus() == NotificationStatus.NEW) {
+    public void update(ObserverEvent event) {
+            if(!event.getUser().equals(authService.getCurrentUser()) && event.getStatus() == NotificationStatus.NEW) {
             notificationButton.setStyle("-fx-font-weight: bold;");
+        } else if (event.getStatus() == NotificationStatus.READ){
+            notificationButton.setStyle("-fx-font-weight: regular;");
         }
     }
 }

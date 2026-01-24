@@ -9,9 +9,10 @@ import org.repository.util.paging.Pageable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class EntityRepository<ID, E extends Entity<ID>> implements PagingRepository<ID,E> {
-    protected Map<ID, E> entities;
+    protected ConcurrentHashMap<ID, E> entities;
     protected Validator<E> validator;
 
     @Override
@@ -19,7 +20,7 @@ public abstract class EntityRepository<ID, E extends Entity<ID>> implements Pagi
 
     public EntityRepository(Validator<E> validator) {
         this.validator = validator;
-        entities = new HashMap<>();
+        entities = new ConcurrentHashMap<>();
     }
 
 
@@ -44,7 +45,7 @@ public abstract class EntityRepository<ID, E extends Entity<ID>> implements Pagi
         if(findOne(entity.getId()) != null)
             return null;
 
-        return entities.put(entity.getId(), entity);
+        return entities.putIfAbsent(entity.getId(), entity);
     }
 
     @Override
@@ -63,7 +64,7 @@ public abstract class EntityRepository<ID, E extends Entity<ID>> implements Pagi
             return entity;
 
         validator.validate(entity);
-        entities.put(entity.getId(), entity);
+        entities.replace(entity.getId(), entity);
         return null;
     }
 

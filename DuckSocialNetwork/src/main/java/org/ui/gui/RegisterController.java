@@ -14,17 +14,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.domain.dtos.DuckData;
 import org.domain.users.User;
-import org.domain.users.duck.Duck;
 import org.domain.users.duck.DuckFactory;
-import org.domain.users.duck.FlyingDuck;
 import org.domain.users.person.Person;
 import org.service.*;
-import org.utils.enums.DuckTypes;
-import org.utils.enums.UserTypes;
+import org.utils.enums.types.UserTypes;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 
 public class RegisterController {
@@ -37,6 +32,7 @@ public class RegisterController {
     private AuthService authService;
     private MessageService messageService;
     private NotificationService notificationService;
+    private RaceEventService raceEventService;
     private Stage stage;
 
     private UserTypes userType;
@@ -60,7 +56,8 @@ public class RegisterController {
     }
 
     public void setServices(DucksService ds, PersonsService ps, FriendshipService fs, UsersService us,
-                            AuthService as, MessageService ms, NotificationService ns) {
+                            AuthService as, MessageService ms, NotificationService ns, RaceEventService res) {
+        this.raceEventService = res;
         this.ducksService = ds;
         this.personsService = ps;
         this.friendshipService = fs;
@@ -115,7 +112,7 @@ public class RegisterController {
 
             LoginController controller = loader.getController();
             controller.setServices(ducksService, personsService, friendshipService, usersService,
-                    authService, messageService, notificationService);
+                    authService, messageService, notificationService, raceEventService);
 
 
             Scene scene = new Scene(root, 1000, 700);
@@ -165,7 +162,7 @@ public class RegisterController {
 
             MainController controller = loader.getController();
             controller.setServices(ducksService, personsService, friendshipService,
-                    usersService, authService, messageService, notificationService);
+                    usersService, authService, messageService, notificationService, raceEventService);
 
             Scene scene = new Scene(root, 1000, 700);
             stage.setTitle("Duck Social Network Login");

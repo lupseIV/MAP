@@ -3,20 +3,23 @@ package org.domain.events;
 import org.domain.Entity;
 import org.domain.Observable;
 import org.domain.Observer;
+import org.utils.enums.status.RaceEventStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Event<E, T extends Observer<E>> extends Entity<Long> implements Observable<E, T> {
     private List<T> subscribers;
+    protected RaceEventStatus state;
 
     public Event(List<T> subscribers) {
         this.subscribers = (subscribers != null) ? subscribers : new ArrayList<>();
+        state = RaceEventStatus.SCHEDULED;
     }
 
-    // Default constructor needed for factories/frameworks
     public Event() {
         this.subscribers = new ArrayList<>();
+        state = RaceEventStatus.SCHEDULED;
     }
 
     public void setSubscribers(List<T> subscribers) {
@@ -38,6 +41,14 @@ public abstract class Event<E, T extends Observer<E>> extends Entity<Long> imple
         for(T o : subscribers){
             o.update(event);
         }
+    }
+
+    public RaceEventStatus getState() {
+        return state;
+    }
+
+    public void setState(RaceEventStatus state) {
+        this.state = state;
     }
 
     public List<T > getSubscribers() {

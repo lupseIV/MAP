@@ -2,19 +2,25 @@ package org.domain.events;
 
 import org.domain.Observer;
 import org.domain.users.duck.SwimmingDuck;
+import org.domain.users.person.Person;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class RaceEvent extends Event<RaceEvent,SwimmingDuck> {
 
     private Double maxTime = 0.0;
     private List<Integer> distances = new ArrayList<>();
     private String name;
+    private Person owner;
+    private Map<Integer, SwimmingDuck> winners = new HashMap<>();
 
-    public RaceEvent(List<SwimmingDuck> subscribers, String name) {
+    public RaceEvent(List<SwimmingDuck> subscribers, String name, Person owner) {
         super(new ArrayList<>());
         this.name = name;
+        this.owner = owner;
 
         if (subscribers != null) {
             for (SwimmingDuck subscriber : subscribers) {
@@ -23,9 +29,14 @@ public class RaceEvent extends Event<RaceEvent,SwimmingDuck> {
         }
     }
 
-    public RaceEvent(String name) {
+    public RaceEvent() {
+        super();
+    }
+
+    public RaceEvent(String name, Person owner) {
         super(new ArrayList<>());
         this.name = name;
+        this.owner = owner;
     }
 
     public String getName() {
@@ -46,6 +57,26 @@ public class RaceEvent extends Event<RaceEvent,SwimmingDuck> {
 
     public void setDistances(List<Integer> distances) {
         this.distances = distances;
+    }
+
+    public Person getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Person owner) {
+        this.owner = owner;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Map<Integer, SwimmingDuck> getWinners() {
+        return winners;
+    }
+
+    public void setWinners(Map<Integer, SwimmingDuck> winners) {
+        this.winners = winners;
     }
 
     @Override

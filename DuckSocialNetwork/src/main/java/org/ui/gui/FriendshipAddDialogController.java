@@ -9,8 +9,7 @@ import org.domain.users.relationships.Friendship;
 import org.service.AuthService;
 import org.service.FriendshipService;
 import org.service.UsersService;
-
-import java.util.Optional;
+import org.utils.enums.status.FriendRequestStatus;
 
 
 public class FriendshipAddDialogController {
@@ -53,13 +52,13 @@ public class FriendshipAddDialogController {
                     showAlert("Error", "User with id " + idFriend + " not found");
                     return;
                 }
-                service.save(new Friendship(authService.getCurrentUser(), user));
+                service.save(new Friendship(authService.getCurrentUser(), user, FriendRequestStatus.PENDING));
 
                 saveClicked = true;
                 dialogStage.close();
 
             } catch (Exception e) {
-                showAlert("Error", "Could not save duck: " + e.getMessage());
+                showAlert("Error", "Could not save : " + e.getMessage());
             }
         }
     }
