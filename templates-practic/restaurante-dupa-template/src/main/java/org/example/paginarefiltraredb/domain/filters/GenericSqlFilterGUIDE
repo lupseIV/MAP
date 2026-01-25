@@ -1,0 +1,56 @@
+/*
+ * ===================================================================================
+ * 📘 GENERIC SQL FILTER - USAGE GUIDE
+ * ===================================================================================
+ * This utility builds dynamic SQL WHERE clauses safely using the Composite Pattern.
+ * It automatically handles NULL values (skips them) and manages PreparedStatement params.
+ *
+ * 🛠 CORE METHODS:
+ * -----------------------------------------------------------------------------------
+ * .and()              -> Starts a filter joined by " AND "
+ * .or()               -> Starts a filter joined by " OR "
+ * .eq("col", val)     -> Adds: column = value (Equality)
+ * .like("col", val)   -> Adds: column LIKE value (Partial Match - add % manually!)
+ * .gt("col", val)     -> Adds: column > value (Greater Than)
+ * .lt("col", val)     -> Adds: column < value (Less Than)
+ * .add(otherFilter)   -> Adds a sub-filter inside brackets (For Nested Logic)
+ *
+ * 💡 EXAMPLES:
+ * -----------------------------------------------------------------------------------
+ *
+ * 1️⃣ SIMPLE FILTER (Name is "John" AND Age > 18)
+ * -----------------------------------------------------------------------------------
+ * GenericSqlFilter filter = GenericSqlFilter.and()
+ * .eq("name", "John")
+ * .gt("age", 18);
+ *
+ * // Result SQL: name = ? AND age > ?
+ * // Result Params: ["John", 18]
+ *
+ *
+ * 2️⃣ SMART SEARCH (Name LIKE "Input" OR Email LIKE "Input")
+ * -----------------------------------------------------------------------------------
+ * String input = "%Pop%"; // Don't forget wildcards for LIKE!
+ * GenericSqlFilter filter = GenericSqlFilter.or()
+ * .like("name", input)
+ * .like("email", input);
+ *
+ * // Result SQL: name LIKE ? OR email LIKE ?
+ * // Result Params: ["%Pop%", "%Pop%"]
+ *
+ *
+ * 3️⃣ COMPLEX / NESTED (Dept IS "IT" AND (Name LIKE "X" OR Email LIKE "X"))
+ * -----------------------------------------------------------------------------------
+ * GenericSqlFilter searchPart = GenericSqlFilter.or()
+ * .like("name", "%Alex%")
+ * .like("email", "%Alex%");
+ *
+ * GenericSqlFilter mainFilter = GenericSqlFilter.and()
+ * .eq("department", "IT")
+ * .add(searchPart); // <--- NESTING HAPPENS HERE
+ *
+ * // Result SQL: department = ? AND (name LIKE ? OR email LIKE ?)
+ * // Result Params: ["IT", "%Alex%", "%Alex%"]
+ *
+ * ===================================================================================
+ */

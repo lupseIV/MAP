@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.paginarefiltraredb.gui.implementations.TableController"
+      spacing="10" prefWidth="500" prefHeight="600">
+
+    <padding>
+        <Insets top="15" right="15" bottom="15" left="15"/>
+    </padding>
+
+    <Label text="Restaurant Menu" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+
+    <Label fx:id="notificationLabel"
+           text=""
+           visible="false"
+           style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10; -fx-font-size: 14px;"/>
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+        <VBox fx:id="menuContainer" spacing="5">
+            <!-- Menu items will be loaded dynamically here -->
+        </VBox>
+    </ScrollPane>
+
+    <HBox alignment="CENTER" spacing="10">
+        <Button fx:id="placeOrderButton"
+                text="Place Order"
+                onAction="#handlePlaceOrder"
+                style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20;"/>
+    </HBox>
+</VBox>

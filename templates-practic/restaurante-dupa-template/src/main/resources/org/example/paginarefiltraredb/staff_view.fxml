@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.paginarefiltraredb.gui.implementations.StaffController"
+      spacing="15" prefWidth="700" prefHeight="600">
+
+    <padding>
+        <Insets top="15" right="15" bottom="15" left="15"/>
+    </padding>
+
+    <!-- Placed Orders Section -->
+    <Label text="Placed Orders" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+    <TableView fx:id="placedOrdersTable" VBox.vgrow="ALWAYS" prefHeight="200">
+        <columns>
+            <TableColumn fx:id="placedTableIdCol" text="Table" prefWidth="80"/>
+            <TableColumn fx:id="placedDateCol" text="Date" prefWidth="150"/>
+            <TableColumn fx:id="placedItemsCol" text="Products" prefWidth="400"/>
+        </columns>
+    </TableView>
+
+    <HBox alignment="CENTER" spacing="10">
+        <Button fx:id="markPreparingButton"
+                text="Mark as Preparing"
+                onAction="#handleMarkPreparing"
+                style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-padding: 8 15;"/>
+    </HBox>
+
+    <!-- Preparing Orders Section (for bonus) -->
+    <Label text="Preparing Orders" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+
+    <TableView fx:id="preparingOrdersTable" VBox.vgrow="ALWAYS" prefHeight="200">
+        <columns>
+            <TableColumn fx:id="preparingTableIdCol" text="Table" prefWidth="80"/>
+            <TableColumn fx:id="preparingDateCol" text="Date" prefWidth="150"/>
+            <TableColumn fx:id="preparingItemsCol" text="Products" prefWidth="400"/>
+        </columns>
+    </TableView>
+
+    <HBox alignment="CENTER" spacing="10">
+        <Button fx:id="markServedButton"
+                text="Mark as Served"
+                onAction="#handleMarkServed"
+                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 8 15;"/>
+    </HBox>
+</VBox>

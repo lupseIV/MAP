@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<!-- Importuri... -->
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="org.example.paginarefiltraredb.gui.implementations.ProgramareController">
+
+    <!-- Partea Stângă: Lista de Pacienți -->
+    <center>
+        <TableView fx:id="tableView">
+            <columns>
+                <TableColumn fx:id="colNumePacient" text="Nume Pacient" />
+                <TableColumn fx:id="colCnp" text="CNP" />
+            </columns>
+        </TableView>
+    </center>
+
+    <!-- Partea Dreaptă: Formularul -->
+    <right>
+        <VBox spacing="10" alignment="TOP_CENTER" style="-fx-padding: 15;">
+            <Label text="Detalii Programare" style="-fx-font-weight: bold;"/>
+
+            <Label text="Selectează Doctor:"/>
+            <ComboBox fx:id="cmbDoctor" promptText="Alege Doctor..." />
+
+            <Label text="Data:"/>
+            <DatePicker fx:id="datePicker" />
+
+            <Label text="Ora (HH:mm):"/>
+            <TextField fx:id="txtOra" promptText="14:00" />
+
+            <Button fx:id="btnProgrameaza" text="Programează" onAction="#handleProgrameaza"
+                    style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+        </VBox>
+    </right>
+
+</BorderPane>

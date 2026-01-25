@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="map.controller.DriverController"
+            prefHeight="400.0" prefWidth="600.0">
+
+    <TableView fx:id="tableView" >
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID" prefWidth="100.0"/>
+            <TableColumn fx:id="statusColumn" text="Status" prefWidth="100.0"/>
+            <TableColumn fx:id="startDateColumn" text="Start Date" prefWidth="100.0"/>
+            <TableColumn fx:id="endDateColumn" text="End Date" prefWidth="100.0"/>
+            <TableColumn fx:id="pickupAddressColumn" text="Pickup Address" prefWidth="100.0"/>
+            <TableColumn fx:id="destinationAddressColumn" text="Destination Address" prefWidth="100.0"/>
+            <TableColumn fx:id="clientNameColumn" text="Client Name" prefWidth="100.0"/>
+            <TableColumn fx:id="markColumn" text="Mark" prefWidth="100.0"/>
+        </columns>
+    </TableView>
+</AnchorPane>
