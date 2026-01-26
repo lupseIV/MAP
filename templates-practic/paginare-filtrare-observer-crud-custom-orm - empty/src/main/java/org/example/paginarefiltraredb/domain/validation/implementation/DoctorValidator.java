@@ -1,6 +1,5 @@
 package org.example.paginarefiltraredb.domain.validation.implementation;
 
-import org.example.paginarefiltraredb.domain.entities.Doctor;
 import org.example.paginarefiltraredb.domain.exceptions.ValidationException;
 import org.example.paginarefiltraredb.domain.validation.Validator;
 

@@ -1,13 +1,9 @@
 package org.example.paginarefiltraredb.repository.database.implementations;
 
 import org.example.paginarefiltraredb.database.DatabaseConnection;
-import org.example.paginarefiltraredb.domain.entities.Doctor;
-import org.example.paginarefiltraredb.domain.entities.Pacient;
-import org.example.paginarefiltraredb.domain.entities.Programare;
 import org.example.paginarefiltraredb.domain.validation.Validator;
 import org.example.paginarefiltraredb.repository.database.EntityDbRepository;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;

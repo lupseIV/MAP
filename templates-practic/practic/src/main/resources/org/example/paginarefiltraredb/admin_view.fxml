@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox spacing="10" style="-fx-background-color: #ecf0f1;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.paginarefiltraredb.gui.implementations.AdminController">
+
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20" />
+    </padding>
+
+    <Label text="Admin Dashboard" textFill="#2c3e50">
+        <font>
+            <Font name="System Bold" size="18.0" />
+        </font>
+    </Label>
+
+    <Label fx:id="notificationLabel" style="-fx-background-color: #fadbd8; -fx-padding: 10; -fx-background-radius: 5;" textFill="#e74c3c" visible="true">
+        <font>
+            <Font name="System Bold" size="14.0" />
+        </font>
+    </Label>
+
+    <Label text="Double-click on a car to view details and approve/reject" textFill="#7f8c8d">
+        <font>
+            <Font size="12.0" />
+        </font>
+    </Label>
+
+    <TableView fx:id="tableView" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="nameColumn" prefWidth="150" text="Car Name" />
+            <TableColumn fx:id="descriptionColumn" prefWidth="200" text="Description" />
+            <TableColumn fx:id="priceColumn" prefWidth="100" text="Base Price" />
+            <TableColumn fx:id="statusColumn" prefWidth="120" text="Status" />
+        </columns>
+    </TableView>
+
+</VBox>

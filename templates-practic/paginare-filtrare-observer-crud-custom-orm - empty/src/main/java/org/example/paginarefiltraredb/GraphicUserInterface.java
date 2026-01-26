@@ -5,10 +5,6 @@ import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import org.example.paginarefiltraredb.database.DatabaseConnection;
-import org.example.paginarefiltraredb.domain.entities.Doctor;
-import org.example.paginarefiltraredb.domain.entities.Pacient;
-import org.example.paginarefiltraredb.domain.entities.Programare;
 import org.example.paginarefiltraredb.domain.filters.GenericSqlFilter;
 import org.example.paginarefiltraredb.domain.filters.implementations.ProgramareFilter;
 import org.example.paginarefiltraredb.domain.validation.Validator;
@@ -24,7 +20,6 @@ import org.example.paginarefiltraredb.service.implementations.DoctorService;
 import org.example.paginarefiltraredb.service.implementations.PacientService;
 import org.example.paginarefiltraredb.service.implementations.ProgramareService;
 
-import javax.print.Doc;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;

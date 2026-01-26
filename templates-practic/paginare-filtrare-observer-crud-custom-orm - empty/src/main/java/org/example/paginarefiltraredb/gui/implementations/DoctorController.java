@@ -7,8 +7,6 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.paginarefiltraredb.domain.dtos.implementation.ProgramariDto;
-import org.example.paginarefiltraredb.domain.entities.Doctor;
-import org.example.paginarefiltraredb.domain.entities.Programare;
 import org.example.paginarefiltraredb.domain.filters.implementations.ProgramareFilter;
 import org.example.paginarefiltraredb.gui.AbstractTableViewController;
 import org.example.paginarefiltraredb.service.implementations.ProgramareService;

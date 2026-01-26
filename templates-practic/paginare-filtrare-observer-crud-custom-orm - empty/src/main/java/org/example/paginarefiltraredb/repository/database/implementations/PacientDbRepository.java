@@ -1,7 +1,6 @@
 package org.example.paginarefiltraredb.repository.database.implementations;
 
 import org.example.paginarefiltraredb.database.DatabaseConnection;
-import org.example.paginarefiltraredb.domain.entities.Pacient;
 import org.example.paginarefiltraredb.domain.exceptions.RepositoryException;
 import org.example.paginarefiltraredb.domain.validation.Validator;
 import org.example.paginarefiltraredb.repository.database.EntityDbRepository;

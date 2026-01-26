@@ -1,17 +1,12 @@
 package org.example.paginarefiltraredb.domain;
 
 import org.example.paginarefiltraredb.customORM.annotations.SchemaGenerator;
-import org.example.paginarefiltraredb.database.DatabaseConnection;
-import org.example.paginarefiltraredb.domain.entities.Doctor;
-import org.example.paginarefiltraredb.domain.entities.Pacient;
-import org.example.paginarefiltraredb.domain.entities.Programare;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.util.List;
 
 public class SqlSchemaGenerator {

@@ -2,7 +2,6 @@ package org.example.paginarefiltraredb.domain.dtos.implementation;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
-import org.example.paginarefiltraredb.domain.entities.Programare;
 
 import java.time.LocalDateTime;
 
